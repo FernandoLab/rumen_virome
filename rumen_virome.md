@@ -28,8 +28,8 @@ To download this raw data in FASTQ format:
 
     mkdir raw_viral
     mkdir raw_total
-    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral/raw_viral_fastq.tgz raw_viral/
-    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total/raw_total_fastq.tgz raw_total/
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral/raw_viral.tgz raw_viral/
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total/raw_total.tgz raw_total/
 
 ##Retrieve Intermidiate Files
 In order to skip some long computational steps, you can use the outputs in this directory as you go along. The output names corresponding to the intermediate files in this directory will be provided after the commands if available.
@@ -68,7 +68,7 @@ The file transp_adapt_remove.cat.txt (in intermediate file directory, iterm/tran
 
 Alternatively, the outputs from the above command are available at interm/trimmomatic_output.
 
-To remove artifical duplicates we use cd-hit-454.  We noticed early on the transposon library preps with the Ion Torrent Museek kits introduce many duplicates (associated with viral sample?). While originally designed for 454 sequencing, Ion Torrent has shares many of the same error profiles as 454 and cd-hit-454 appears to work fairly well for removing duplicates in our data.
+To remove artifical duplicates we use cd-hit-454.  We noticed early on the transposon library preps with the Ion Torrent Museek kits introduces (unfortunately sometimes many) duplicates (associated with viral sample?). While the software was originally designed for 454 sequencing, Ion Torrent shares many of the same error profiles as 454 and cd-hit-454 appears to work fairly well for removing duplicates in our data.
 
 First download cd-hit-454:
 
@@ -95,7 +95,7 @@ Then remove the duplicates from all viral metagenome samples and write output to
 
 Alternatively, the outputs from the above command are available at interm/cd_hit_454_output.
 
-###Total Metagenome:
+###Total Metagenome QC:
 TO_DO
 
 
