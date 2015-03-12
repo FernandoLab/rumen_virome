@@ -2,15 +2,55 @@ Impact of dietary change on auxillary viral metabolism and viral-bacterial inter
 ===============
 Author: Chris Anderson
 
-##Abstract
+##Introduction
+To recreate the analysis from Anderson et al. manuscript.  All commands below were done in a linux enviornment and memory intensive commands were carried out on a high performance cluster at UNL.  Requirements noted so far, but are most likely available to you (other versions likely work):
 
+java (version 1.8 used for manuscript)
+perl (version?)
+python (version 2.7)
+
+##Clone the repository
+Clone the repository to get intermediate files and certain scripts for the analysis:
+
+
+    git clone https://github.com/chrisLanderson/rumen_virome.git
+    cd rumen_virome
 
 ##Retrieve Raw Data
-After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs.  To download this raw data in FASTQ format:
+After seqeuncing the Torrent Server (version?) software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
 
-```
-scp -r canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral/raw_viral_fastq.tgz ./
-```
+--barcode-mode 1 --barcode-cutoff 0 --min-read-length 100 --trim-min-read-len 100
+
+
+To download this raw data in FASTQ format:
+
+    mkdir raw_viral
+    mkdir raw_total
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral/raw_viral_fastq.tgz raw_viral/
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total/raw_total_fastq.tgz raw_total/
+
+##QC
+To ensure the data was properly trimmed by the Torrent Server and to deal with known biases such as artifical duplications created by the transposon library preps used for the viral metagenomes, we performed additioanl QC steps.
+
+To ensure adaptor trimming, removal of barcode seqeunce, and removal of inserted transposon sequences we used Trimmomatic.  To get the software:
+
+    wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip
+    unzip Trimmomatic-0.33.zip 
+
+The file transp_adapt_remove.cat.txt (in intermediate file direcory) was supplied to direct removal of adaptors, barcodes, and transposon seqeunces. Further, observed GC and k-mer bias was noted in the 5' and 3' ends.  In order to begin to alleviate those biases, reads were trimmed 20 basepairs and the 5' end and a sample dependent trimming from the 3' end (more 3' trimming later).  To trim all samples (I used 30GB RAM on one node, took ~few hours):
+
+    mkdir trimmomatic_output
+    cd raw_viral/
+    for f in *.fastq
+    do
+        filename=$(basename "$f")
+        cd /work/samodha/canderson3
+        java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/$f trimmomatic_output/"$filename""_trimmomatic.fastq" ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 HEADCROP:20 CROP:300 MINLEN:85
+    done
+
+Alternatively, the output from the above command in available at interm/trimmomatic_output
+
+
 
 
 
