@@ -8,3 +8,10 @@
 - [ ] add PBS cluster information to commands?
 - [ ] add portion to explain why sample dep't trimming -- each library prep a bit diff with transposon
 - [x] add email to markdown
+- [ ] explain why the QC for total is different than viral
+- [ ] add viral to outputs, like viral_cd_hit_454 and change to code to reflect this
+- [ ] set home (~) varaible at beginning to make it easier to get around
+- [ ] after QC, change the name of files so short, qc.fastq or something
+- [ ] once done with QC, check all steps by running in Tusker
+    - [ ] have shell script to run certain portions? like shell script to run all viral QC steps
+
