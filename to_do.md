@@ -6,4 +6,5 @@
 - [ ] have the interm file as a compressed file for DL, change in the markdown
 - [ ] add introduction about data - total vs. viral (VMG / BMG), research questions, hypothesis, etc
 - [ ] add PBS cluster information to commands?
-
+- [ ] add portion to explain why sample dep't trimming -- each library prep a bit diff with transposon
+- [x] add email to markdown

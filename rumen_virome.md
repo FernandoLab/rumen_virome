@@ -1,6 +1,6 @@
 Impact of dietary change on auxillary viral metabolism and viral-bacterial interactions in the rumen of beef cattle
 ===============
-Author: Christopher L. Anderson
+Author: Christopher L. Anderson (canderson30@unl.edu)
 
 
 ##Introduction
