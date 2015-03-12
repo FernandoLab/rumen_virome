@@ -1,0 +1,9 @@
+- [ ] Rebundle the viral files for downloading
+- [ ] Check to make sure the BMG files are correct
+- [ ] start running code for BMG metagenomes as well
+- [ ] take out cloning repository step? might need for figure examples? or put in interm directory?
+- [ ] add trimmomatic and cd-hit-454 results to interm
+- [ ] have the interm file as a compressed file for DL, change in the markdown
+- [ ] add introduction about data - total vs. viral (VMG / BMG), research questions, hypothesis, etc
+- [ ] add PBS cluster information to commands?
+
