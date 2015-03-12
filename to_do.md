@@ -1,4 +1,4 @@
-- [ ] Rebundle the viral files for downloading
+- [x] Rebundle the viral files for downloading
 - [ ] Check to make sure the BMG files are correct
 - [ ] start running code for BMG metagenomes as well
 - [ ] take out cloning repository step? might need for figure examples? or put in interm directory?
