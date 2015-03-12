@@ -6,9 +6,10 @@ Author: Christopher L. Anderson
 ##Introduction
 To recreate the analysis from Anderson et al. manuscript.  All commands below were done in a linux enviornment and memory intensive commands were carried out on a high performance cluster at UNL.  Requirements noted so far, but are most likely available to you (other versions likely work):
 
-* java (version 1.8 used for manuscript)
-* perl (version?)
-* python (version 2.7)
+- java (version 1.8 used for manuscript)
+- perl (version?)
+- python (version 2.7)
+
 
 ##Clone the repository
 Clone the repository to get some intermediate files and certain scripts for the analysis:
