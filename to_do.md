@@ -14,4 +14,6 @@
 - [ ] after QC, change the name of files so short, qc.fastq or something
 - [ ] once done with QC, check all steps by running in Tusker
     - [ ] have shell script to run certain portions? like shell script to run all viral QC steps
+- [ ] put warning about generating lot of data, make sure have room for files
+- [ ] make sure interm file names match waht they should actually be - cdhit454 is wrong now
 

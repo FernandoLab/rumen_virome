@@ -28,8 +28,11 @@ To download this raw data in FASTQ format:
 
     mkdir raw_viral
     mkdir raw_total
-    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral/raw_viral.tgz raw_viral/
-    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total/raw_total.tgz raw_total/
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral.tgz raw_viral/
+    scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz raw_total/
+    tar -zxvf raw_viral.tgz
+    tar -zxvf raw_total.tgz
+    #set home variable
 
 ##Retrieve Intermidiate Files
 In order to skip some long computational steps, you can use the outputs in this directory as you go along. The output names corresponding to the intermediate files in this directory will be provided after the commands if available.
@@ -78,7 +81,7 @@ First download cd-hit-454:
     make openmp=yes
     cd ..
 
-Then remove the duplicates from all viral metagenome samples and write output to cd_hit_454_output
+Then remove the duplicates from all viral metagenome samples and write output to cd_hit_454_output:
 
     export OMP_NUM_THREADS=10
 
@@ -95,7 +98,28 @@ Then remove the duplicates from all viral metagenome samples and write output to
 
 Alternatively, the outputs from the above command are available at interm/cd_hit_454_output.
 
-###Total Metagenome QC:
+
+Now, we wanted to double check once again for other types of duplicates and some that may have been missed by cd-hit-454. Further, we can use prinseq to remove transposon associated seqeunces that kept showing up in the 3' end.  We dtermined that trimming the last 5% of a read did the trick. 
+
+
+Download prinseq-lite:
+
+    wget http://sourceforge.net/projects/prinseq/files/standalone/prinseq-lite-0.20.4.tar.gz
+    tar xvf prinseq-lite-0.20.4.tar.gz
+
+Run prinseq on each viral metagenome:
+
+    mkdir prinseq_output
+    cd cd_hit_454_output
+    for f in *.fastq
+    do
+        filename=$(basename "$f")
+        filename="${filename%.*}"
+        cd ~
+        perl prinseq-lite-0.20.4/./prinseq-lite.pl -derep 12345 -lc_method dust -lc_threshold 7 -trim_right_p 5 -fastq cd_hit_454_output/$f -out_format 3 -out_good prinseq_output/"$filename""_prinseq.fastq"
+    done
+
+##Total Metagenome QC:
 TO_DO
 
 
