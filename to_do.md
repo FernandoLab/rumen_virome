@@ -16,4 +16,8 @@
     - [ ] have shell script to run certain portions? like shell script to run all viral QC steps
 - [ ] put warning about generating lot of data, make sure have room for files
 - [ ] make sure interm file names match waht they should actually be - cdhit454 is wrong now
-
+- [ ] look at and list modules needed for perl (python too?) for prinseq
+- [ ] change all scripts to remove unnecessary cd .. steps and just call direct path of script in home
+- [ ] make total trimmomatic step (first) a loop since not sample dep't
+- [ ] re-compress the total metagenome samples. rename?
+- [ ] if you make trimmomatic be underscore trimm then naming will work
