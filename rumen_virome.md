@@ -4,7 +4,7 @@ Author: Christopher L. Anderson (canderson30@unl.edu)
 
 
 ##Introduction
-To recreate the analysis from Anderson et al. manuscript.  All commands below were done in a linux enviornment and memory intensive commands were carried out on a high performance cluster at UNL.
+To recreate the analysis from Anderson et al. manuscript.  All commands below were done in a linux enviornment and memory intensive commands were carried out on HCC resources at UNL.
 
 
 ##Clone the repository
@@ -89,8 +89,7 @@ Then remove the duplicates from all viral metagenome samples and write output to
     done
 
 
-Now, we wanted to check for other types of duplicates and some that may have been missed by cd-hit-454. Further, we can use prinseq to remove transposon associated seqeunces that kept showing up in the 3' end.  We determined that trimming the last 5% of a read helped a lot.
-
+Now, we wanted to check for other types of duplicates and some that may have been missed by cd-hit-454. Further, we can use prinseq to remove transposon associated seqeunces that kept showing up in the 3' end.
 
 Download prinseq-lite:
 
@@ -151,10 +150,21 @@ Now remove all artificial duplicates:
 
 
 ##rRNA Contamination
+Download and install basic version of QIIME, used more later:
+
+	wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz#md5=e08796f79d112f3bfa6653cc10840114
+    tar -xzf virtualenv-12.0.7.tar.gz
+    cd virtualenv-*; python virtualenv.py ../qiimeEnv; cd ..
+    source qiimeEnv/bin/activate
+    pip install numpy
+    pip install qiime
+
+
 Convert all the viral finalQC FASTQ files to fasta to use for rRNA predictor.
 	
+	source qiimeEnv/bin/activate
 	cd prinseq_output
-	for f in *_.fastq
+	for f in *.fastq
 	do
     	convert_fastaqual_fastq.py -f $f -c fastq_to_fastaqual
 	done
@@ -180,98 +190,101 @@ Run the predictor for all samples.  Will likely need to put the full path to get
 
 Check the number of rRNA hits for each sample using custom script to parse outputs:
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.1_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.1_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 149
-Total number of prokaryptic 16S and 23S rRNA: 74
+Total number of rRNA: 158
+Total number of prokaryptic 16S and 23S rRNA: 76
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.2_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.2_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 6
-Total number of prokaryptic 16S and 23S rRNA: 5
+Total number of rRNA: 5
+Total number of prokaryptic 16S and 23S rRNA: 4
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.3_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.3_trimm_prinseq.fna.coord 
 
 Total number of rRNA: 125
 Total number of prokaryptic 16S and 23S rRNA: 112
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.4_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.4_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 828
-Total number of prokaryptic 16S and 23S rRNA: 760
+Total number of rRNA: 844
+Total number of prokaryptic 16S and 23S rRNA: 771
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.5_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.5_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 1030
-Total number of prokaryptic 16S and 23S rRNA: 1010
+Total number of rRNA: 1085
+Total number of prokaryptic 16S and 23S rRNA: 1064
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.6_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.6_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 38
-Total number of prokaryptic 16S and 23S rRNA: 29
+Total number of rRNA: 43
+Total number of prokaryptic 16S and 23S rRNA: 33
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.7_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.7_trimm_prinseq.fna.coord 
 
 Total number of rRNA: 27
-Total number of prokaryptic 16S and 23S rRNA: 23
+Total number of prokaryptic 16S and 23S rRNA: 22
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.8_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.8_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 139
-Total number of prokaryptic 16S and 23S rRNA: 117
+Total number of rRNA: 142
+Total number of prokaryptic 16S and 23S rRNA: 119
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.9_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.9_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 249
-Total number of prokaryptic 16S and 23S rRNA: 244
+Total number of rRNA: 242
+Total number of prokaryptic 16S and 23S rRNA: 236
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.10_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.10_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 579
-Total number of prokaryptic 16S and 23S rRNA: 513
+Total number of rRNA: 590
+Total number of prokaryptic 16S and 23S rRNA: 522
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.11_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.11_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 3110
-Total number of prokaryptic 16S and 23S rRNA: 2981
+Total number of rRNA: 3129
+Total number of prokaryptic 16S and 23S rRNA: 2987
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.12_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.12_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 428
-Total number of prokaryptic 16S and 23S rRNA: 393
+Total number of rRNA: 422
+Total number of prokaryptic 16S and 23S rRNA: 387
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.13_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.13_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 642
-Total number of prokaryptic 16S and 23S rRNA: 625
+Total number of rRNA: 657
+Total number of prokaryptic 16S and 23S rRNA: 638
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.14_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.14_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 96
-Total number of prokaryptic 16S and 23S rRNA: 82
+Total number of rRNA: 93
+Total number of prokaryptic 16S and 23S rRNA: 79
 
-	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.15_finalQC.fna.coord 
+	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.15_trimm_prinseq.fna.coord 
 
-Total number of rRNA: 358
-Total number of prokaryptic 16S and 23S rRNA: 353
+Total number of rRNA: 371
+Total number of prokaryptic 16S and 23S rRNA: 366
 
 
 Cat all the .coord and fasta files together to get a total count for each:
 
 	cat rRNA_prediction/examples/e1/input_viral/*.fna > VMG.cat.fasta
 	grep -c ">" VMG.cat.fasta
-13232896
+
+14631035
 	
 	cat rRNA_prediction/examples/e1/output_viral/*.coord > rRNA_prediction/examples/e1/output_viral/VMG.cat.coord
 	./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.cat.coord 
 
-Total number of rRNA: 7818
+./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/output_viral/VMG.cat.coord
 
-Total number of prokaryptic 16S and 23S rRNA: 7321
-	
-7818 total rRNA detected / 13232896 = 0.059%
+Total number of rRNA: 7947
+Total number of prokaryptic 16S and 23S rRNA: 7416
 
-7321 prokaryotic rRNA detected / 13232896 = 0.055%
+
+7947 total rRNA detected / 14631035 = 0.054%
+
+7416 prokaryotic rRNA detected / 14631035 = 0.051%
 
 ##K-mer Profiles
 Get khmer software to compare k-mer profiles of different metagenomes:
@@ -284,7 +297,7 @@ Now, load all viral metagenomes into counting:
 
     source khmerEnv/bin/activate
     cd /work/samodha/canderson3/prinseq_output
-    for f in *_finalQC.fastq
+    for f in *_prinseq.fastq
     do
         filename=$(basename "$f")
         filename="${filename%_*}"
@@ -320,7 +333,7 @@ Viral:
 
 Setup the config file used by the get_comb_multi.py script. To do so, we need to know the average read length:
 	
-	cat prinseq_output/*_finalQC.fastq > VMG.cat.fastq
+	cat prinseq_output/*_prinseq.fastq > VMG.cat.fastq
 	perl prinseq-lite-0.20.4/./prinseq-lite.pl -fastq VMG.cat.fastq -stats_len
 	
 stats_len	max	150
@@ -374,7 +387,7 @@ Viral:
 
 	wget http://spades.bioinf.spbau.ru/release3.5.0/SPAdes-3.5.0-Linux.tar.gz
 	tar -zxvf SPAdes-3.5.0-Linux.tar.gz
-	
+
 	python SPAdes-3.5.0-Linux/bin/spades.py -k 21,33,55,77 --only-assembler --sc -s VMG.cat.fastq -m 60000 -t 2 -o vmg_cat_sc
 
 Total:
@@ -401,61 +414,13 @@ Viral:
 	perl prinseq-lite-0.20.4/./prinseq-lite.pl -fasta vmg.contigs.fasta -min_len 250 -out_format 1 -out_good vmg.contigs.filter
 	./prodigal -i vmg.contigs.filter.fasta -d vmg.orfs_nt.fasta -a vmg.orfs_aa.fasta -p meta 
 
-Remove later:
-perl_scripts/./length_distribution.pl vmg.orfs_nt.fasta 
-Total reads:	268554
-Total nt:	89488467
-Mean length:	333.223362899082
-Median length:	261
-Mode length:	252
-Max length:	11589
-Min length:	60
-Length	# Seqs
-10	0
-35	0
-50	0
-75	7219
-99	12564
-100	0
-150	30751
-200	35456
-250	37120
-300	43523
-350	24599
-400	17958
-450	12368
-500	8447
-550	6684
-600	5228
-650	3646
-700	3173
-750	2515
-800	2071
-850	1824
-900	1581
-950	1333
-1000	1197
-
 Filter the ORFs based on length of nt, then use those sequences as a guide to remove the short seqeunces from aa file:
 	
 	perl prinseq-lite-0.20.4/./prinseq-lite.pl -fasta vmg.orfs_nt.fasta -min_len 200 -out_format 1 -out_good vmg.orfs_nt.filter
-	
-	
-Download and install basic version of QIIME, used more lately
-
-	wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz#md5=e08796f79d112f3bfa6653cc10840114
-    tar -xzf virtualenv-12.0.7.tar.gz
-    cd virtualenv-*; python virtualenv.py ../qiimeEnv; cd ..
-    source qiimeEnv/bin/activate
-    pip install numpy
-    pip install qiime
 
 	source qiimeEnv/bin/activate
 	filter_fasta.py -f vmg.orfs_aa.fasta -a vmg.orfs_nt.filter.fasta -o vmg.orfs_aa.filter.fasta
 	
-
-
-
 Total:
 
 	mv vmg_cat_sc/contigs.fasta /work/samodha/canderson3/
@@ -463,42 +428,6 @@ Total:
 	perl prinseq-lite-0.20.4/./prinseq-lite.pl -fasta vmg.contigs.fasta -min_len 250 -out_format 1 -out_good vmg.contigs.filter
 	./prodigal -i bmg.contigs.filter.fasta -d bmg.orfs_nt.fasta -a bmg.orfs_aa.fasta -p meta 
 
-
-perl_scripts/length_distribution.pl bmg.orfs_nt.fasta 
-Total reads:	1637008
-Total nt:	653989896
-Mean length:	399.503176526932
-Median length:	315
-Mode length:	204
-Max length:	11283
-Min length:	60
-Length	# Seqs
-10	0
-35	0
-50	0
-75	26390
-99	52880
-100	0
-150	159350
-200	175694
-250	191802
-300	171692
-350	134710
-400	121632
-450	104511
-500	82397
-550	74355
-600	61459
-650	45533
-700	38119
-750	30394
-800	23881
-850	20938
-900	17838
-950	14061
-1000	12274
-
-	
 Filter the ORFs based on length of nt, then use those sequences as a guide to remove the short seqeunces from aa file:
 	
 	perl prinseq-lite-0.20.4/./prinseq-lite.pl -fasta bmg.orfs_nt.fasta -min_len 200 -out_format 1 -out_good bmg.orfs_nt.filter
@@ -564,7 +493,7 @@ Make bowtie database:
 
 Align all viral reads to nt ORFs:
 
-    for f in prinseq_output/*_finalQC.fastq
+    for f in prinseq_output/*.fastq
     do
         filename=$(basename "$f")
         filename="${filename%_*}"
@@ -590,177 +519,177 @@ Viral:
 
 	./blast2tsv.pl -blast_file=vmg.ublast.kegg.txt -bowtie_dir=vmg_orfs_bowtie -gene_ko=kegg_2/genes/ko/ko_genes.list
 
-Number of top hits from BLAST file: 72840
+Number of top hits from BLAST file: 95153
 
-Alignment count for VMG.6: 169706
-Total Read count VMG.6: 253755
-Redundant gene count with aligned reads for VMG.6: 3515
-Non-Redundant gene count with aligned reads for VMG.6: 2363
-Total abundance in gene hits from aligned reads for VMG.6: 51913
-Non-Redundant ko count with aligned reads for VMG.6: 206
-Number of nr genes with ko hits: 437
-Total abundance in ko hits from aligned reads for VMG.6: 4736
-Number of nr genes without ko hits: 1926
-Total abundance of reads from genes without ko hits: 47177
+Alignment count for VMG.10_trimm: 335426
+Total Read count VMG.10_trimm: 659514
+Redundant gene count with aligned reads for VMG.10_trimm: 17361
+Non-Redundant gene count with aligned reads for VMG.10_trimm: 13233
+Total abundance in gene hits from aligned reads for VMG.10_trimm: 126334
+Non-Redundant ko count with aligned reads for VMG.10_trimm: 1880
+Number of nr genes with ko hits: 5133
+Total abundance in ko hits from aligned reads for VMG.10_trimm: 22533
+Number of nr genes without ko hits: 8100
+Total abundance of reads from genes without ko hits: 103801
 
-Alignment count for VMG.13: 517178
-Total Read count VMG.13: 894911
-Redundant gene count with aligned reads for VMG.13: 16101
-Non-Redundant gene count with aligned reads for VMG.13: 11115
-Total abundance in gene hits from aligned reads for VMG.13: 172042
-Non-Redundant ko count with aligned reads for VMG.13: 1481
-Number of nr genes with ko hits: 3777
-Total abundance in ko hits from aligned reads for VMG.13: 26669
-Number of nr genes without ko hits: 7338
-Total abundance of reads from genes without ko hits: 145373
+Alignment count for VMG.11_trimm: 1719015
+Total Read count VMG.11_trimm: 2890819
+Redundant gene count with aligned reads for VMG.11_trimm: 48065
+Non-Redundant gene count with aligned reads for VMG.11_trimm: 24214
+Total abundance in gene hits from aligned reads for VMG.11_trimm: 675510
+Non-Redundant ko count with aligned reads for VMG.11_trimm: 1648
+Number of nr genes with ko hits: 9786
+Total abundance in ko hits from aligned reads for VMG.11_trimm: 152395
+Number of nr genes without ko hits: 14428
+Total abundance of reads from genes without ko hits: 523115
 
-Alignment count for VMG.8: 318319
-Total Read count VMG.8: 499499
-Redundant gene count with aligned reads for VMG.8: 4748
-Non-Redundant gene count with aligned reads for VMG.8: 3360
-Total abundance in gene hits from aligned reads for VMG.8: 108708
-Non-Redundant ko count with aligned reads for VMG.8: 317
-Number of nr genes with ko hits: 715
-Total abundance in ko hits from aligned reads for VMG.8: 11198
-Number of nr genes without ko hits: 2645
-Total abundance of reads from genes without ko hits: 97510
+Alignment count for VMG.12_trimm: 230192
+Total Read count VMG.12_trimm: 497309
+Redundant gene count with aligned reads for VMG.12_trimm: 11896
+Non-Redundant gene count with aligned reads for VMG.12_trimm: 8813
+Total abundance in gene hits from aligned reads for VMG.12_trimm: 64893
+Non-Redundant ko count with aligned reads for VMG.12_trimm: 1138
+Number of nr genes with ko hits: 3314
+Total abundance in ko hits from aligned reads for VMG.12_trimm: 11478
+Number of nr genes without ko hits: 5499
+Total abundance of reads from genes without ko hits: 53415
 
-Alignment count for VMG.4: 1061166
-Total Read count VMG.4: 1803796
-Redundant gene count with aligned reads for VMG.4: 21345
-Non-Redundant gene count with aligned reads for VMG.4: 12504
-Total abundance in gene hits from aligned reads for VMG.4: 431386
-Non-Redundant ko count with aligned reads for VMG.4: 1243
-Number of nr genes with ko hits: 4123
-Total abundance in ko hits from aligned reads for VMG.4: 80943
-Number of nr genes without ko hits: 8381
-Total abundance of reads from genes without ko hits: 350443
+Alignment count for VMG.13_trimm: 550866
+Total Read count VMG.13_trimm: 958298
+Redundant gene count with aligned reads for VMG.13_trimm: 19542
+Non-Redundant gene count with aligned reads for VMG.13_trimm: 13660
+Total abundance in gene hits from aligned reads for VMG.13_trimm: 185322
+Non-Redundant ko count with aligned reads for VMG.13_trimm: 1750
+Number of nr genes with ko hits: 4885
+Total abundance in ko hits from aligned reads for VMG.13_trimm: 27712
+Number of nr genes without ko hits: 8775
+Total abundance of reads from genes without ko hits: 157610
 
-Alignment count for VMG.2: 52531
-Total Read count VMG.2: 83104
-Redundant gene count with aligned reads for VMG.2: 1109
-Non-Redundant gene count with aligned reads for VMG.2: 818
-Total abundance in gene hits from aligned reads for VMG.2: 15401
-Non-Redundant ko count with aligned reads for VMG.2: 73
-Number of nr genes with ko hits: 122
-Total abundance in ko hits from aligned reads for VMG.2: 557
-Number of nr genes without ko hits: 696
-Total abundance of reads from genes without ko hits: 14844
+Alignment count for VMG.14_trimm: 382173
+Total Read count VMG.14_trimm: 652788
+Redundant gene count with aligned reads for VMG.14_trimm: 6537
+Non-Redundant gene count with aligned reads for VMG.14_trimm: 4105
+Total abundance in gene hits from aligned reads for VMG.14_trimm: 170389
+Non-Redundant ko count with aligned reads for VMG.14_trimm: 392
+Number of nr genes with ko hits: 924
+Total abundance in ko hits from aligned reads for VMG.14_trimm: 22306
+Number of nr genes without ko hits: 3181
+Total abundance of reads from genes without ko hits: 148083
 
-Alignment count for VMG.14: 340451
-Total Read count VMG.14: 558324
-Redundant gene count with aligned reads for VMG.14: 6012
-Non-Redundant gene count with aligned reads for VMG.14: 3782
-Total abundance in gene hits from aligned reads for VMG.14: 151391
-Non-Redundant ko count with aligned reads for VMG.14: 308
-Number of nr genes with ko hits: 765
-Total abundance in ko hits from aligned reads for VMG.14: 17462
-Number of nr genes without ko hits: 3017
-Total abundance of reads from genes without ko hits: 133929
+Alignment count for VMG.15_trimm: 204269
+Total Read count VMG.15_trimm: 356082
+Redundant gene count with aligned reads for VMG.15_trimm: 7150
+Non-Redundant gene count with aligned reads for VMG.15_trimm: 5441
+Total abundance in gene hits from aligned reads for VMG.15_trimm: 86831
+Non-Redundant ko count with aligned reads for VMG.15_trimm: 1021
+Number of nr genes with ko hits: 2009
+Total abundance in ko hits from aligned reads for VMG.15_trimm: 13781
+Number of nr genes without ko hits: 3432
+Total abundance of reads from genes without ko hits: 73050
 
-Alignment count for VMG.1: 355977
-Total Read count VMG.1: 555195
-Redundant gene count with aligned reads for VMG.1: 7609
-Non-Redundant gene count with aligned reads for VMG.1: 4622
-Total abundance in gene hits from aligned reads for VMG.1: 144310
-Non-Redundant ko count with aligned reads for VMG.1: 432
-Number of nr genes with ko hits: 1007
-Total abundance in ko hits from aligned reads for VMG.1: 28557
-Number of nr genes without ko hits: 3615
-Total abundance of reads from genes without ko hits: 115753
+Alignment count for VMG.1_trimm: 388672
+Total Read count VMG.1_trimm: 661076
+Redundant gene count with aligned reads for VMG.1_trimm: 8354
+Non-Redundant gene count with aligned reads for VMG.1_trimm: 5101
+Total abundance in gene hits from aligned reads for VMG.1_trimm: 152237
+Non-Redundant ko count with aligned reads for VMG.1_trimm: 514
+Number of nr genes with ko hits: 1176
+Total abundance in ko hits from aligned reads for VMG.1_trimm: 33573
+Number of nr genes without ko hits: 3925
+Total abundance of reads from genes without ko hits: 118664
 
-Alignment count for VMG.10: 317750
-Total Read count VMG.10: 622454
-Redundant gene count with aligned reads for VMG.10: 13480
-Non-Redundant gene count with aligned reads for VMG.10: 9812
-Total abundance in gene hits from aligned reads for VMG.10: 115941
-Non-Redundant ko count with aligned reads for VMG.10: 1491
-Number of nr genes with ko hits: 3473
-Total abundance in ko hits from aligned reads for VMG.10: 17950
-Number of nr genes without ko hits: 6339
-Total abundance of reads from genes without ko hits: 97991
+Alignment count for VMG.2_trimm: 63883
+Total Read count VMG.2_trimm: 141850
+Redundant gene count with aligned reads for VMG.2_trimm: 1126
+Non-Redundant gene count with aligned reads for VMG.2_trimm: 852
+Total abundance in gene hits from aligned reads for VMG.2_trimm: 6453
+Non-Redundant ko count with aligned reads for VMG.2_trimm: 84
+Number of nr genes with ko hits: 135
+Total abundance in ko hits from aligned reads for VMG.2_trimm: 667
+Number of nr genes without ko hits: 717
+Total abundance of reads from genes without ko hits: 5786
 
-Alignment count for VMG.12: 214299
-Total Read count VMG.12: 448057
-Redundant gene count with aligned reads for VMG.12: 9853
-Non-Redundant gene count with aligned reads for VMG.12: 7295
-Total abundance in gene hits from aligned reads for VMG.12: 58612
-Non-Redundant ko count with aligned reads for VMG.12: 992
-Number of nr genes with ko hits: 2625
-Total abundance in ko hits from aligned reads for VMG.12: 9671
-Number of nr genes without ko hits: 4670
-Total abundance of reads from genes without ko hits: 48941
+Alignment count for VMG.3_trimm: 1005238
+Total Read count VMG.3_trimm: 1472309
+Redundant gene count with aligned reads for VMG.3_trimm: 13671
+Non-Redundant gene count with aligned reads for VMG.3_trimm: 7270
+Total abundance in gene hits from aligned reads for VMG.3_trimm: 367298
+Non-Redundant ko count with aligned reads for VMG.3_trimm: 608
+Number of nr genes with ko hits: 1717
+Total abundance in ko hits from aligned reads for VMG.3_trimm: 45852
+Number of nr genes without ko hits: 5553
+Total abundance of reads from genes without ko hits: 321446
 
-Alignment count for VMG.3: 894624
-Total Read count VMG.3: 1280825
-Redundant gene count with aligned reads for VMG.3: 12409
-Non-Redundant gene count with aligned reads for VMG.3: 6657
-Total abundance in gene hits from aligned reads for VMG.3: 332528
-Non-Redundant ko count with aligned reads for VMG.3: 517
-Number of nr genes with ko hits: 1480
-Total abundance in ko hits from aligned reads for VMG.3: 40368
-Number of nr genes without ko hits: 5177
-Total abundance of reads from genes without ko hits: 292160
+Alignment count for VMG.4_trimm: 1159901
+Total Read count VMG.4_trimm: 2026959
+Redundant gene count with aligned reads for VMG.4_trimm: 24337
+Non-Redundant gene count with aligned reads for VMG.4_trimm: 14186
+Total abundance in gene hits from aligned reads for VMG.4_trimm: 450491
+Non-Redundant ko count with aligned reads for VMG.4_trimm: 1366
+Number of nr genes with ko hits: 4845
+Total abundance in ko hits from aligned reads for VMG.4_trimm: 81635
+Number of nr genes without ko hits: 9341
+Total abundance of reads from genes without ko hits: 368856
 
-Alignment count for VMG.9: 439638
-Total Read count VMG.9: 673709
-Redundant gene count with aligned reads for VMG.9: 12439
-Non-Redundant gene count with aligned reads for VMG.9: 7948
-Total abundance in gene hits from aligned reads for VMG.9: 177056
-Non-Redundant ko count with aligned reads for VMG.9: 892
-Number of nr genes with ko hits: 2526
-Total abundance in ko hits from aligned reads for VMG.9: 23309
-Number of nr genes without ko hits: 5422
-Total abundance of reads from genes without ko hits: 153747
+Alignment count for VMG.5_trimm: 1345061
+Total Read count VMG.5_trimm: 2166417
+Redundant gene count with aligned reads for VMG.5_trimm: 25115
+Non-Redundant gene count with aligned reads for VMG.5_trimm: 13928
+Total abundance in gene hits from aligned reads for VMG.5_trimm: 605441
+Non-Redundant ko count with aligned reads for VMG.5_trimm: 1287
+Number of nr genes with ko hits: 4675
+Total abundance in ko hits from aligned reads for VMG.5_trimm: 122338
+Number of nr genes without ko hits: 9253
+Total abundance of reads from genes without ko hits: 483103
 
-Alignment count for VMG.11: 1566769
-Total Read count VMG.11: 2667035
-Redundant gene count with aligned reads for VMG.11: 39741
-Non-Redundant gene count with aligned reads for VMG.11: 20721
-Total abundance in gene hits from aligned reads for VMG.11: 621550
-Non-Redundant ko count with aligned reads for VMG.11: 1490
-Number of nr genes with ko hits: 8225
-Total abundance in ko hits from aligned reads for VMG.11: 138390
-Number of nr genes without ko hits: 12496
-Total abundance of reads from genes without ko hits: 483160
+Alignment count for VMG.6_trimm: 185311
+Total Read count VMG.6_trimm: 305262
+Redundant gene count with aligned reads for VMG.6_trimm: 3711
+Non-Redundant gene count with aligned reads for VMG.6_trimm: 2524
+Total abundance in gene hits from aligned reads for VMG.6_trimm: 54237
+Non-Redundant ko count with aligned reads for VMG.6_trimm: 245
+Number of nr genes with ko hits: 494
+Total abundance in ko hits from aligned reads for VMG.6_trimm: 5160
+Number of nr genes without ko hits: 2030
+Total abundance of reads from genes without ko hits: 49077
 
-Alignment count for VMG.15: 185755
-Total Read count VMG.15: 312234
-Redundant gene count with aligned reads for VMG.15: 5956
-Non-Redundant gene count with aligned reads for VMG.15: 4398
-Total abundance in gene hits from aligned reads for VMG.15: 78894
-Non-Redundant ko count with aligned reads for VMG.15: 776
-Number of nr genes with ko hits: 1439
-Total abundance in ko hits from aligned reads for VMG.15: 12678
-Number of nr genes without ko hits: 2959
-Total abundance of reads from genes without ko hits: 66216
+Alignment count for VMG.7_trimm: 325582
+Total Read count VMG.7_trimm: 530173
+Redundant gene count with aligned reads for VMG.7_trimm: 5940
+Non-Redundant gene count with aligned reads for VMG.7_trimm: 3668
+Total abundance in gene hits from aligned reads for VMG.7_trimm: 111078
+Non-Redundant ko count with aligned reads for VMG.7_trimm: 273
+Number of nr genes with ko hits: 707
+Total abundance in ko hits from aligned reads for VMG.7_trimm: 13728
+Number of nr genes without ko hits: 2961
+Total abundance of reads from genes without ko hits: 97350
 
-Alignment count for VMG.7: 306421
-Total Read count VMG.7: 468317
-Redundant gene count with aligned reads for VMG.7: 5508
-Non-Redundant gene count with aligned reads for VMG.7: 3403
-Total abundance in gene hits from aligned reads for VMG.7: 109234
-Non-Redundant ko count with aligned reads for VMG.7: 233
-Number of nr genes with ko hits: 628
-Total abundance in ko hits from aligned reads for VMG.7: 12777
-Number of nr genes without ko hits: 2775
-Total abundance of reads from genes without ko hits: 96457
+Alignment count for VMG.8_trimm: 349140
+Total Read count VMG.8_trimm: 563401
+Redundant gene count with aligned reads for VMG.8_trimm: 5475
+Non-Redundant gene count with aligned reads for VMG.8_trimm: 3933
+Total abundance in gene hits from aligned reads for VMG.8_trimm: 113900
+Non-Redundant ko count with aligned reads for VMG.8_trimm: 468
+Number of nr genes with ko hits: 980
+Total abundance in ko hits from aligned reads for VMG.8_trimm: 12425
+Number of nr genes without ko hits: 2953
+Total abundance of reads from genes without ko hits: 101475
 
-Alignment count for VMG.5: 1181469
-Total Read count VMG.5: 2111681
-Redundant gene count with aligned reads for VMG.5: 20957
-Non-Redundant gene count with aligned reads for VMG.5: 12000
-Total abundance in gene hits from aligned reads for VMG.5: 534394
-Non-Redundant ko count with aligned reads for VMG.5: 1170
-Number of nr genes with ko hits: 3997
-Total abundance in ko hits from aligned reads for VMG.5: 112021
-Number of nr genes without ko hits: 8003
-Total abundance of reads from genes without ko hits: 422373
+Alignment count for VMG.9_trimm: 480977
+Total Read count VMG.9_trimm: 748778
+Redundant gene count with aligned reads for VMG.9_trimm: 14351
+Non-Redundant gene count with aligned reads for VMG.9_trimm: 9052
+Total abundance in gene hits from aligned reads for VMG.9_trimm: 198460
+Non-Redundant ko count with aligned reads for VMG.9_trimm: 989
+Number of nr genes with ko hits: 2944
+Total abundance in ko hits from aligned reads for VMG.9_trimm: 26403
+Number of nr genes without ko hits: 6108
+Total abundance of reads from genes without ko hits: 172057
 
 
-Total nucleotides for all samples combined: 1746518841
-Average nucleotides per samples: 116434589.4
-Number of ORFs with assignments printed to orf_assignment.txt: 24232
+Total nucleotides for all samples combined: 2284667869
+Average nucleotides per samples: 152311191.266667
+Number of ORFs with assignments printed to orf_assignment.txt: 32928
 
 	mkdir viral_blast2tsv
 	mv *no_ko_hit.txt viral_blast2tsv/
@@ -780,7 +709,7 @@ Merge all the normalized abundance tables together:
 		biom convert --table-type="OTU table" --to-json -i $f -o viral_blast2tsv/$filename.biom
 	done
 
-	merge_otu_tables.py -i viral_blast2tsv/VMG.1.ko_corrected_abundances.biom,viral_blast2tsv/VMG.2.ko_corrected_abundances.biom,viral_blast2tsv/VMG.3.ko_corrected_abundances.biom,viral_blast2tsv/VMG.4.ko_corrected_abundances.biom,viral_blast2tsv/VMG.5.ko_corrected_abundances.biom,viral_blast2tsv/VMG.6.ko_corrected_abundances.biom,viral_blast2tsv/VMG.7.ko_corrected_abundances.biom,viral_blast2tsv/VMG.8.ko_corrected_abundances.biom,viral_blast2tsv/VMG.9.ko_corrected_abundances.biom,viral_blast2tsv/VMG.10.ko_corrected_abundances.biom,viral_blast2tsv/VMG.11.ko_corrected_abundances.biom,viral_blast2tsv/VMG.12.ko_corrected_abundances.biom,viral_blast2tsv/VMG.13.ko_corrected_abundances.biom,viral_blast2tsv/VMG.14.ko_corrected_abundances.biom,viral_blast2tsv/VMG.15.ko_corrected_abundances.biom -o viral_blast2tsv/VMG.ko_corrected_abundances.biom
+	merge_otu_tables.py -i viral_blast2tsv/VMG.1_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.2_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.3_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.4_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.5_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.6_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.7_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.8_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.9_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.10_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.11_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.12_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.13_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.14_trimm.ko_corrected_abundances.biom,viral_blast2tsv/VMG.15_trimm.ko_corrected_abundances.biom -o viral_blast2tsv/VMG.ko_corrected_abundances.biom
 
 	biom summarize-table -i viral_blast2tsv/VMG.ko_corrected_abundances.biom -o viral_blast2tsv/VMG.ko_corrected_abundances_summarize.txt
 	
@@ -1056,11 +985,11 @@ Now, use custom perl script to filter based on criteria described above:
 
 	./get_knum_phast_hits.pl -phast_blast=vmg.ublast.phast.txt -orf_ko_assign=viral_blast2tsv/orf_ko_assignment.txt -knum=viral_all_kos.txt
 
-Number of unique differential k numbers found with ORFs: 2473
-Total number of PHAST top hits: 30429
-Contigs with phast and KO hit: 5481 
-ORFs on a contig with phast hit and ORF has a KO: 6698
-K numbers printed that were on a contig with PHAST hit and KO: 700
+Number of unique differential k numbers found with ORFs: 2877
+Total number of PHAST top hits: 36850
+Contigs with phast and KO hit: 6810 
+ORFs on a contig with phast hit and ORF has a KO: 8520
+K numbers printed that were on a contig with PHAST hit and KO: 895
 
 	mv orf_ko_phast_hits.txt viral_blast2tsv/
 	mv ko_w_phast_hits_list.txt viral_blast2tsv
@@ -1209,7 +1138,7 @@ using the R version on mac (will need to transfer VMG_BMG.ko_corrected_abundance
 	}
 
 Apply force-directed layoutSaved file as ssn.cysOpen network in cytoscape 3.1.0 (File --> open)Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
-This should generate a network with 1266 nodes.
+This should generate a network with 1304 nodes.
 Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
 This will take awhile.File -- Export --> Table --> node(1) default node
 Save as:ssn_attributes.csv
@@ -1221,7 +1150,8 @@ Want to investigate the topology of differential features in both the total meta
 
 Need to take the network attribute tables and identify the topological features for the differential KOs and compare the values of differential to non-differntial and viral differential to total differential.
 
-	mkdir network_plots
+	mkdir ref_network_plots
+	mkdir ssn_network_plots
 	R-3.2.0/bin/./R
 	vmg_lefse <- read.table("viral_blast2tsv/VMG.ko_phast_lefse_output.txt", sep="\t", header=FALSE)
 	vmg_lefse$split <- (vmg_lefse$V4 > 1)
@@ -1336,9 +1266,9 @@ Total Degree:
 	#stat_summary(fun.data = get_n, geom = "text") +
 	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
-	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=89)","Differential\nTotal MG\n(n=47)")) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
-	ggsave(plot_degree, file="network_plots/degree_grey.pdf", w=5, h=5)
+	ggsave(plot_degree, file="ref_network_plots/degree_grey.pdf", w=5, h=5)
 
 In-Degree:
 
@@ -1365,9 +1295,9 @@ In-Degree:
 	#stat_summary(fun.data = get_n, geom = "text") +
 	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
-	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=89)","Differential\nTotal MG\n(n=47)")) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
-	ggsave(plot_indegree, file="network_plots/indegree_grey.pdf", w=5, h=5)
+	ggsave(plot_indegree, file="ref_network_plots/indegree_grey.pdf", w=5, h=5)
 
 Out-Degree:
 
@@ -1378,7 +1308,7 @@ Out-Degree:
 	merge2 <- t(merge1)
 	merge3 <- data.frame(merge2)
 	merge3$Dataset <- rownames(merge3)
-	merge3$Sign <- c("?","?","?")
+	merge3$Sign <- c("b","b","a")
 	merge3$pos <- (merge3$X5 * 1.05)
 	
 	sts <- boxplot.stats(vmg_bmg_non$Outdegree)$stats
@@ -1394,9 +1324,9 @@ Out-Degree:
 	#stat_summary(fun.data = get_n, geom = "text") +
 	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
-	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=89)","Differential\nTotal MG\n(n=47)")) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
-	ggsave(plot_outdegree, file="network_plots/outdegree_grey.pdf", w=5, h=5)
+	ggsave(plot_outdegree, file="ref_network_plots/outdegree_grey.pdf", w=5, h=5)
 
 Average Path:
 
@@ -1423,9 +1353,9 @@ Average Path:
 	#stat_summary(fun.data = get_n, geom = "text") +
 	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
-	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=89)","Differential\nTotal MG\n(n=47)")) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
-	ggsave(plot_avgpath, file="network_plots/avgpath_grey.pdf", w=5, h=5)
+	ggsave(plot_avgpath, file="ref_network_plots/averagepathlength_grey.pdf", w=5, h=5)
 
 Betweenness Centrality:
 
@@ -1436,7 +1366,7 @@ Betweenness Centrality:
 	merge2 <- t(merge1)
 	merge3 <- data.frame(merge2)
 	merge3$Dataset <- rownames(merge3)
-	merge3$Sign <- c("b","b","a")
+	merge3$Sign <- c("b","a,b","a")
 	merge3$pos <- (merge3$X5 * 1.05)
 	
 	sts <- boxplot.stats(vmg_bmg_non$BetweennessCentrality)$stats
@@ -1452,15 +1382,1096 @@ Betweenness Centrality:
 	#stat_summary(fun.data = get_n, geom = "text") +
 	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
-	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=89)","Differential\nTotal MG\n(n=47)")) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
-	ggsave(plot_bc, file="network_plots/bc_grey.pdf", w=5, h=5)
+	ggsave(plot_bc, file="ref_network_plots/betweennesscentrality_grey.pdf", w=5, h=5)
+
+Closeness Centrality:
+
+	VMG <- boxplot.stats(vmg_diff_topo$ClosenessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$ClosenessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo$ClosenessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$ClosenessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_cc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClosenessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Closeness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_cc, file="ref_network_plots/closenesscentrality_grey.pdf", w=5, h=5)
+
+
+Neighborhood Connectivity:
+
+	VMG <- boxplot.stats(vmg_diff_topo$NeighborhoodConnectivity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$NeighborhoodConnectivity)$stats
+	Non <- boxplot.stats(non_diff_topo$NeighborhoodConnectivity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$NeighborhoodConnectivity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_nc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=NeighborhoodConnectivity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Neighborhood Connectivity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_nc, file="ref_network_plots/neighborhoodconnectivity_grey.pdf", w=5, h=5)
+
+Eccentricity:
+
+	VMG <- boxplot.stats(vmg_diff_topo$Eccentricity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$Eccentricity)$stats
+	Non <- boxplot.stats(non_diff_topo$Eccentricity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$Eccentricity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_ecc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Eccentricity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Eccentricity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_ecc, file="ref_network_plots/eccentricity_grey.pdf", w=5, h=5)
+
+Clustering Coefficient:
+
+	VMG <- boxplot.stats(vmg_diff_topo$ClusteringCoefficient)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$ClusteringCoefficient)$stats
+	Non <- boxplot.stats(non_diff_topo$ClusteringCoefficient)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$ClusteringCoefficient)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_clust <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClusteringCoefficient)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Clustering Coefficient",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_clust, file="ref_network_plots/clustering_coeffecient_grey.pdf", w=5, h=5)
+	
+All on one 9 panel plot:
+
+	install.packages("gridExtra")
+	install.packages("grid")
+	library(gridExtra)	library(grid)
+	VMG <- boxplot.stats(vmg_diff_topo$EdgeCount)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$EdgeCount)$stats
+	Non <- boxplot.stats(non_diff_topo$EdgeCount)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$EdgeCount)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_degree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=EdgeCount)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Total Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$Indegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$Indegree)$stats
+	Non <- boxplot.stats(non_diff_topo$Indegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$Indegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_indegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Indegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "In-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$Outdegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$Outdegree)$stats
+	Non <- boxplot.stats(non_diff_topo$Outdegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$Outdegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_outdegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Outdegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Out-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$AverageShortestPathLength)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$AverageShortestPathLength)$stats
+	Non <- boxplot.stats(non_diff_topo$AverageShortestPathLength)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$AverageShortestPathLength)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_avgpath <- ggplot(vmg_bmg_non, aes(x=Dataset, y=AverageShortestPathLength)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Average Shortest Path Length",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$BetweennessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$BetweennessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo$BetweennessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$BetweennessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_bc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=BetweennessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Betweenness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$ClosenessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$ClosenessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo$ClosenessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$ClosenessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_cc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClosenessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Closeness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
 
 
 
+	VMG <- boxplot.stats(vmg_diff_topo$NeighborhoodConnectivity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$NeighborhoodConnectivity)$stats
+	Non <- boxplot.stats(non_diff_topo$NeighborhoodConnectivity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$NeighborhoodConnectivity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_nc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=NeighborhoodConnectivity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Neighborhood Connectivity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
 
+
+	VMG <- boxplot.stats(vmg_diff_topo$Eccentricity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$Eccentricity)$stats
+	Non <- boxplot.stats(non_diff_topo$Eccentricity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$Eccentricity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_ecc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Eccentricity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Eccentricity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo$ClusteringCoefficient)$stats
+	BMG <- boxplot.stats(bmg_diff_topo$ClusteringCoefficient)$stats
+	Non <- boxplot.stats(non_diff_topo$ClusteringCoefficient)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non$ClusteringCoefficient)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	
+	plot_clust <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClusteringCoefficient)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Clustering Coefficient",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
+	theme(axis.ticks = element_blank())
+	pdf(file="ref_network_plots/network_topology_panel_grey.pdf",w=12,h=12)
+	grid.arrange(plot_degree,plot_indegree,plot_outdegree,plot_bc,plot_cc,plot_clust,plot_avgpath,plot_nc,plot_ecc,legend,ncol=3,nrow = 3)
+	dev.off()
+
+
+Repeat all of above for the ssn network:
+
+	ssn_topo <- read.table("ssn_attributes.txt", header=TRUE, sep="\t")
+	vmg_diff_topo_ssn <- merge(x=vmg_diff, y=ssn_topo, by="canonicalName")
+	bmg_diff_topo_ssn <- merge(x=bmg_diff, y=ssn_topo, by="canonicalName")
+
+There is one less KO in the BMG dataset because it was removed when extracting the largest component of the network.
+
+	total_topo_ssn <- merge(x=ssn_topo, y=diff, all.x=TRUE)
+	total_topo_ssn[is.na(total_topo_ssn)] <- 0
+	non_diff_topo_ssn <- subset(total_topo_ssn, total_topo_ssn$LDA == 0)
+	
+	vmg_diff_topo_ssn[vmg_diff_topo_ssn=="TRUE"] <- "VMG"
+	bmg_diff_topo_ssn[bmg_diff_topo_ssn=="TRUE"] <- "BMG"
+	non_diff_topo_ssn$Dataset[non_diff_topo_ssn$Dataset == 0] <- "Non"
+	
+	vmg_bmg_ssn <- rbind(vmg_diff_topo_ssn, bmg_diff_topo_ssn)
+	vmg_non_ssn <- rbind(vmg_diff_topo_ssn, non_diff_topo_ssn)
+	bmg_non_ssn <- rbind(bmg_diff_topo_ssn, non_diff_topo_ssn) 
+	
+	vmg_non_ssn_edge <- wilcox.test(EdgeCount ~ Dataset, data=vmg_non_ssn, paired=FALSE)    
+	vmg_non_ssn_in <- wilcox.test(Indegree ~ Dataset, data=vmg_non_ssn, paired=FALSE)   
+	vmg_non_ssn_out <- wilcox.test(Outdegree ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_path <- wilcox.test(AverageShortestPathLength ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_bc <- wilcox.test(BetweennessCentrality ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_cc <- wilcox.test(ClosenessCentrality ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_clust <- wilcox.test(ClusteringCoefficient ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_ecc <- wilcox.test(Eccentricity ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+	vmg_non_ssn_nc <- wilcox.test(NeighborhoodConnectivity ~ Dataset, data=vmg_non_ssn, paired=FALSE)
+
+	bmg_non_ssn_edge <- wilcox.test(EdgeCount ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_in <- wilcox.test(Indegree ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_out <- wilcox.test(Outdegree ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_path <- wilcox.test(AverageShortestPathLength ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_bc <- wilcox.test(BetweennessCentrality ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_cc <- wilcox.test(ClosenessCentrality ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_clust <- wilcox.test(ClusteringCoefficient ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_ecc <- wilcox.test(Eccentricity ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+	bmg_non_ssn_nc <- wilcox.test(NeighborhoodConnectivity ~ Dataset, data=bmg_non_ssn, paired=FALSE)
+
+	vmg_bmg_ssn_edge <- wilcox.test(EdgeCount ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_in <- wilcox.test(Indegree ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_out <- wilcox.test(Outdegree ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_path <- wilcox.test(AverageShortestPathLength ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_bc <- wilcox.test(BetweennessCentrality ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_cc <- wilcox.test(ClosenessCentrality ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_clust <- wilcox.test(ClusteringCoefficient ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_ecc <- wilcox.test(Eccentricity ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+	vmg_bmg_ssn_nc <- wilcox.test(NeighborhoodConnectivity ~ Dataset, data=vmg_bmg_ssn, paired=FALSE)
+
+Plot these ssn results:
+
+Total Degree:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$EdgeCount)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$EdgeCount)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$EdgeCount)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$EdgeCount)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_degree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=EdgeCount)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Total Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_degree, file="ssn_network_plots/degree_grey.pdf", w=5, h=5)
+	
+In-Degree:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Indegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Indegree)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Indegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Indegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_indegree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Indegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "In-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_indegree, file="ssn_network_plots/indegree_grey.pdf", w=5, h=5)
+	
+Out-Degree:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Outdegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Outdegree)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Outdegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Outdegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_outdegree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Outdegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Out-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_outdegree, file="ssn_network_plots/outdegree_grey.pdf", w=5, h=5)
+	
+Average Path:
+	
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$AverageShortestPathLength)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$AverageShortestPathLength)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$AverageShortestPathLength)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$AverageShortestPathLength)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_avgpath <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=AverageShortestPathLength)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Average Shortest Path Length",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_avgpath, file="ssn_network_plots/averagepathlength_grey.pdf", w=5, h=5)
+
+Betweenness Centrality:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$BetweennessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$BetweennessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$BetweennessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$BetweennessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_bc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=BetweennessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Betweenness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_bc, file="ssn_network_plots/betweennesscentrality_grey.pdf", w=5, h=5)
+
+Closeness Centrality:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$ClosenessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$ClosenessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$ClosenessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$ClosenessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_cc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=ClosenessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Closeness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_cc, file="ssn_network_plots/closenesscentrality_grey.pdf", w=5, h=5)
+
+Neighborhood Connectivity:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$NeighborhoodConnectivity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_nc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=NeighborhoodConnectivity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Neighborhood Connectivity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_nc, file="ssn_network_plots/neighborhoodconnectivity_grey.pdf", w=5, h=5)
+	
+Eccentricity:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Eccentricity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Eccentricity)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Eccentricity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Eccentricity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_ecc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Eccentricity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Eccentricity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_ecc, file="ssn_network_plots/eccentricity_grey.pdf", w=5, h=5)		
+
+Clustering Coefficient:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$ClusteringCoefficient)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$ClusteringCoefficient)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$ClusteringCoefficient)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$ClusteringCoefficient)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_clust <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=ClusteringCoefficient)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Clustering Coefficient",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.text.x = element_text(face="bold"), axis.ticks = element_blank())
+	ggsave(plot_clust, file="ssn_network_plots/clusteringcoefficient_grey.pdf", w=5, h=5)	
+
+Plot all the above on a 9 panel plot:
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$EdgeCount)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$EdgeCount)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$EdgeCount)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$EdgeCount)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_degree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=EdgeCount)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Total Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+	
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Indegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Indegree)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Indegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Indegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_indegree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Indegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "In-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+	
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Outdegree)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Outdegree)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Outdegree)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Outdegree)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_outdegree <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Outdegree)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Out-Degree",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+		
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$AverageShortestPathLength)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$AverageShortestPathLength)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$AverageShortestPathLength)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$AverageShortestPathLength)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_avgpath <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=AverageShortestPathLength)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Average Shortest Path Length",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$BetweennessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$BetweennessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$BetweennessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$BetweennessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_bc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=BetweennessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Betweenness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$ClosenessCentrality)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$ClosenessCentrality)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$ClosenessCentrality)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$ClosenessCentrality)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_cc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=ClosenessCentrality)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Closeness Centrality",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$NeighborhoodConnectivity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","a,b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$NeighborhoodConnectivity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_nc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=NeighborhoodConnectivity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Neighborhood Connectivity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$Eccentricity)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$Eccentricity)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$Eccentricity)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("b","b","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$Eccentricity)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_ecc <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=Eccentricity)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Eccentricity",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+
+	VMG <- boxplot.stats(vmg_diff_topo_ssn$ClusteringCoefficient)$stats
+	BMG <- boxplot.stats(bmg_diff_topo_ssn$ClusteringCoefficient)$stats
+	Non <- boxplot.stats(non_diff_topo_ssn$ClusteringCoefficient)$stats
+	merge1 <- data.frame(VMG,BMG,Non)
+	merge2 <- t(merge1)
+	merge3 <- data.frame(merge2)
+	merge3$Dataset <- rownames(merge3)
+	merge3$Sign <- c("a","a","a")
+	merge3$pos <- (merge3$X5 * 1.05)
+	
+	sts <- boxplot.stats(vmg_bmg_non_ssn$ClusteringCoefficient)$stats
+	order <- c( "Non", "VMG", "BMG")
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
+	plot_clust <- ggplot(vmg_bmg_non_ssn, aes(x=Dataset, y=ClusteringCoefficient)) +
+	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
+	scale_fill_grey(start=0.35,end=0.95) +
+	labs(x="", y = "Clustering Coefficient",colour="legend" ) +
+	guides(fill=FALSE) +
+	theme_bw() +
+	#stat_summary(fun.data = get_n, geom = "text") +
+	geom_text(data = merge3, aes(x = Dataset, y = pos, label = Sign)) +
+	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
+	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=1095)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=46)")) +
+	theme(axis.ticks = element_blank())
+
+	pdf(file="ssn_network_plots/network_topology_panel_grey.pdf",w=12,h=12)
+	grid.arrange(plot_degree,plot_indegree,plot_outdegree,plot_bc,plot_cc,plot_clust,plot_avgpath,plot_nc,plot_ecc,legend,ncol=3,nrow = 3)
+	dev.off()
+	quit()
 
 ##Differential KOs mapped to PWs
+
+First, look at how many differential KOs are overlapping between BMG and VMG:
+
+	R-3.2.0/bin/./R
+	vmg_lefse <- read.table("viral_blast2tsv/VMG.ko_phast_lefse_output.txt", sep="\t", header=FALSE)
+	vmg_lefse$split <- (vmg_lefse$V4 > 1)
+	vmg_diff <- split(vmg_lefse, vmg_lefse$split)
+	vmg_diff <- as.data.frame(vmg_diff)
+	names(vmg_diff)[1] <- "canonicalName"
+	names(vmg_diff)[2] <- "KruskallWallis"
+	names(vmg_diff)[3] <- "Diet"
+	names(vmg_diff)[4] <- "LDA"
+	names(vmg_diff)[5] <- "PValue"
+	names(vmg_diff)[6] <- "Dataset"
+	dim(vmg_diff)
+
+289 diff VMG KOs
+
+	bmg_lefse <- read.table("bmg_blast2tsv/BMG.ko_corrected_abundance_lefse_output.txt", sep="\t", header=FALSE)
+	bmg_lefse$split <- (bmg_lefse$V4 > 1)
+	bmg_diff <- split(bmg_lefse, bmg_lefse$split)
+	bmg_diff <- as.data.frame(bmg_diff)
+	names(bmg_diff)[1] <- "canonicalName"
+	names(bmg_diff)[2] <- "KruskallWallis"
+	names(bmg_diff)[3] <- "Diet"
+	names(bmg_diff)[4] <- "LDA"
+	names(bmg_diff)[5] <- "PValue"
+	names(bmg_diff)[6] <- "Dataset"
+	dim(bmg_diff)
+
+118 diff BMG KOs
+
+Intersection:
+
+	overlap <- intersect(bmg_diff$canonicalName, vmg_diff$canonicalName)
+	length(overlap)
+
+24 KOs overlap (out of possible 118, ~20.3%)	
+
+What about those specifically involved in metabolism as defined by KEGG:
+
+	ref_topo <- read.table("refnet_attributes.txt", header=TRUE, sep="\t")
+	vmg_diff_topo <- merge(x=vmg_diff, y=ref_topo, by="canonicalName")
+	bmg_diff_topo <- merge(x=bmg_diff, y=ref_topo, by="canonicalName")
+	dim(vmg_diff_topo)
+[1] 133  24 - 133 viral KO in metabolism that are diff
+
+	dim(bmg_diff_topo)
+[1] 47 24 - 47 BMG KO in metabolism that are diff
+
+	overlap_metab <- intersect(vmg_diff_topo$canonicalName, bmg_diff_topo$canonicalName)
+	length(overlap_metab)
+[1] 9 - 9 out of a possible 47 overlap
+
+Map KOs to PWs (once again, I can't provide this mapping file because of KEGG liscence):
+
+	write.table(vmg_diff$canonicalName, "viral_diff_ko.txt", row.names=FALSE, col.names=FALSE, quote = FALSE)
+	write.table(bmg_diff$canonicalName, "bmg_diff_ko.txt",row.names=FALSE, col.names=FALSE, quote=FALSE)
+	write.table(vmg_diff_topo$canonicalName, "viral_diff_metab_ko.txt", row.names=FALSE, col.names=FALSE, quote = FALSE)
+	write.table(bmg_diff_topo$canonicalName, "bmg_diff_metab_ko.txt", row.names=FALSE, col.names=FALSE, quote = FALSE)
+	q()
+
+Map All Viral KOs:
+	
+	./ko_to_pw.pl -k_numbers=viral_diff_ko.txt -pw_map=kegg_2/genes/ko/ko_pathway.list
+	mv ko_pw.txt viral_ko_pw.txt
+	mv pw_list.txt viral_pw_list.txt
+	wc -l viral_ko_pw.txt
+173 viral_ko_pw.txt - 173 (of289) KOs mapped to PWs
+	
+	wc -l viral_pw_list.txt 
+385 viral_pw_list.txt - 385 total PWs (KOs can map to >1 PW)
+
+Map Metabolic Viral KOs:
+
+	./ko_to_pw.pl -k_numbers=viral_diff_metab_ko.txt -pw_map=kegg_2/genes/ko/ko_pathway.list
+	mv ko_pw.txt viral_metab_ko_pw.txt
+	mv pw_list.txt viral_metab_pw_list.txt
+	wc -l viral_metab_ko_pw.txt
+133 viral_metab_ko_pw.txt
+
+	wc -l viral_metab_pw_list.txt
+332 viral_metab_pw_list.txt
+
+Map BMG KOs:
+	
+	./ko_to_pw.pl -k_numbers=bmg_diff_ko.txt -pw_map=kegg_2/genes/ko/ko_pathway.list
+	mv ko_pw.txt bmg_ko_pw.txt
+	mv pw_list.txt bmg_pw_list.txt
+	wc -l bmg_ko_pw.txt 
+68 bmg_ko_pw.txt - 68 (of 118) KOs mapped to PWs
+
+	wc -l bmg_pw_list.txt 
+153 bmg_pw_list.txt - 153 total PWs
+
+Map Metabolic BMG KOs:
+
+	./ko_to_pw.pl -k_numbers=bmg_diff_metab_ko.txt -pw_map=kegg_2/genes/ko/ko_pathway.list
+	mv ko_pw.txt bmg_metab_ko_pw.txt
+	mv pw_list.txt bmg_metab_pw_list.txt
+	wc -l bmg_metab_ko_pw.txt
+47 bmg_metab_ko_pw.txt
+      
+	wc -l bmg_metab_pw_list.txt
+126 bmg_metab_pw_list.txt
+
+Overlap:
+	
+	R-3.2.0/bin/./R
+	viral_pw <- read.table("viral_pw_list.txt")
+	bmg_pw <- read.table("bmg_pw_list.txt")
+	pw_overlap <- intersect(bmg_pw$V1, viral_pw$V1)
+	length(pw_overlap)
+[1] 53 - 53 of 153 possible PWs overlap between BMG and VMG (~34.6%)
+
+	viral_metab_pw <- read.table("viral_metab_pw_list.txt")
+	bmg_metab_pw <- read.table("bmg_metab_pw_list.txt")
+	metab_pw_overlap <- intersect(viral_metab_pw$V1, bmg_metab_pw$V1)
+	length(metab_pw_overlap)
+[1] 45 - 45 of 126 metabolic pathways overlap (~35.7%)
+
 
 ##Community Stats on all KEGG functions, ORF abundance, metabolic genes
 
