@@ -297,7 +297,7 @@ Now, load all viral metagenomes into counting:
 
     source khmerEnv/bin/activate
     cd /work/samodha/canderson3/prinseq_output
-    for f in *_prinseq.fastq
+    for f in *.fastq
     do
         filename=$(basename "$f")
         filename="${filename%_*}"
@@ -518,6 +518,7 @@ The perl script uses the first hit (top hit) because multiple entries could be a
 Viral:
 
 	./blast2tsv.pl -blast_file=vmg.ublast.kegg.txt -bowtie_dir=vmg_orfs_bowtie -gene_ko=kegg_2/genes/ko/ko_genes.list
+
 
 Number of top hits from BLAST file: 95153
 
@@ -1085,12 +1086,29 @@ Now, in R on the mac:
 	}
 
 
-This should push the network to cytoscape 2.8.2Apply force-directed layoutSaved file as refnet.cysOpen network in cytoscape 3.1.0 (File --> open)Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
-This should generate a network with 3616 nodes.
-Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
-This will take awhile.File -- Export --> Table --> node(1) default node
-Save as:refnet_attributes.csv
-Open in excel and convert to tab delimited text file. Save as refnet_attributes.txt
+This should push the network to cytoscape 2.8.2
+Apply force-directed layout
+Saved file as refnet.cys
+Open network in cytoscape 3.1.0 (File --> open)
+
+Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
+
+
+This should generate a network with 3616 nodes.
+
+
+Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
+
+
+This will take awhile.
+
+File -- Export --> Table --> node(1) default node
+
+Save as:
+refnet_attributes.csv
+
+Open in excel and convert to tab delimited text file. Save as refnet_attributes.txt
+
 
 
 
@@ -1137,12 +1155,27 @@ using the R version on mac (will need to transfer VMG_BMG.ko_corrected_abundance
 	displayGraph(cw)
 	}
 
-Apply force-directed layoutSaved file as ssn.cysOpen network in cytoscape 3.1.0 (File --> open)Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
-This should generate a network with 1304 nodes.
-Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
-This will take awhile.File -- Export --> Table --> node(1) default node
-Save as:ssn_attributes.csv
-Open in excel and convert to tab delimited text file. Save as ssn_attributes.txt
+Apply force-directed layout
+Saved file as ssn.cys
+Open network in cytoscape 3.1.0 (File --> open)
+
+Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
+
+
+This should generate a network with 1304 nodes.
+
+
+Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
+
+
+This will take awhile.
+
+File -- Export --> Table --> node(1) default node
+
+Save as:
+ssn_attributes.csv
+
+Open in excel and convert to tab delimited text file. Save as ssn_attributes.txt
 
 ##Topology of Differential KOs in Metabolic Network
 
@@ -1255,7 +1288,10 @@ Total Degree:
 	
 	sts <- boxplot.stats(vmg_bmg_non$EdgeCount)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_degree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=EdgeCount)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1284,7 +1320,10 @@ In-Degree:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Indegree)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_indegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Indegree)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1313,7 +1352,10 @@ Out-Degree:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Outdegree)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_outdegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Outdegree)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1342,7 +1384,10 @@ Average Path:
 	
 	sts <- boxplot.stats(vmg_bmg_non$AverageShortestPathLength)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_avgpath <- ggplot(vmg_bmg_non, aes(x=Dataset, y=AverageShortestPathLength)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1371,7 +1416,10 @@ Betweenness Centrality:
 	
 	sts <- boxplot.stats(vmg_bmg_non$BetweennessCentrality)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_bc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=BetweennessCentrality)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1400,7 +1448,10 @@ Closeness Centrality:
 	
 	sts <- boxplot.stats(vmg_bmg_non$ClosenessCentrality)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_cc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClosenessCentrality)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1430,7 +1481,10 @@ Neighborhood Connectivity:
 	
 	sts <- boxplot.stats(vmg_bmg_non$NeighborhoodConnectivity)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_nc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=NeighborhoodConnectivity)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1459,7 +1513,10 @@ Eccentricity:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Eccentricity)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_ecc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Eccentricity)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1488,7 +1545,10 @@ Clustering Coefficient:
 	
 	sts <- boxplot.stats(vmg_bmg_non$ClusteringCoefficient)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_clust <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClusteringCoefficient)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1507,8 +1567,10 @@ All on one 9 panel plot:
 
 	install.packages("gridExtra")
 	install.packages("grid")
-	library(gridExtra)	library(grid)
-	VMG <- boxplot.stats(vmg_diff_topo$EdgeCount)$stats
+	library(gridExtra)
+	library(grid)
+
+	VMG <- boxplot.stats(vmg_diff_topo$EdgeCount)$stats
 	BMG <- boxplot.stats(bmg_diff_topo$EdgeCount)$stats
 	Non <- boxplot.stats(non_diff_topo$EdgeCount)$stats
 	merge1 <- data.frame(VMG,BMG,Non)
@@ -1520,7 +1582,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$EdgeCount)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_degree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=EdgeCount)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1547,7 +1612,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Indegree)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_indegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Indegree)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1574,7 +1642,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Outdegree)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_outdegree <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Outdegree)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1601,7 +1672,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$AverageShortestPathLength)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_avgpath <- ggplot(vmg_bmg_non, aes(x=Dataset, y=AverageShortestPathLength)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1628,7 +1702,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$BetweennessCentrality)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_bc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=BetweennessCentrality)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1655,7 +1732,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$ClosenessCentrality)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_cc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClosenessCentrality)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1683,7 +1763,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$NeighborhoodConnectivity)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_nc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=NeighborhoodConnectivity)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1710,7 +1793,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$Eccentricity)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_ecc <- ggplot(vmg_bmg_non, aes(x=Dataset, y=Eccentricity)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1737,7 +1823,10 @@ All on one 9 panel plot:
 	
 	sts <- boxplot.stats(vmg_bmg_non$ClusteringCoefficient)$stats
 	order <- c( "Non", "VMG", "BMG")
-	#get_n <- function(x){	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))	#}
+	#get_n <- function(x){
+	#return(data.frame(y = median(x)*1.25, label = paste0("n = ",length(x))))
+	#}
+
 	
 	plot_clust <- ggplot(vmg_bmg_non, aes(x=Dataset, y=ClusteringCoefficient)) +
 	geom_boxplot(outlier.colour = NA, aes(fill=Dataset)) +
@@ -1750,9 +1839,11 @@ All on one 9 panel plot:
 	coord_cartesian(ylim = c(sts[2]/2,max(merge1)*1.15)) +
 	scale_x_discrete(limits=order, labels=c("Non-Differential\n(n=3485)","Differential\nViral MG\n(n=133)","Differential\nTotal MG\n(n=47)")) +
 	theme(axis.ticks = element_blank())
-	pdf(file="ref_network_plots/network_topology_panel_grey.pdf",w=12,h=12)
+
+	pdf(file="ref_network_plots/network_topology_panel_grey.pdf",w=12,h=12)
 	grid.arrange(plot_degree,plot_indegree,plot_outdegree,plot_bc,plot_cc,plot_clust,plot_avgpath,plot_nc,plot_ecc,legend,ncol=3,nrow = 3)
 	dev.off()
+
 
 
 Repeat all of above for the ssn network:
@@ -2527,6 +2618,19 @@ Trim the adaptors and quality trim:
 	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V11_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V11_S4_L001_R2_001.fastq.gz
 	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V12_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V12_S5_L001_R2_001.fastq.gz
 	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V13_S6_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V13_S6_L001_R2_001.fastq.gz
+	
+	
+	cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v9_S2_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v9_S2_L001_R1_001.fastq.gz
+	cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v10_S3_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v10_S3_L001_R1_001.fastq.gz
+	cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v12_S4_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v12_S4_L001_R1_001.fastq.gz
+	cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v13_S5_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v13_S5_L001_R1_001.fastq.gz
+
+	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v9_S2_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v9_S2_L001_R2_001.fastq.gz
+	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v10_S3_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v10_S3_L001_R2_001.fastq.gz
+	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v12_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v12_S4_L001_R2_001.fastq.gz
+	cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v13_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v13_S5_L001_R2_001.fastq.gz
+
+
 
 	
 Prefer userach quality filter based on expected errors per read for filtering illumina data.  Need a free liscence to download it.  Go to http://www.drive5.com/usearch/download.html and download the linux version of USEARCH v8.0.1623 and enter your email address.  Copy the download link in the email address and use below:
@@ -2539,71 +2643,132 @@ Remove seqeunces that have an estimated error rate >1%:
 	
 	mkdir usearch_qc
 	gunzip -d cutadapt_qc/*
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
 
 	mkdir usearch_qc2
 	gunzip -d cutadapt_qc2/*
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
-	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	
+	mkdir usearch_qc3
+	gunzip -d cutadapt_qc3/*
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v12_S4_L001_R1_001.trim.fastq -fastqout usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v12_S4_L001_R2_001.trim.fastq -fastqout usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v13_S5_L001_R1_001.trim.fastq -fastqout usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+	./usearch8.0.1623 -fastq_filter cutadapt_qc3/v13_S5_L001_R2_001.trim.fastq -fastqout usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+
+merge read1 and read2 together, many of reverse reads lost due to quality falling off early in V3 chemistry, not worth getting pairs back together:
+
+	cat usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq > usearch_qc/V4_S1_L001_R1_R2.fastq
+	cat usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq > usearch_qc/V9_S2_L001_R1_R2.fastq
+	cat usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq > usearch_qc/V10_S3_L001_R1_R2.fastq
+	cat usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq > usearch_qc/V11_S4_L001_R1_R2.fastq
+	cat usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq > usearch_qc/V12_S5_L001_R1_R2.fastq
+	cat usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq > usearch_qc/V13_S6_L001_R1_R2.fastq
+
+	cat usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq > usearch_qc2/V4_S1_L001_R1_R2.fastq
+	cat usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq > usearch_qc2/V9_S2_L001_R1_R2.fastq
+	cat usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq > usearch_qc2/V10_S3_L001_R1_R2.fastq
+	cat usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq > usearch_qc2/V11_S4_L001_R1_R2.fastq
+	cat usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq > usearch_qc2/V12_S5_L001_R1_R2.fastq
+	cat usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq > usearch_qc2/V13_S6_L001_R1_R2.fastq
+
+	cat usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq > usearch_qc3/v9_S2_L001_R1_R2.fastq
+	cat usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq > usearch_qc3/v10_S3_L001_R1_R2.fastq
+	cat usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq > usearch_qc3/v12_S4_L001_R1_R2.fastq
+	cat usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq > usearch_qc3/v13_S5_L001_R1_R2.fastq
+
+Use different version of CD-HIT with updated software to remove illumina duplicates:
+	
+	wget https://github.com/weizhongli/cdhit/releases/download/V4.6.3/cd-hit-v4.6.3-2015-0515.tar.gz
+	tar -zxvf cd-hit-v4.6.3-2015-0515.tar.gz
+	cd cd-hit-v4.6.3-2015-0515
+	make
+	cd cd-hit-auxtools
+	make
+	cd ..
+	cd ..
 
 	
-Removed duplicates:
-
-	./usearch8.0.1623 -derep_prefix usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V4.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V9.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V10.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V11.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V12.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V13.R1.unique.fasta -minseqlength 80
-
-	./usearch8.0.1623 -derep_prefix usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V4.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V9.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V10.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V11.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V12.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V13.R2.unique.fasta -minseqlength 80
 
 
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R1.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R1.unique.fasta -minseqlength 80
 
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R2.unique.fasta -minseqlength 80
-	./usearch8.0.1623 -derep_prefix usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R2.unique.fasta -minseqlength 80
+
+
+
+
+
+
+Removed duplicates (this step required our 64-bit version of usearch.  Can run the smaller files on 32-bit and see it produces same output):
+
+	./usearch7.0.10 -derep_prefix usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V4.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V9.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V10.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V11.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V12.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V13.R1.unique.fasta -minseqlength 80
+
+	./usearch7.0.10 -derep_prefix usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V4.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V9.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V10.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V11.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V12.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V13.R2.unique.fasta -minseqlength 80
+
+
+	./usearch7.0.10 -derep_prefix usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R1.unique.fasta -minseqlength 80
+
+	./usearch7.0.10 -derep_prefix usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R2.unique.fasta -minseqlength 80
 	
+	./usearch7.0.10 -derep_prefix usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V9.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V10.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V12.R1.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V13.R1.unique.fasta -minseqlength 80
+	
+	./usearch7.0.10 -derep_prefix usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V9.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V10.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V12.R2.unique.fasta -minseqlength 80
+	./usearch7.0.10 -derep_prefix usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V13.R2.unique.fasta -minseqlength 80
+
 
 
 Now, we can use QIIME to filter the original FASTQ files with the seqeunce identifiers from the truncated/dereplicated FASTQ files:
 
-    source qiimeEnv/bin/activate
     source qiimeEnv/bin/activate
 	filter_fasta.py -f usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq -s usearch_qc/V4_S1_L001_R1_001_trunc75_ids.txt -o usearch_qc/V4_S1_L001_R1_001_usearch_finalqc.fastq
 	filter_fasta.py -f usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq -s usearch_qc/V9_S2_L001_R1_001_trunc75_ids.txt -o usearch_qc/V9_S2_L001_R1_001_usearch_finalqc.fastq
@@ -2632,8 +2797,22 @@ Now, we can use QIIME to filter the original FASTQ files with the seqeunce ident
 	filter_fasta.py -f usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq -s usearch_qc2/V11_S4_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V11_S4_L001_R2_001_usearch_finalqc.fastq
 	filter_fasta.py -f usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq -s usearch_qc2/V12_S5_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V12_S5_L001_R2_001_usearch_finalqc.fastq
 	filter_fasta.py -f usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq -s usearch_qc2/V13_S6_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V13_S6_L001_R2_001_usearch_finalqc.fastq
+	
+	filter_fasta.py -f usearch_qc3/V9_S2_L001_R1_001_usearch_error.fastq -s usearch_qc3/V9_S2_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V9_S2_L001_R1_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V10_S3_L001_R1_001_usearch_error.fastq -s usearch_qc3/V10_S3_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V10_S3_L001_R1_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V12_S4_L001_R1_001_usearch_error.fastq -s usearch_qc3/V12_S4_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V12_S4_L001_R1_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V13_S5_L001_R1_001_usearch_error.fastq -s usearch_qc3/V13_S5_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V13_S5_L001_R1_001_usearch_finalqc.fastq
+
+	filter_fasta.py -f usearch_qc3/V9_S2_L001_R2_001_usearch_error.fastq -s usearch_qc3/V9_S2_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V9_S2_L001_R2_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V10_S3_L001_R2_001_usearch_error.fastq -s usearch_qc3/V10_S3_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V10_S3_L001_R2_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V12_S4_L001_R2_001_usearch_error.fastq -s usearch_qc3/V12_S4_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V12_S4_L001_R2_001_usearch_finalqc.fastq
+	filter_fasta.py -f usearch_qc3/V13_S5_L001_R2_001_usearch_error.fastq -s usearch_qc3/V13_S5_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V13_S5_L001_R2_001_usearch_finalqc.fastq
+
+	
 
 Added one more step to ensure removal of duplicates.  Also, combined read1 and read2 together because we had many orphans as it was due to quality falling quickly on v3 MiSeq chemsitry on read2:
+
+	cat
 
 	mkdir prinseq_illumina
     cd usearch_qc
