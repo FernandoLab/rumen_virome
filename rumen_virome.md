@@ -2715,125 +2715,32 @@ Use different version of CD-HIT with updated software to remove illumina duplica
 	cd ..
 
 	
+	cd usearch_qc
+	for f in *_R2.fastq
+	do
+		filename=$(basename "$f")
+    	filename="${filename%_*}"
+    	cd /work/samodha/canderson3
+		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc/$f -o "usearch_qc/$filename""_R2_derep.fastq" -e 0.01 -m false
+	done
 
+	cd usearch_qc2
+	for f in *_R2.fastq
+	do
+		filename=$(basename "$f")
+    	filename="${filename%_*}"
+    	cd /work/samodha/canderson3
+		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc2/$f -o "usearch_qc2/$filename""_R2_derep.fastq" -e 0.01 -m false
+	done
 
-
-
-
-
-
-
-
-Removed duplicates (this step required our 64-bit version of usearch.  Can run the smaller files on 32-bit and see it produces same output):
-
-	./usearch7.0.10 -derep_prefix usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V4.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V9.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V10.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V11.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V12.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc/V13.R1.unique.fasta -minseqlength 80
-
-	./usearch7.0.10 -derep_prefix usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V4.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V9.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V10.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V11.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V12.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc/V13.R2.unique.fasta -minseqlength 80
-
-
-	./usearch7.0.10 -derep_prefix usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R1.unique.fasta -minseqlength 80
-
-	./usearch7.0.10 -derep_prefix usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V4.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V9.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V10.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V11.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V12.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq  -fastaout usearch_qc2/V13.R2.unique.fasta -minseqlength 80
-	
-	./usearch7.0.10 -derep_prefix usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V9.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V10.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V12.R1.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq -fastaout usearch_qc3/V13.R1.unique.fasta -minseqlength 80
-	
-	./usearch7.0.10 -derep_prefix usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V9.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V10.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V12.R2.unique.fasta -minseqlength 80
-	./usearch7.0.10 -derep_prefix usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq -fastaout usearch_qc3/V13.R2.unique.fasta -minseqlength 80
-
-
-
-Now, we can use QIIME to filter the original FASTQ files with the seqeunce identifiers from the truncated/dereplicated FASTQ files:
-
-    source qiimeEnv/bin/activate
-	filter_fasta.py -f usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq -s usearch_qc/V4_S1_L001_R1_001_trunc75_ids.txt -o usearch_qc/V4_S1_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq -s usearch_qc/V9_S2_L001_R1_001_trunc75_ids.txt -o usearch_qc/V9_S2_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq -s usearch_qc/V10_S3_L001_R1_001_trunc75_ids.txt -o usearch_qc/V10_S3_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq -s usearch_qc/V11_S4_L001_R1_001_trunc75_ids.txt -o usearch_qc/V11_S4_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq -s usearch_qc/V12_S5_L001_R1_001_trunc75_ids.txt -o usearch_qc/V12_S5_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq -s usearch_qc/V13_S6_L001_R1_001_trunc75_ids.txt -o usearch_qc/V13_S6_L001_R1_001_usearch_finalqc.fastq
-
-	filter_fasta.py -f usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq -s usearch_qc/V4_S1_L001_R2_001_trunc75_ids.txt -o usearch_qc/V4_S1_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq -s usearch_qc/V9_S2_L001_R2_001_trunc75_ids.txt -o usearch_qc/V9_S2_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq -s usearch_qc/V10_S3_L001_R2_001_trunc75_ids.txt -o usearch_qc/V10_S3_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq -s usearch_qc/V11_S4_L001_R2_001_trunc75_ids.txt -o usearch_qc/V11_S4_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq -s usearch_qc/V12_S5_L001_R2_001_trunc75_ids.txt -o usearch_qc/V12_S5_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq -s usearch_qc/V13_S6_L001_R2_001_trunc75_ids.txt -o usearch_qc/V13_S6_L001_R2_001_usearch_finalqc.fastq
-
-	filter_fasta.py -f usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq -s usearch_qc2/V4_S1_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V4_S1_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq -s usearch_qc2/V9_S2_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V9_S2_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq -s usearch_qc2/V10_S3_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V10_S3_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq -s usearch_qc2/V11_S4_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V11_S4_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq -s usearch_qc2/V12_S5_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V12_S5_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq -s usearch_qc2/V13_S6_L001_R1_001_trunc75_ids.txt -o usearch_qc2/V13_S6_L001_R1_001_usearch_finalqc.fastq
-
-	filter_fasta.py -f usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq -s usearch_qc2/V4_S1_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V4_S1_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq -s usearch_qc2/V9_S2_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V9_S2_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq -s usearch_qc2/V10_S3_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V10_S3_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq -s usearch_qc2/V11_S4_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V11_S4_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq -s usearch_qc2/V12_S5_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V12_S5_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq -s usearch_qc2/V13_S6_L001_R2_001_trunc75_ids.txt -o usearch_qc2/V13_S6_L001_R2_001_usearch_finalqc.fastq
-	
-	filter_fasta.py -f usearch_qc3/V9_S2_L001_R1_001_usearch_error.fastq -s usearch_qc3/V9_S2_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V9_S2_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V10_S3_L001_R1_001_usearch_error.fastq -s usearch_qc3/V10_S3_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V10_S3_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V12_S4_L001_R1_001_usearch_error.fastq -s usearch_qc3/V12_S4_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V12_S4_L001_R1_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V13_S5_L001_R1_001_usearch_error.fastq -s usearch_qc3/V13_S5_L001_R1_001_trunc75_ids.txt -o usearch_qc3/V13_S5_L001_R1_001_usearch_finalqc.fastq
-
-	filter_fasta.py -f usearch_qc3/V9_S2_L001_R2_001_usearch_error.fastq -s usearch_qc3/V9_S2_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V9_S2_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V10_S3_L001_R2_001_usearch_error.fastq -s usearch_qc3/V10_S3_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V10_S3_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V12_S4_L001_R2_001_usearch_error.fastq -s usearch_qc3/V12_S4_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V12_S4_L001_R2_001_usearch_finalqc.fastq
-	filter_fasta.py -f usearch_qc3/V13_S5_L001_R2_001_usearch_error.fastq -s usearch_qc3/V13_S5_L001_R2_001_trunc75_ids.txt -o usearch_qc3/V13_S5_L001_R2_001_usearch_finalqc.fastq
-
-	
-
-Added one more step to ensure removal of duplicates.  Also, combined read1 and read2 together because we had many orphans as it was due to quality falling quickly on v3 MiSeq chemsitry on read2:
-
-	cat
-
-	mkdir prinseq_illumina
-    cd usearch_qc
-    for f in *_R2_finalqc.fastq
-    do
-        filename=$(basename "$f")
-        filename="${filename%_*}"
-        cd ~
-        perl prinseq-lite-0.20.4/./prinseq-lite.pl -derep 14 -lc_method dust -lc_threshold 7 -fastq usearch_qc/$f -out_format 3 -out_good prinseq_illumina/"$filename""_prinseq"
-    done
-    
-    mkdir prinseq_illumina2
-    cd usearch_qc2
-    for f in *_R2_finalqc.fastq
-    do
-        filename=$(basename "$f")
-        filename="${filename%_*}"
-        cd ~
-        perl prinseq-lite-0.20.4/./prinseq-lite.pl -derep 14 -lc_method dust -lc_threshold 7 -fastq usearch_qc2/$f -out_format 3 -out_good prinseq_illumina2/"$filename""_prinseq"
-    done
-
+	cd usearch_qc3
+	for f in *_R2.fastq
+	do
+		filename=$(basename "$f")
+		filename="${filename%_*}"
+   		cd /work/samodha/canderson3
+		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc3/$f -o "usearch_qc3/$filename""_R2_derep.fastq" -e 0.01 -m false
+	done
 
 Combine reads from all runs together:
 
