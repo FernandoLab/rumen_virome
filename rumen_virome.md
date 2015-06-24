@@ -2703,25 +2703,15 @@ merge read1 and read2 together, many of reverse reads lost due to quality fallin
 	cat usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq > usearch_qc3/v12_S4_L001_R1_R2.fastq
 	cat usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq > usearch_qc3/v13_S5_L001_R1_R2.fastq
 
-Use different version of CD-HIT with updated software to remove illumina duplicates:
-	
-	wget https://github.com/weizhongli/cdhit/releases/download/V4.6.3/cd-hit-v4.6.3-2015-0515.tar.gz
-	tar -zxvf cd-hit-v4.6.3-2015-0515.tar.gz
-	cd cd-hit-v4.6.3-2015-0515
-	make
-	cd cd-hit-auxtools
-	make
-	cd ..
-	cd ..
+Usearch to remove duplicates.  Due to file size had to use our licensed 64 bit version of usearch:
 
-	
 	cd usearch_qc
 	for f in *_R2.fastq
 	do
 		filename=$(basename "$f")
     	filename="${filename%_*}"
-    	cd /work/samodha/canderson3
-		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc/$f -o "usearch_qc/$filename""_R2_derep.fastq" -e 0.01 -m false
+    	cd ~
+		./usearch8.0.1623_64bit -derep_prefix usearch_qc/$f -fastaout "usearch_qc/$filename""_R2_derep.fasta"
 	done
 
 	cd usearch_qc2
@@ -2729,8 +2719,8 @@ Use different version of CD-HIT with updated software to remove illumina duplica
 	do
 		filename=$(basename "$f")
     	filename="${filename%_*}"
-    	cd /work/samodha/canderson3
-		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc2/$f -o "usearch_qc2/$filename""_R2_derep.fastq" -e 0.01 -m false
+    	cd ~
+		./usearch8.0.1623_64bit -derep_prefix usearch_qc2/$f -fastaout "usearch_qc2/$filename""_R2_derep.fasta"
 	done
 
 	cd usearch_qc3
@@ -2738,10 +2728,47 @@ Use different version of CD-HIT with updated software to remove illumina duplica
 	do
 		filename=$(basename "$f")
 		filename="${filename%_*}"
-   		cd /work/samodha/canderson3
-		cd-hit-v4.6.3-2015-0515/cd-hit-auxtools/cd-hit-dup -i usearch_qc3/$f -o "usearch_qc3/$filename""_R2_derep.fastq" -e 0.01 -m false
+    	cd ~
+		./usearch8.0.1623_64bit -derep_prefix usearch_qc3/$f -fastaout "usearch_qc3/$filename""_R2_derep.fasta"
 	done
 
+	module load python/2.7
+	source qiimeEnv/bin/activate
+	grep ">" usearch_qc/V4_S1_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V4_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V4_S1_L001_R1_R2.fastq -s usearch_qc/V4_keep_ids.txt -o usearch_qc/V4_R1_R2_finalQC.fastq
+	grep ">" usearch_qc/V9_S2_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V9_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V9_S2_L001_R1_R2.fastq -s usearch_qc/V9_keep_ids.txt -o usearch_qc/V9_R1_R2_finalQC.fastq
+	grep ">" usearch_qc/V10_S3_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V10_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V10_S3_L001_R1_R2.fastq -s usearch_qc/V10_keep_ids.txt -o usearch_qc/V10_R1_R2_finalQC.fastq
+	grep ">" usearch_qc/V11_S4_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V11_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V11_S4_L001_R1_R2.fastq -s usearch_qc/V11_keep_ids.txt -o usearch_qc/V11_R1_R2_finalQC.fastq
+	grep ">" usearch_qc/V12_S5_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V12_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V12_S5_L001_R1_R2.fastq -s usearch_qc/V12_keep_ids.txt -o usearch_qc/V12_R1_R2_finalQC.fastq
+	grep ">" usearch_qc/V13_S6_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc/V13_keep_ids.txt
+	filter_fasta.py -f usearch_qc/V13_S6_L001_R1_R2.fastq -s usearch_qc/V13_keep_ids.txt -o usearch_qc/V13_R1_R2_finalQC.fastq
+	
+	grep ">" usearch_qc2/V4_S1_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V4_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V4_S1_L001_R1_R2.fastq -s usearch_qc2/V4_keep_ids.txt -o usearch_qc2/V4_R1_R2_finalQC.fastq
+	grep ">" usearch_qc2/V9_S2_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V9_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V9_S2_L001_R1_R2.fastq -s usearch_qc2/V9_keep_ids.txt -o usearch_qc2/V9_R1_R2_finalQC.fastq
+	grep ">" usearch_qc2/V10_S3_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V10_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V10_S3_L001_R1_R2.fastq -s usearch_qc2/V10_keep_ids.txt -o usearch_qc2/V10_R1_R2_finalQC.fastq
+	grep ">" usearch_qc2/V11_S4_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V11_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V11_S4_L001_R1_R2.fastq -s usearch_qc2/V11_keep_ids.txt -o usearch_qc2/V11_R1_R2_finalQC.fastq
+	grep ">" usearch_qc2/V12_S5_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V12_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V12_S5_L001_R1_R2.fastq -s usearch_qc2/V12_keep_ids.txt -o usearch_qc2/V12_R1_R2_finalQC.fastq
+	grep ">" usearch_qc2/V13_S6_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc2/V13_keep_ids.txt
+	filter_fasta.py -f usearch_qc2/V13_S6_L001_R1_R2.fastq -s usearch_qc2/V13_keep_ids.txt -o usearch_qc2/V13_R1_R2_finalQC.fastq
+	
+	grep ">" usearch_qc3/v9_S2_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc3/v9_keep_ids.txt
+	filter_fasta.py -f usearch_qc3/V9_S2_L001_R1_R2.fastq -s usearch_qc3/v9_keep_ids.txt -o usearch_qc3/v9_R1_R2_finalQC.fastq
+	grep ">" usearch_qc3/v10_S3_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc3/v10_keep_ids.txt
+	filter_fasta.py -f usearch_qc3/V10_S3_L001_R1_R2.fastq -s usearch_qc3/v10_keep_ids.txt -o usearch_qc3/v10_R1_R2_finalQC.fastq
+	grep ">" usearch_qc3/v12_S4_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc3/v12_keep_ids.txt
+	filter_fasta.py -f usearch_qc3/V12_S4_L001_R1_R2.fastq -s usearch_qc3/v12_keep_ids.txt -o usearch_qc3/v12_R1_R2_finalQC.fastq
+	grep ">" usearch_qc3/v13_S5_L001_R1_R2_derep.fasta | cut -c 2- > usearch_qc3/v13_keep_ids.txt
+	filter_fasta.py -f usearch_qc3/V13_S5_L001_R1_R2.fastq -s usearch_qc3/v13_keep_ids.txt -o usearch_qc3/v13_R1_R2_finalQC.fastq
+	
 Combine reads from all runs together:
 
    
