@@ -783,7 +783,7 @@ Filter the ORFs based on length of nt, then use those sequences as a guide to re
 
 ##Search against KEGG and PHAST VIRAL DBs
 
-Unfortunately, we do use a licensed version of KEGG and usearch for large searches and I can not share those, but the outputs from the search are available in the interm directory. If you wish to use the free version of usearch (up to 4GB RAM), it can be downloaded from http://www.drive5.com/usearch/download.html and is straightforward to install and get running.
+Unfortunately, we do use a licensed version of KEGG and usearch for large searches and I can not share those, but the outputs from the search are available at: . If you wish to use the free version of usearch (up to 4GB RAM), it can be downloaded from http://www.drive5.com/usearch/download.html and is straightforward to install and get running.
 
 We prefer ublast from userach to do our large scale blasting.  Here, we will be doing protein-protein searches.  First, we need to configure the usearch datbase from the KEGG sequeneces:
 
@@ -1135,182 +1135,184 @@ Wrote a custom perl script that calcualtes the abundance of each ORF and KEGG KO
 
 The perl script uses the first hit (top hit) because multiple entries could be a top hit in the case that they have the same e-value. So, you could also input a blast file with multiple hits for each entry. The script will output a lot of different infomration, a lot of which we don't end up using downstream.
 
-Viral:
-
+Since we are using a licensed version of KEGG we cannot provide the genes list file here, but outputs from the script are available at:
+Ion Viral:
+	
+	wget https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/blast2tsv.pl
+	chmod 775 blast2tsv.pl
 	./blast2tsv.pl -blast_file=vmg.ublast.kegg.txt -bowtie_dir=vmg_orfs_bowtie -gene_ko=kegg_2/genes/ko/ko_genes.list
 
+Number of top hits from BLAST file: 60708
 
-Number of top hits from BLAST file: 95153
+Alignment count for VMG.15_trimm: 184871
+Total Read count VMG.15_trimm: 328660
+Redundant gene count with aligned reads for VMG.15_trimm: 5599
+Non-Redundant gene count with aligned reads for VMG.15_trimm: 4046
+Total abundance in gene hits from aligned reads for VMG.15_trimm: 84573
+Non-Redundant ko count with aligned reads for VMG.15_trimm: 691
+Number of nr genes with ko hits: 1278
+Total abundance in ko hits from aligned reads for VMG.15_trimm: 13273
+Number of nr genes without ko hits: 2768
+Total abundance of reads from genes without ko hits: 71300
 
-Alignment count for VMG.10_trimm: 335426
-Total Read count VMG.10_trimm: 659514
-Redundant gene count with aligned reads for VMG.10_trimm: 17361
-Non-Redundant gene count with aligned reads for VMG.10_trimm: 13233
-Total abundance in gene hits from aligned reads for VMG.10_trimm: 126334
-Non-Redundant ko count with aligned reads for VMG.10_trimm: 1880
-Number of nr genes with ko hits: 5133
-Total abundance in ko hits from aligned reads for VMG.10_trimm: 22533
-Number of nr genes without ko hits: 8100
-Total abundance of reads from genes without ko hits: 103801
-
-Alignment count for VMG.11_trimm: 1719015
-Total Read count VMG.11_trimm: 2890819
-Redundant gene count with aligned reads for VMG.11_trimm: 48065
-Non-Redundant gene count with aligned reads for VMG.11_trimm: 24214
-Total abundance in gene hits from aligned reads for VMG.11_trimm: 675510
-Non-Redundant ko count with aligned reads for VMG.11_trimm: 1648
-Number of nr genes with ko hits: 9786
-Total abundance in ko hits from aligned reads for VMG.11_trimm: 152395
-Number of nr genes without ko hits: 14428
-Total abundance of reads from genes without ko hits: 523115
-
-Alignment count for VMG.12_trimm: 230192
-Total Read count VMG.12_trimm: 497309
-Redundant gene count with aligned reads for VMG.12_trimm: 11896
-Non-Redundant gene count with aligned reads for VMG.12_trimm: 8813
-Total abundance in gene hits from aligned reads for VMG.12_trimm: 64893
-Non-Redundant ko count with aligned reads for VMG.12_trimm: 1138
-Number of nr genes with ko hits: 3314
-Total abundance in ko hits from aligned reads for VMG.12_trimm: 11478
-Number of nr genes without ko hits: 5499
-Total abundance of reads from genes without ko hits: 53415
-
-Alignment count for VMG.13_trimm: 550866
-Total Read count VMG.13_trimm: 958298
-Redundant gene count with aligned reads for VMG.13_trimm: 19542
-Non-Redundant gene count with aligned reads for VMG.13_trimm: 13660
-Total abundance in gene hits from aligned reads for VMG.13_trimm: 185322
-Non-Redundant ko count with aligned reads for VMG.13_trimm: 1750
-Number of nr genes with ko hits: 4885
-Total abundance in ko hits from aligned reads for VMG.13_trimm: 27712
-Number of nr genes without ko hits: 8775
-Total abundance of reads from genes without ko hits: 157610
-
-Alignment count for VMG.14_trimm: 382173
-Total Read count VMG.14_trimm: 652788
-Redundant gene count with aligned reads for VMG.14_trimm: 6537
-Non-Redundant gene count with aligned reads for VMG.14_trimm: 4105
-Total abundance in gene hits from aligned reads for VMG.14_trimm: 170389
-Non-Redundant ko count with aligned reads for VMG.14_trimm: 392
+Alignment count for VMG.1_trimm: 349858
+Total Read count VMG.1_trimm: 593530
+Redundant gene count with aligned reads for VMG.1_trimm: 7126
+Non-Redundant gene count with aligned reads for VMG.1_trimm: 4314
+Total abundance in gene hits from aligned reads for VMG.1_trimm: 159029
+Non-Redundant ko count with aligned reads for VMG.1_trimm: 405
 Number of nr genes with ko hits: 924
-Total abundance in ko hits from aligned reads for VMG.14_trimm: 22306
-Number of nr genes without ko hits: 3181
-Total abundance of reads from genes without ko hits: 148083
+Total abundance in ko hits from aligned reads for VMG.1_trimm: 35829
+Number of nr genes without ko hits: 3390
+Total abundance of reads from genes without ko hits: 123200
 
-Alignment count for VMG.15_trimm: 204269
-Total Read count VMG.15_trimm: 356082
-Redundant gene count with aligned reads for VMG.15_trimm: 7150
-Non-Redundant gene count with aligned reads for VMG.15_trimm: 5441
-Total abundance in gene hits from aligned reads for VMG.15_trimm: 86831
-Non-Redundant ko count with aligned reads for VMG.15_trimm: 1021
-Number of nr genes with ko hits: 2009
-Total abundance in ko hits from aligned reads for VMG.15_trimm: 13781
-Number of nr genes without ko hits: 3432
-Total abundance of reads from genes without ko hits: 73050
+Alignment count for VMG.2_trimm: 58577
+Total Read count VMG.2_trimm: 100696
+Redundant gene count with aligned reads for VMG.2_trimm: 1079
+Non-Redundant gene count with aligned reads for VMG.2_trimm: 808
+Total abundance in gene hits from aligned reads for VMG.2_trimm: 18702
+Non-Redundant ko count with aligned reads for VMG.2_trimm: 72
+Number of nr genes with ko hits: 121
+Total abundance in ko hits from aligned reads for VMG.2_trimm: 648
+Number of nr genes without ko hits: 687
+Total abundance of reads from genes without ko hits: 18054
 
-Alignment count for VMG.1_trimm: 388672
-Total Read count VMG.1_trimm: 661076
-Redundant gene count with aligned reads for VMG.1_trimm: 8354
-Non-Redundant gene count with aligned reads for VMG.1_trimm: 5101
-Total abundance in gene hits from aligned reads for VMG.1_trimm: 152237
-Non-Redundant ko count with aligned reads for VMG.1_trimm: 514
-Number of nr genes with ko hits: 1176
-Total abundance in ko hits from aligned reads for VMG.1_trimm: 33573
-Number of nr genes without ko hits: 3925
-Total abundance of reads from genes without ko hits: 118664
+Alignment count for VMG.14_trimm: 348945
+Total Read count VMG.14_trimm: 593047
+Redundant gene count with aligned reads for VMG.14_trimm: 5633
+Non-Redundant gene count with aligned reads for VMG.14_trimm: 3493
+Total abundance in gene hits from aligned reads for VMG.14_trimm: 169120
+Non-Redundant ko count with aligned reads for VMG.14_trimm: 277
+Number of nr genes with ko hits: 708
+Total abundance in ko hits from aligned reads for VMG.14_trimm: 21360
+Number of nr genes without ko hits: 2785
+Total abundance of reads from genes without ko hits: 147760
 
-Alignment count for VMG.2_trimm: 63883
-Total Read count VMG.2_trimm: 141850
-Redundant gene count with aligned reads for VMG.2_trimm: 1126
-Non-Redundant gene count with aligned reads for VMG.2_trimm: 852
-Total abundance in gene hits from aligned reads for VMG.2_trimm: 6453
-Non-Redundant ko count with aligned reads for VMG.2_trimm: 84
-Number of nr genes with ko hits: 135
-Total abundance in ko hits from aligned reads for VMG.2_trimm: 667
-Number of nr genes without ko hits: 717
-Total abundance of reads from genes without ko hits: 5786
+Alignment count for VMG.8_trimm: 323296
+Total Read count VMG.8_trimm: 526337
+Redundant gene count with aligned reads for VMG.8_trimm: 4584
+Non-Redundant gene count with aligned reads for VMG.8_trimm: 3208
+Total abundance in gene hits from aligned reads for VMG.8_trimm: 114754
+Non-Redundant ko count with aligned reads for VMG.8_trimm: 317
+Number of nr genes with ko hits: 713
+Total abundance in ko hits from aligned reads for VMG.8_trimm: 12266
+Number of nr genes without ko hits: 2495
+Total abundance of reads from genes without ko hits: 102488
 
-Alignment count for VMG.3_trimm: 1005238
-Total Read count VMG.3_trimm: 1472309
-Redundant gene count with aligned reads for VMG.3_trimm: 13671
-Non-Redundant gene count with aligned reads for VMG.3_trimm: 7270
-Total abundance in gene hits from aligned reads for VMG.3_trimm: 367298
-Non-Redundant ko count with aligned reads for VMG.3_trimm: 608
-Number of nr genes with ko hits: 1717
-Total abundance in ko hits from aligned reads for VMG.3_trimm: 45852
-Number of nr genes without ko hits: 5553
-Total abundance of reads from genes without ko hits: 321446
+Alignment count for VMG.10_trimm: 299434
+Total Read count VMG.10_trimm: 629489
+Redundant gene count with aligned reads for VMG.10_trimm: 11791
+Non-Redundant gene count with aligned reads for VMG.10_trimm: 8454
+Total abundance in gene hits from aligned reads for VMG.10_trimm: 117572
+Non-Redundant ko count with aligned reads for VMG.10_trimm: 1315
+Number of nr genes with ko hits: 2962
+Total abundance in ko hits from aligned reads for VMG.10_trimm: 18552
+Number of nr genes without ko hits: 5492
+Total abundance of reads from genes without ko hits: 99020
 
-Alignment count for VMG.4_trimm: 1159901
-Total Read count VMG.4_trimm: 2026959
-Redundant gene count with aligned reads for VMG.4_trimm: 24337
-Non-Redundant gene count with aligned reads for VMG.4_trimm: 14186
-Total abundance in gene hits from aligned reads for VMG.4_trimm: 450491
-Non-Redundant ko count with aligned reads for VMG.4_trimm: 1366
-Number of nr genes with ko hits: 4845
-Total abundance in ko hits from aligned reads for VMG.4_trimm: 81635
-Number of nr genes without ko hits: 9341
-Total abundance of reads from genes without ko hits: 368856
+Alignment count for VMG.6_trimm: 182912
+Total Read count VMG.6_trimm: 276069
+Redundant gene count with aligned reads for VMG.6_trimm: 3437
+Non-Redundant gene count with aligned reads for VMG.6_trimm: 2296
+Total abundance in gene hits from aligned reads for VMG.6_trimm: 56735
+Non-Redundant ko count with aligned reads for VMG.6_trimm: 199
+Number of nr genes with ko hits: 422
+Total abundance in ko hits from aligned reads for VMG.6_trimm: 5535
+Number of nr genes without ko hits: 1874
+Total abundance of reads from genes without ko hits: 51200
 
-Alignment count for VMG.5_trimm: 1345061
-Total Read count VMG.5_trimm: 2166417
-Redundant gene count with aligned reads for VMG.5_trimm: 25115
-Non-Redundant gene count with aligned reads for VMG.5_trimm: 13928
-Total abundance in gene hits from aligned reads for VMG.5_trimm: 605441
-Non-Redundant ko count with aligned reads for VMG.5_trimm: 1287
-Number of nr genes with ko hits: 4675
-Total abundance in ko hits from aligned reads for VMG.5_trimm: 122338
-Number of nr genes without ko hits: 9253
-Total abundance of reads from genes without ko hits: 483103
+Alignment count for VMG.3_trimm: 896894
+Total Read count VMG.3_trimm: 1350530
+Redundant gene count with aligned reads for VMG.3_trimm: 11586
+Non-Redundant gene count with aligned reads for VMG.3_trimm: 6235
+Total abundance in gene hits from aligned reads for VMG.3_trimm: 357019
+Non-Redundant ko count with aligned reads for VMG.3_trimm: 506
+Number of nr genes with ko hits: 1409
+Total abundance in ko hits from aligned reads for VMG.3_trimm: 44269
+Number of nr genes without ko hits: 4826
+Total abundance of reads from genes without ko hits: 312750
 
-Alignment count for VMG.6_trimm: 185311
-Total Read count VMG.6_trimm: 305262
-Redundant gene count with aligned reads for VMG.6_trimm: 3711
-Non-Redundant gene count with aligned reads for VMG.6_trimm: 2524
-Total abundance in gene hits from aligned reads for VMG.6_trimm: 54237
-Non-Redundant ko count with aligned reads for VMG.6_trimm: 245
-Number of nr genes with ko hits: 494
-Total abundance in ko hits from aligned reads for VMG.6_trimm: 5160
-Number of nr genes without ko hits: 2030
-Total abundance of reads from genes without ko hits: 49077
+Alignment count for VMG.7_trimm: 309523
+Total Read count VMG.7_trimm: 499466
+Redundant gene count with aligned reads for VMG.7_trimm: 5287
+Non-Redundant gene count with aligned reads for VMG.7_trimm: 3242
+Total abundance in gene hits from aligned reads for VMG.7_trimm: 121663
+Non-Redundant ko count with aligned reads for VMG.7_trimm: 226
+Number of nr genes with ko hits: 612
+Total abundance in ko hits from aligned reads for VMG.7_trimm: 14932
+Number of nr genes without ko hits: 2630
+Total abundance of reads from genes without ko hits: 106731
 
-Alignment count for VMG.7_trimm: 325582
-Total Read count VMG.7_trimm: 530173
-Redundant gene count with aligned reads for VMG.7_trimm: 5940
-Non-Redundant gene count with aligned reads for VMG.7_trimm: 3668
-Total abundance in gene hits from aligned reads for VMG.7_trimm: 111078
-Non-Redundant ko count with aligned reads for VMG.7_trimm: 273
-Number of nr genes with ko hits: 707
-Total abundance in ko hits from aligned reads for VMG.7_trimm: 13728
-Number of nr genes without ko hits: 2961
-Total abundance of reads from genes without ko hits: 97350
+Alignment count for VMG.12_trimm: 215483
+Total Read count VMG.12_trimm: 470915
+Redundant gene count with aligned reads for VMG.12_trimm: 8965
+Non-Redundant gene count with aligned reads for VMG.12_trimm: 6586
+Total abundance in gene hits from aligned reads for VMG.12_trimm: 68419
+Non-Redundant ko count with aligned reads for VMG.12_trimm: 931
+Number of nr genes with ko hits: 2306
+Total abundance in ko hits from aligned reads for VMG.12_trimm: 9590
+Number of nr genes without ko hits: 4280
+Total abundance of reads from genes without ko hits: 58829
 
-Alignment count for VMG.8_trimm: 349140
-Total Read count VMG.8_trimm: 563401
-Redundant gene count with aligned reads for VMG.8_trimm: 5475
-Non-Redundant gene count with aligned reads for VMG.8_trimm: 3933
-Total abundance in gene hits from aligned reads for VMG.8_trimm: 113900
-Non-Redundant ko count with aligned reads for VMG.8_trimm: 468
-Number of nr genes with ko hits: 980
-Total abundance in ko hits from aligned reads for VMG.8_trimm: 12425
-Number of nr genes without ko hits: 2953
-Total abundance of reads from genes without ko hits: 101475
+Alignment count for VMG.9_trimm: 435485
+Total Read count VMG.9_trimm: 703720
+Redundant gene count with aligned reads for VMG.9_trimm: 11481
+Non-Redundant gene count with aligned reads for VMG.9_trimm: 7331
+Total abundance in gene hits from aligned reads for VMG.9_trimm: 196910
+Non-Redundant ko count with aligned reads for VMG.9_trimm: 846
+Number of nr genes with ko hits: 2264
+Total abundance in ko hits from aligned reads for VMG.9_trimm: 23927
+Number of nr genes without ko hits: 5067
+Total abundance of reads from genes without ko hits: 172983
 
-Alignment count for VMG.9_trimm: 480977
-Total Read count VMG.9_trimm: 748778
-Redundant gene count with aligned reads for VMG.9_trimm: 14351
-Non-Redundant gene count with aligned reads for VMG.9_trimm: 9052
-Total abundance in gene hits from aligned reads for VMG.9_trimm: 198460
-Non-Redundant ko count with aligned reads for VMG.9_trimm: 989
-Number of nr genes with ko hits: 2944
-Total abundance in ko hits from aligned reads for VMG.9_trimm: 26403
-Number of nr genes without ko hits: 6108
-Total abundance of reads from genes without ko hits: 172057
+Alignment count for VMG.4_trimm: 1048723
+Total Read count VMG.4_trimm: 1881525
+Redundant gene count with aligned reads for VMG.4_trimm: 19000
+Non-Redundant gene count with aligned reads for VMG.4_trimm: 11085
+Total abundance in gene hits from aligned reads for VMG.4_trimm: 446825
+Non-Redundant ko count with aligned reads for VMG.4_trimm: 1150
+Number of nr genes with ko hits: 3591
+Total abundance in ko hits from aligned reads for VMG.4_trimm: 80137
+Number of nr genes without ko hits: 7494
+Total abundance of reads from genes without ko hits: 366688
+
+Alignment count for VMG.13_trimm: 498752
+Total Read count VMG.13_trimm: 920397
+Redundant gene count with aligned reads for VMG.13_trimm: 14172
+Non-Redundant gene count with aligned reads for VMG.13_trimm: 9685
+Total abundance in gene hits from aligned reads for VMG.13_trimm: 184678
+Non-Redundant ko count with aligned reads for VMG.13_trimm: 1326
+Number of nr genes with ko hits: 3246
+Total abundance in ko hits from aligned reads for VMG.13_trimm: 27005
+Number of nr genes without ko hits: 6439
+Total abundance of reads from genes without ko hits: 157673
+
+Alignment count for VMG.11_trimm: 1506844
+Total Read count VMG.11_trimm: 2712098
+Redundant gene count with aligned reads for VMG.11_trimm: 33406
+Non-Redundant gene count with aligned reads for VMG.11_trimm: 17745
+Total abundance in gene hits from aligned reads for VMG.11_trimm: 636644
+Non-Redundant ko count with aligned reads for VMG.11_trimm: 1418
+Number of nr genes with ko hits: 6780
+Total abundance in ko hits from aligned reads for VMG.11_trimm: 134212
+Number of nr genes without ko hits: 10965
+Total abundance of reads from genes without ko hits: 502432
+
+Alignment count for VMG.5_trimm: 1137296
+Total Read count VMG.5_trimm: 2138335
+Redundant gene count with aligned reads for VMG.5_trimm: 19527
+Non-Redundant gene count with aligned reads for VMG.5_trimm: 11183
+Total abundance in gene hits from aligned reads for VMG.5_trimm: 552557
+Non-Redundant ko count with aligned reads for VMG.5_trimm: 1149
+Number of nr genes with ko hits: 3689
+Total abundance in ko hits from aligned reads for VMG.5_trimm: 113781
+Number of nr genes without ko hits: 7494
+Total abundance of reads from genes without ko hits: 438776
 
 
-Total nucleotides for all samples combined: 2284667869
-Average nucleotides per samples: 152311191.266667
-Number of ORFs with assignments printed to orf_assignment.txt: 32928
+Total nucleotides for all samples combined: 2134811573
+Average nucleotides per samples: 142320771.533333
+Number of ORFs with assignments printed to orf_assignment.txt: 19075
 
 	mkdir viral_blast2tsv
 	mv *no_ko_hit.txt viral_blast2tsv/
@@ -1319,10 +1321,9 @@ Number of ORFs with assignments printed to orf_assignment.txt: 32928
 	mv blast_top_hit.txt viral_blast2tsv/
 	mv orf_ko_assignment.txt viral_blast2tsv/
 
-
 Merge all the normalized abundance tables together:
 	
-	source qiimeEnv/bin/activate
+	source anaconda/bin/activate rumenVirome
 	for f in viral_blast2tsv/*ko_corrected_abundances.txt
 	do
 		filename=$(basename "$f")
@@ -1340,233 +1341,10 @@ Merge all the normalized abundance tables together:
 Total:
 
 	./blast2tsv.pl -blast_file=bmg.ublast.kegg.txt -bowtie_dir=bmg_orfs_bowtie -gene_ko=kegg_2/genes/ko/ko_genes.list
-	
-Number of top hits from BLAST file: 830683
-
-Alignment count for BMG.1: 468360
-Total Read count BMG.1: 931099
-Redundant gene count with aligned reads for BMG.1: 108316
-Non-Redundant gene count with aligned reads for BMG.1: 52631
-Total abundance in gene hits from aligned reads for BMG.1: 401605
-Non-Redundant ko count with aligned reads for BMG.1: 2707
-Number of nr genes with ko hits: 25688
-Total abundance in ko hits from aligned reads for BMG.1: 173612
-Number of nr genes without ko hits: 26943
-Total abundance of reads from genes without ko hits: 227993
-
-Alignment count for BMG.10: 309109
-Total Read count BMG.10: 631225
-Redundant gene count with aligned reads for BMG.10: 98022
-Non-Redundant gene count with aligned reads for BMG.10: 55013
-Total abundance in gene hits from aligned reads for BMG.10: 265551
-Non-Redundant ko count with aligned reads for BMG.10: 2685
-Number of nr genes with ko hits: 27803
-Total abundance in ko hits from aligned reads for BMG.10: 131065
-Number of nr genes without ko hits: 27210
-Total abundance of reads from genes without ko hits: 134486
-
-Alignment count for BMG.11: 1119959
-Total Read count BMG.11: 2261004
-Redundant gene count with aligned reads for BMG.11: 165603
-Non-Redundant gene count with aligned reads for BMG.11: 68806
-Total abundance in gene hits from aligned reads for BMG.11: 931976
-Non-Redundant ko count with aligned reads for BMG.11: 2871
-Number of nr genes with ko hits: 33467
-Total abundance in ko hits from aligned reads for BMG.11: 401052
-Number of nr genes without ko hits: 35339
-Total abundance of reads from genes without ko hits: 530924
-
-Alignment count for BMG.12: 770771
-Total Read count BMG.12: 1591514
-Redundant gene count with aligned reads for BMG.12: 133470
-Non-Redundant gene count with aligned reads for BMG.12: 61010
-Total abundance in gene hits from aligned reads for BMG.12: 632660
-Non-Redundant ko count with aligned reads for BMG.12: 2682
-Number of nr genes with ko hits: 29825
-Total abundance in ko hits from aligned reads for BMG.12: 258092
-Number of nr genes without ko hits: 31185
-Total abundance of reads from genes without ko hits: 374568
-
-Alignment count for BMG.13: 355193
-Total Read count BMG.13: 972805
-Redundant gene count with aligned reads for BMG.13: 107361
-Non-Redundant gene count with aligned reads for BMG.13: 49668
-Total abundance in gene hits from aligned reads for BMG.13: 289533
-Non-Redundant ko count with aligned reads for BMG.13: 2681
-Number of nr genes with ko hits: 23799
-Total abundance in ko hits from aligned reads for BMG.13: 123909
-Number of nr genes without ko hits: 25869
-Total abundance of reads from genes without ko hits: 165624
-
-Alignment count for BMG.14: 1103838
-Total Read count BMG.14: 2475541
-Redundant gene count with aligned reads for BMG.14: 182944
-Non-Redundant gene count with aligned reads for BMG.14: 86298
-Total abundance in gene hits from aligned reads for BMG.14: 912395
-Non-Redundant ko count with aligned reads for BMG.14: 3229
-Number of nr genes with ko hits: 43523
-Total abundance in ko hits from aligned reads for BMG.14: 416138
-Number of nr genes without ko hits: 42775
-Total abundance of reads from genes without ko hits: 496257
-
-Alignment count for BMG.15: 338712
-Total Read count BMG.15: 734576
-Redundant gene count with aligned reads for BMG.15: 89556
-Non-Redundant gene count with aligned reads for BMG.15: 45650
-Total abundance in gene hits from aligned reads for BMG.15: 275246
-Non-Redundant ko count with aligned reads for BMG.15: 2525
-Number of nr genes with ko hits: 22108
-Total abundance in ko hits from aligned reads for BMG.15: 117376
-Number of nr genes without ko hits: 23542
-Total abundance of reads from genes without ko hits: 157870
-
-Alignment count for BMG.16: 812199
-Total Read count BMG.16: 2011286
-Redundant gene count with aligned reads for BMG.16: 147022
-Non-Redundant gene count with aligned reads for BMG.16: 79450
-Total abundance in gene hits from aligned reads for BMG.16: 604995
-Non-Redundant ko count with aligned reads for BMG.16: 3166
-Number of nr genes with ko hits: 40386
-Total abundance in ko hits from aligned reads for BMG.16: 296067
-Number of nr genes without ko hits: 39064
-Total abundance of reads from genes without ko hits: 308928
-
-Alignment count for BMG.17: 211026
-Total Read count BMG.17: 509528
-Redundant gene count with aligned reads for BMG.17: 70402
-Non-Redundant gene count with aligned reads for BMG.17: 44428
-Total abundance in gene hits from aligned reads for BMG.17: 170837
-Non-Redundant ko count with aligned reads for BMG.17: 2605
-Number of nr genes with ko hits: 21933
-Total abundance in ko hits from aligned reads for BMG.17: 78803
-Number of nr genes without ko hits: 22495
-Total abundance of reads from genes without ko hits: 92034
-
-Alignment count for BMG.18: 419898
-Total Read count BMG.18: 1240812
-Redundant gene count with aligned reads for BMG.18: 113752
-Non-Redundant gene count with aligned reads for BMG.18: 51085
-Total abundance in gene hits from aligned reads for BMG.18: 340162
-Non-Redundant ko count with aligned reads for BMG.18: 2694
-Number of nr genes with ko hits: 24375
-Total abundance in ko hits from aligned reads for BMG.18: 142549
-Number of nr genes without ko hits: 26710
-Total abundance of reads from genes without ko hits: 197613
-
-Alignment count for BMG.19: 485087
-Total Read count BMG.19: 995310
-Redundant gene count with aligned reads for BMG.19: 116604
-Non-Redundant gene count with aligned reads for BMG.19: 59400
-Total abundance in gene hits from aligned reads for BMG.19: 408014
-Non-Redundant ko count with aligned reads for BMG.19: 2790
-Number of nr genes with ko hits: 29668
-Total abundance in ko hits from aligned reads for BMG.19: 180907
-Number of nr genes without ko hits: 29732
-Total abundance of reads from genes without ko hits: 227107
-
-Alignment count for BMG.2: 749692
-Total Read count BMG.2: 1331228
-Redundant gene count with aligned reads for BMG.2: 145268
-Non-Redundant gene count with aligned reads for BMG.2: 73768
-Total abundance in gene hits from aligned reads for BMG.2: 660700
-Non-Redundant ko count with aligned reads for BMG.2: 3166
-Number of nr genes with ko hits: 37811
-Total abundance in ko hits from aligned reads for BMG.2: 338181
-Number of nr genes without ko hits: 35957
-Total abundance of reads from genes without ko hits: 322519
-
-Alignment count for BMG.20: 408000
-Total Read count BMG.20: 888555
-Redundant gene count with aligned reads for BMG.20: 106270
-Non-Redundant gene count with aligned reads for BMG.20: 55476
-Total abundance in gene hits from aligned reads for BMG.20: 319884
-Non-Redundant ko count with aligned reads for BMG.20: 2702
-Number of nr genes with ko hits: 26648
-Total abundance in ko hits from aligned reads for BMG.20: 130613
-Number of nr genes without ko hits: 28828
-Total abundance of reads from genes without ko hits: 189271
-
-Alignment count for BMG.3: 1086151
-Total Read count BMG.3: 2070496
-Redundant gene count with aligned reads for BMG.3: 166442
-Non-Redundant gene count with aligned reads for BMG.3: 68879
-Total abundance in gene hits from aligned reads for BMG.3: 930384
-Non-Redundant ko count with aligned reads for BMG.3: 2767
-Number of nr genes with ko hits: 33171
-Total abundance in ko hits from aligned reads for BMG.3: 387823
-Number of nr genes without ko hits: 35708
-Total abundance of reads from genes without ko hits: 542561
-
-Alignment count for BMG.4: 1559650
-Total Read count BMG.4: 3165966
-Redundant gene count with aligned reads for BMG.4: 212337
-Non-Redundant gene count with aligned reads for BMG.4: 98306
-Total abundance in gene hits from aligned reads for BMG.4: 1299794
-Non-Redundant ko count with aligned reads for BMG.4: 3190
-Number of nr genes with ko hits: 49641
-Total abundance in ko hits from aligned reads for BMG.4: 630815
-Number of nr genes without ko hits: 48665
-Total abundance of reads from genes without ko hits: 668979
-
-Alignment count for BMG.5: 259823
-Total Read count BMG.5: 666970
-Redundant gene count with aligned reads for BMG.5: 79992
-Non-Redundant gene count with aligned reads for BMG.5: 37560
-Total abundance in gene hits from aligned reads for BMG.5: 212833
-Non-Redundant ko count with aligned reads for BMG.5: 2280
-Number of nr genes with ko hits: 17377
-Total abundance in ko hits from aligned reads for BMG.5: 87361
-Number of nr genes without ko hits: 20183
-Total abundance of reads from genes without ko hits: 125472
-
-Alignment count for BMG.6: 1173763
-Total Read count BMG.6: 2344185
-Redundant gene count with aligned reads for BMG.6: 230737
-Non-Redundant gene count with aligned reads for BMG.6: 98932
-Total abundance in gene hits from aligned reads for BMG.6: 1017524
-Non-Redundant ko count with aligned reads for BMG.6: 3232
-Number of nr genes with ko hits: 49970
-Total abundance in ko hits from aligned reads for BMG.6: 490093
-Number of nr genes without ko hits: 48962
-Total abundance of reads from genes without ko hits: 527431
-
-Alignment count for BMG.7: 230721
-Total Read count BMG.7: 484852
-Redundant gene count with aligned reads for BMG.7: 89489
-Non-Redundant gene count with aligned reads for BMG.7: 52921
-Total abundance in gene hits from aligned reads for BMG.7: 194331
-Non-Redundant ko count with aligned reads for BMG.7: 2746
-Number of nr genes with ko hits: 26741
-Total abundance in ko hits from aligned reads for BMG.7: 94508
-Number of nr genes without ko hits: 26180
-Total abundance of reads from genes without ko hits: 99823
-
-Alignment count for BMG.8: 469011
-Total Read count BMG.8: 884957
-Redundant gene count with aligned reads for BMG.8: 80567
-Non-Redundant gene count with aligned reads for BMG.8: 42988
-Total abundance in gene hits from aligned reads for BMG.8: 382214
-Non-Redundant ko count with aligned reads for BMG.8: 2336
-Number of nr genes with ko hits: 20776
-Total abundance in ko hits from aligned reads for BMG.8: 149320
-Number of nr genes without ko hits: 22212
-Total abundance of reads from genes without ko hits: 232894
-
-Alignment count for BMG.9: 251814
-Total Read count BMG.9: 667046
-Redundant gene count with aligned reads for BMG.9: 87964
-Non-Redundant gene count with aligned reads for BMG.9: 49582
-Total abundance in gene hits from aligned reads for BMG.9: 188350
-Non-Redundant ko count with aligned reads for BMG.9: 2503
-Number of nr genes with ko hits: 24125
-Total abundance in ko hits from aligned reads for BMG.9: 85108
-Number of nr genes without ko hits: 25457
-Total abundance of reads from genes without ko hits: 103242
 
 
-Total nucleotides for all samples combined: 7369829541
-Average nucleotides per samples: 491321969.4
-Number of ORFs with assignments printed to orf_assignment.txt: 355187	
+
+
 	
 	mkdir bmg_blast2tsv
 	mv *no_ko_hit.txt bmg_blast2tsv/
@@ -1577,7 +1355,7 @@ Number of ORFs with assignments printed to orf_assignment.txt: 355187
 	
 Merge all the normalized abundance tables together:
 	
-	source qiimeEnv/bin/activate
+	source anaconda/bin/activate rumenVirome
 	for f in bmg_blast2tsv/*ko_corrected_abundances.txt
 	do
 		filename=$(basename "$f")
@@ -1593,6 +1371,107 @@ Merge all the normalized abundance tables together:
 
 
 
+Illumina Viral:
+
+	./blast2tsv.pl -blast_file=vmg.illumina.ublast.kegg.txt -bowtie_dir=vmg_illumina_orfs_bowtie -gene_ko=ko_genes.list
+
+Number of top hits from BLAST file: 280325
+
+Alignment count for V12.illumina.cat.fastq: 4560453
+Total Read count V12.illumina.cat.fastq: 7455959
+Redundant gene count with aligned reads for V12.illumina.cat.fastq: 120435
+Non-Redundant gene count with aligned reads for V12.illumina.cat.fastq: 58963
+Total abundance in gene hits from aligned reads for V12.illumina.cat.fastq: 2579453
+Non-Redundant ko count with aligned reads for V12.illumina.cat.fastq: 2908
+Number of nr genes with ko hits: 26160
+Total abundance in ko hits from aligned reads for V12.illumina.cat.fastq: 846823
+Number of nr genes without ko hits: 32803
+Total abundance of reads from genes without ko hits: 1732630
+
+Alignment count for V11.illumina.cat.fastq: 4517005
+Total Read count V11.illumina.cat.fastq: 8385479
+Redundant gene count with aligned reads for V11.illumina.cat.fastq: 90736
+Non-Redundant gene count with aligned reads for V11.illumina.cat.fastq: 40642
+Total abundance in gene hits from aligned reads for V11.illumina.cat.fastq: 1919964
+Non-Redundant ko count with aligned reads for V11.illumina.cat.fastq: 2398
+Number of nr genes with ko hits: 16281
+Total abundance in ko hits from aligned reads for V11.illumina.cat.fastq: 441720
+Number of nr genes without ko hits: 24361
+Total abundance of reads from genes without ko hits: 1478244
+
+Alignment count for V9.illumina.cat.fastq: 5043704
+Total Read count V9.illumina.cat.fastq: 7415628
+Redundant gene count with aligned reads for V9.illumina.cat.fastq: 77765
+Non-Redundant gene count with aligned reads for V9.illumina.cat.fastq: 36024
+Total abundance in gene hits from aligned reads for V9.illumina.cat.fastq: 2637797
+Non-Redundant ko count with aligned reads for V9.illumina.cat.fastq: 2215
+Number of nr genes with ko hits: 13489
+Total abundance in ko hits from aligned reads for V9.illumina.cat.fastq: 484687
+Number of nr genes without ko hits: 22535
+Total abundance of reads from genes without ko hits: 2153110
+
+Alignment count for V13.illumina.cat.fastq: 2734812
+Total Read count V13.illumina.cat.fastq: 5527947
+Redundant gene count with aligned reads for V13.illumina.cat.fastq: 70383
+Non-Redundant gene count with aligned reads for V13.illumina.cat.fastq: 49326
+Total abundance in gene hits from aligned reads for V13.illumina.cat.fastq: 1253703
+Non-Redundant ko count with aligned reads for V13.illumina.cat.fastq: 3364
+Number of nr genes with ko hits: 19460
+Total abundance in ko hits from aligned reads for V13.illumina.cat.fastq: 294371
+Number of nr genes without ko hits: 29866
+Total abundance of reads from genes without ko hits: 959332
+
+Alignment count for V10.illumina.cat.fastq: 3623642
+Total Read count V10.illumina.cat.fastq: 7358902
+Redundant gene count with aligned reads for V10.illumina.cat.fastq: 80816
+Non-Redundant gene count with aligned reads for V10.illumina.cat.fastq: 62915
+Total abundance in gene hits from aligned reads for V10.illumina.cat.fastq: 1597957
+Non-Redundant ko count with aligned reads for V10.illumina.cat.fastq: 3761
+Number of nr genes with ko hits: 26778
+Total abundance in ko hits from aligned reads for V10.illumina.cat.fastq: 343792
+Number of nr genes without ko hits: 36137
+Total abundance of reads from genes without ko hits: 1254165
+
+Alignment count for V4.illumina.cat.fastq: 3706928
+Total Read count V4.illumina.cat.fastq: 5576608
+Redundant gene count with aligned reads for V4.illumina.cat.fastq: 51979
+Non-Redundant gene count with aligned reads for V4.illumina.cat.fastq: 30119
+Total abundance in gene hits from aligned reads for V4.illumina.cat.fastq: 1876298
+Non-Redundant ko count with aligned reads for V4.illumina.cat.fastq: 2292
+Number of nr genes with ko hits: 11289
+Total abundance in ko hits from aligned reads for V4.illumina.cat.fastq: 335509
+Number of nr genes without ko hits: 18830
+Total abundance of reads from genes without ko hits: 1540789
+
+
+Total nucleotides for all samples combined: 8330830965
+Average nucleotides per samples: 555388731
+Number of ORFs with assignments printed to orf_assignment.txt: 111907
+
+	mkdir viral_illumina_blast2tsv
+	mv *no_ko_hit.txt viral_illumina_blast2tsv
+	mv *_abundances.txt viral_illumina_blast2tsv
+	mv *_abundance.txt viral_illumina_blast2tsv
+	mv blast_top_hit.txt viral_illumina_blast2tsv
+	mv orf_ko_assignment.txt viral_illumina_blast2tsv
+
+Merge all normalized abundance tables together:
+	
+	source anaconda/bin/activate rumenVirome
+	for f in viral_illumina_blast2tsv/*ko_corrected_abundances.txt
+	do
+		filename=$(basename "$f")
+		filename="${filename%.txt}"
+		biom convert --table-type="OTU table" --to-json -i $f -o viral_illumina_blast2tsv/$filename.biom
+	done
+
+	merge_otu_tables.py -i viral_illumina_blast2tsv/V4.illumina.cat.fastq.ko_corrected_abundances.biom,viral_illumina_blast2tsv/V9.illumina.cat.fastq.ko_corrected_abundances.biom,viral_illumina_blast2tsv/V10.illumina.cat.fastq.ko_corrected_abundances.biom,viral_illumina_blast2tsv/V11.illumina.cat.fastq.ko_corrected_abundances.biom,viral_illumina_blast2tsv/V12.illumina.cat.fastq.ko_corrected_abundances.biom,viral_illumina_blast2tsv/V13.illumina.cat.fastq.ko_corrected_abundances.biom -o viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.biom
+
+	biom summarize-table -i viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.biom  -o viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances_summarize.txt
+	
+	biom convert -i viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.biom -o viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.txt --table-type="OTU table" --to-tsv
+
+
 ##Filter Viral KOs for viral homology
 We used the results from searching against the PHAST viral database to filter KOs, saying that for a KO to be considered downstream, an ORF that the KO came from had to have a singificant PHAST database hit somewhere on the contig that the ORF came from.  This helps to ensure the metabolism genes we are looking at are actually of viral origin.
 
@@ -1601,8 +1480,13 @@ NEED TO DOUBLE CHECK THIS SCRIPT!!!!???!!!!
 First, need to create a list of viral KOs from abundance table just created:
 
 	awk 'NR>2{print $1}' viral_blast2tsv/VMG.ko_corrected_abundances.txt > viral_all_kos.txt
+	awk 'NR>2{print $1}' viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.txt > viral_illumina_all_kos.txt
 
 Now, use custom perl script to filter based on criteria described above:
+
+	wget
+
+Ion Viral:
 
 	./get_knum_phast_hits.pl -phast_blast=vmg.ublast.phast.txt -orf_ko_assign=viral_blast2tsv/orf_ko_assignment.txt -knum=viral_all_kos.txt
 
@@ -1621,6 +1505,7 @@ Use the ko_w_phast_hits_list.txt file to filter the KO abundance table generated
 	filter_otus_from_otu_table.py -i viral_blast2tsv/VMG.ko_corrected_abundances.biom -o viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.biom -e viral_blast2tsv/ko_w_phast_hits_list.txt --negate_ids_to_exclude
 	biom convert -i viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.biom -o viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.txt --table-type="OTU table" --to-tsv
 
+Illumina Viral:
 
 
 ##Find Differential Features KOs:
