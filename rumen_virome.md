@@ -653,11 +653,39 @@ Total:
 	
 
 
-Do threshold of 1 (present in one other sample), whatever that was before
-Turn counts into normalized, then distance metric, and community Stats in R. Then look at pairwise statistics
+To try and eliminate the imapct of some sequencing errors on the results, say that a read must be shared with at least one other sample in the dataset:
+
+	wget https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/khmer_multi_threshold.pl
+	chmod 775 khmer_multi_threshold.pl
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
 
 
+Look at how reads are shared within a diet and within an individual:
+Total:
 
+	./khmer_multi_grouping.pl -group=diet -khmer_multi_dir= -threshold=3 -config=config.txt 
+
+	./khmer_multi_grouping.pl -group=animal -khmer_multi_dir= -threshold=1 -config=config.txt 
+
+Ion Viral:
+
+
+Illumina Viral:
+
+
+Compare diets pairwise to observe the shared number of reads between them:
+Total:
+
+
+Ion Viral:
+
+
+Illumina viral:
 
 
 
@@ -801,10 +829,13 @@ Make bowtie database:
 	
 	mkdir vmg_orfs_bowtie
 	bowtie2-2.2.5/bowtie2-build vmg.orfs_nt.filter.fasta vmg_orfs_bowtie/vmg_orfs_bowtie_db
+	
 	mkdir bmg_orfs_bowtie
 	bowtie2-2.2.5/bowtie2-build bmg.orfs_nt.filter.fasta bmg_orfs_bowtie/bmg_orfs_bowtie_db
 
-
+	mkdir vmg_illumina_orfs_bowtie
+	bowtie2-2.2.5/bowtie2-build vmg.illumina.orfs_nt.filter.fasta vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db
+	
 Align all viral reads to nt ORFs:
 
     for f in prinseq_output/*.fastq
