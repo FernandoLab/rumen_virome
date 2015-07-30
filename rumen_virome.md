@@ -669,7 +669,6 @@ Look at how reads are shared within a diet and within an individual:
 Total:
 
 	./khmer_multi_grouping.pl -group=diet -khmer_multi_dir= -threshold=3 -config=config.txt 
-
 	./khmer_multi_grouping.pl -group=animal -khmer_multi_dir= -threshold=1 -config=config.txt 
 
 Ion Viral:
@@ -680,6 +679,8 @@ Illumina Viral:
 
 Compare diets pairwise to observe the shared number of reads between them:
 Total:
+
+	./khmer_multi_diet_overlap.pl -khmer_multi_dir= -threshold=2 -config=config.txt -diet1=40MDGS -diet2=Control
 
 
 Ion Viral:
