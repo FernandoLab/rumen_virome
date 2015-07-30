@@ -653,18 +653,7 @@ Total:
 	
 
 
-To try and eliminate the imapct of some sequencing errors on the results, say that a read must be shared with at least one other sample in the dataset:
-
-	wget https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/khmer_multi_threshold.pl
-	chmod 775 khmer_multi_threshold.pl
-	
-	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
-	
-	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
-	
-	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
-
-
+##Read sharing within diets, between diets, and within an animal over time
 Look at how reads are shared within a diet and within an individual:
 Total:
 
@@ -690,10 +679,35 @@ Illumina viral:
 
 
 
+##Beta-Diversity using Read Sharing
+To try and eliminate the impact of some sequencing errors on the results, say that a read must be shared with at least one other sample in the dataset:
+
+	wget https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/khmer_multi_threshold.pl
+	chmod 775 khmer_multi_threshold.pl
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
+	
+	./khmer_multi_threshold.pl -khmer_multi_dir= -threshold=1
+
+
+
+
+
+
+
+
+
 
 
 
 Overlap of Viral and total:
+
+
+
+
+
 
 
 
@@ -837,23 +851,283 @@ Make bowtie database:
 	mkdir vmg_illumina_orfs_bowtie
 	bowtie2-2.2.5/bowtie2-build vmg.illumina.orfs_nt.filter.fasta vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db
 	
-Align all viral reads to nt ORFs:
+Align Ion viral reads to nt ORFs:
 
-    for f in prinseq_output/*.fastq
+    for f in prinseq_output/*finalQC.fastq
     do
         filename=$(basename "$f")
         filename="${filename%_*}"
         bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x vmg_orfs_bowtie/vmg_orfs_bowtie_db -S vmg_orfs_bowtie/$filename.psl --un vmg_orfs_bowtie/$filename.unaligned.txt --al vmg_orfs_bowtie/$filename.aligned.txt 
     done
+    
+    629489 reads; of these:
+
+629489 (100.00%) were unpaired; of these:
+    330055 (52.43%) aligned 0 times
+    261690 (41.57%) aligned exactly 1 time
+    37744 (6.00%) aligned >1 times
+47.57% overall alignment rate
+2712098 reads; of these:
+  2712098 (100.00%) were unpaired; of these:
+    1205254 (44.44%) aligned 0 times
+    1372819 (50.62%) aligned exactly 1 time
+    134025 (4.94%) aligned >1 times
+55.56% overall alignment rate
+470915 reads; of these:
+  470915 (100.00%) were unpaired; of these:
+    255432 (54.24%) aligned 0 times
+    186626 (39.63%) aligned exactly 1 time
+    28857 (6.13%) aligned >1 times
+45.76% overall alignment rate
+920397 reads; of these:
+  920397 (100.00%) were unpaired; of these:
+    421645 (45.81%) aligned 0 times
+    444659 (48.31%) aligned exactly 1 time
+    54093 (5.88%) aligned >1 times
+54.19% overall alignment rate
+593047 reads; of these:
+  593047 (100.00%) were unpaired; of these:
+    244102 (41.16%) aligned 0 times
+    291046 (49.08%) aligned exactly 1 time
+    57899 (9.76%) aligned >1 times
+58.84% overall alignment rate
+328660 reads; of these:
+  328660 (100.00%) were unpaired; of these:
+    143789 (43.75%) aligned 0 times
+    154674 (47.06%) aligned exactly 1 time
+    30197 (9.19%) aligned >1 times
+56.25% overall alignment rate
+593530 reads; of these:
+  593530 (100.00%) were unpaired; of these:
+    243672 (41.05%) aligned 0 times
+    282511 (47.60%) aligned exactly 1 time
+    67347 (11.35%) aligned >1 times
+58.95% overall alignment rate
+100696 reads; of these:
+  100696 (100.00%) were unpaired; of these:
+    42119 (41.83%) aligned 0 times
+    45007 (44.70%) aligned exactly 1 time
+    13570 (13.48%) aligned >1 times
+58.17% overall alignment rate
+1350530 reads; of these:
+  1350530 (100.00%) were unpaired; of these:
+    453636 (33.59%) aligned 0 times
+    809569 (59.94%) aligned exactly 1 time
+    87325 (6.47%) aligned >1 times
+66.41% overall alignment rate
+1881525 reads; of these:
+  1881525 (100.00%) were unpaired; of these:
+    832802 (44.26%) aligned 0 times
+    898101 (47.73%) aligned exactly 1 time
+    150622 (8.01%) aligned >1 times
+55.74% overall alignment rate
+2138335 reads; of these:
+  2138335 (100.00%) were unpaired; of these:
+    1001039 (46.81%) aligned 0 times
+    1065502 (49.83%) aligned exactly 1 time
+    71794 (3.36%) aligned >1 times
+53.19% overall alignment rate
+276069 reads; of these:
+  276069 (100.00%) were unpaired; of these:
+    93157 (33.74%) aligned 0 times
+    159257 (57.69%) aligned exactly 1 time
+    23655 (8.57%) aligned >1 times
+66.26% overall alignment rate
+499466 reads; of these:
+  499466 (100.00%) were unpaired; of these:
+    189943 (38.03%) aligned 0 times
+    273171 (54.69%) aligned exactly 1 time
+    36352 (7.28%) aligned >1 times
+61.97% overall alignment rate
+526337 reads; of these:
+  526337 (100.00%) were unpaired; of these:
+    203041 (38.58%) aligned 0 times
+    305234 (57.99%) aligned exactly 1 time
+    18062 (3.43%) aligned >1 times
+61.42% overall alignment rate
+703720 reads; of these:
+  703720 (100.00%) were unpaired; of these:
+    268235 (38.12%) aligned 0 times
+    359932 (51.15%) aligned exactly 1 time
+    75553 (10.74%) aligned >1 times
+61.88% overall alignment rate
  
 All total metagenome reads to nt ORFs:
 	
-	for f in cd_hit_454_output_total/*_cd454.fastq
+	for f in cd_hit_454_output_total/*cd454.fastq
 	do
 		filename=$(basename "$f")
     	filename="${filename%_*}"
     	bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x bmg_orfs_bowtie/bmg_orfs_bowtie_db -S bmg_orfs_bowtie/$filename.psl --un bmg_orfs_bowtie/$filename.unaligned.txt --al bmg_orfs_bowtie/$filename.aligned.txt 
 	done
+	
+631225 reads; of these:
+  631225 (100.00%) were unpaired; of these:
+    329226 (52.16%) aligned 0 times
+    263705 (41.78%) aligned exactly 1 time
+    38294 (6.07%) aligned >1 times
+47.84% overall alignment rate
+2261004 reads; of these:
+  2261004 (100.00%) were unpaired; of these:
+    1173604 (51.91%) aligned 0 times
+    940816 (41.61%) aligned exactly 1 time
+    146584 (6.48%) aligned >1 times
+48.09% overall alignment rate
+1591514 reads; of these:
+  1591514 (100.00%) were unpaired; of these:
+    847842 (53.27%) aligned 0 times
+    634628 (39.88%) aligned exactly 1 time
+    109044 (6.85%) aligned >1 times
+46.73% overall alignment rate
+972805 reads; of these:
+  972805 (100.00%) were unpaired; of these:
+    632422 (65.01%) aligned 0 times
+    285680 (29.37%) aligned exactly 1 time
+    54703 (5.62%) aligned >1 times
+34.99% overall alignment rate
+2475541 reads; of these:
+  2475541 (100.00%) were unpaired; of these:
+    1397606 (56.46%) aligned 0 times
+    925374 (37.38%) aligned exactly 1 time
+    152561 (6.16%) aligned >1 times
+43.54% overall alignment rate
+734576 reads; of these:
+  734576 (100.00%) were unpaired; of these:
+    407815 (55.52%) aligned 0 times
+    284785 (38.77%) aligned exactly 1 time
+    41976 (5.71%) aligned >1 times
+44.48% overall alignment rate
+2011286 reads; of these:
+  2011286 (100.00%) were unpaired; of these:
+    1221235 (60.72%) aligned 0 times
+    721069 (35.85%) aligned exactly 1 time
+    68982 (3.43%) aligned >1 times
+39.28% overall alignment rate
+509528 reads; of these:
+  509528 (100.00%) were unpaired; of these:
+    305494 (59.96%) aligned 0 times
+    183373 (35.99%) aligned exactly 1 time
+    20661 (4.05%) aligned >1 times
+40.04% overall alignment rate
+1240812 reads; of these:
+  1240812 (100.00%) were unpaired; of these:
+    831807 (67.04%) aligned 0 times
+    364842 (29.40%) aligned exactly 1 time
+    44163 (3.56%) aligned >1 times
+32.96% overall alignment rate
+995310 reads; of these:
+  995310 (100.00%) were unpaired; of these:
+    523437 (52.59%) aligned 0 times
+    391325 (39.32%) aligned exactly 1 time
+    80548 (8.09%) aligned >1 times
+47.41% overall alignment rate
+931099 reads; of these:
+  931099 (100.00%) were unpaired; of these:
+    471758 (50.67%) aligned 0 times
+    399330 (42.89%) aligned exactly 1 time
+    60011 (6.45%) aligned >1 times
+49.33% overall alignment rate
+888555 reads; of these:
+  888555 (100.00%) were unpaired; of these:
+    491969 (55.37%) aligned 0 times
+    339300 (38.19%) aligned exactly 1 time
+    57286 (6.45%) aligned >1 times
+44.63% overall alignment rate
+1331228 reads; of these:
+  1331228 (100.00%) were unpaired; of these:
+    602799 (45.28%) aligned 0 times
+    649682 (48.80%) aligned exactly 1 time
+    78747 (5.92%) aligned >1 times
+54.72% overall alignment rate
+2070496 reads; of these:
+  2070496 (100.00%) were unpaired; of these:
+    1003546 (48.47%) aligned 0 times
+    901884 (43.56%) aligned exactly 1 time
+    165066 (7.97%) aligned >1 times
+51.53% overall alignment rate
+3165966 reads; of these:
+  3165966 (100.00%) were unpaired; of these:
+    1640544 (51.82%) aligned 0 times
+    1353141 (42.74%) aligned exactly 1 time
+    172281 (5.44%) aligned >1 times
+48.18% overall alignment rate
+666970 reads; of these:
+  666970 (100.00%) were unpaired; of these:
+    413511 (62.00%) aligned 0 times
+    223655 (33.53%) aligned exactly 1 time
+    29804 (4.47%) aligned >1 times
+38.00% overall alignment rate
+2344185 reads; of these:
+  2344185 (100.00%) were unpaired; of these:
+    1199686 (51.18%) aligned 0 times
+    1021735 (43.59%) aligned exactly 1 time
+    122764 (5.24%) aligned >1 times
+48.82% overall alignment rate
+484852 reads; of these:
+  484852 (100.00%) were unpaired; of these:
+    260409 (53.71%) aligned 0 times
+    198320 (40.90%) aligned exactly 1 time
+    26123 (5.39%) aligned >1 times
+46.29% overall alignment rate
+884957 reads; of these:
+  884957 (100.00%) were unpaired; of these:
+    427966 (48.36%) aligned 0 times
+    369044 (41.70%) aligned exactly 1 time
+    87947 (9.94%) aligned >1 times
+51.64% overall alignment rate
+667046 reads; of these:
+  667046 (100.00%) were unpaired; of these:
+    425283 (63.76%) aligned 0 times
+    210658 (31.58%) aligned exactly 1 time
+    31105 (4.66%) aligned >1 times
+36.24% overall alignment rate
+
+
+All illumina viral reads to nt ORFs:
+
+	for f in *illumina.cat.fastq
+    do
+        filename=$(basename "$f")
+        filename="${filename%_*}"
+        bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db -S vmg_illumina_orfs_bowtie/$filename.psl --un vmg_illumina_orfs_bowtie/$filename.unaligned.txt --al vmg_illumina_orfs_bowtie/$filename.aligned.txt 
+    done
+
+7358902 reads; of these:
+  7358902 (100.00%) were unpaired; of these:
+    3735260 (50.76%) aligned 0 times
+    2972335 (40.39%) aligned exactly 1 time
+    651307 (8.85%) aligned >1 times
+49.24% overall alignment rate
+8385479 reads; of these:
+  8385479 (100.00%) were unpaired; of these:
+    3868474 (46.13%) aligned 0 times
+    3862432 (46.06%) aligned exactly 1 time
+    654573 (7.81%) aligned >1 times
+53.87% overall alignment rate
+7455959 reads; of these:
+  7455959 (100.00%) were unpaired; of these:
+    2895506 (38.83%) aligned 0 times
+    3742900 (50.20%) aligned exactly 1 time
+    817553 (10.97%) aligned >1 times
+61.17% overall alignment rate
+5527947 reads; of these:
+  5527947 (100.00%) were unpaired; of these:
+    2793135 (50.53%) aligned 0 times
+    2392466 (43.28%) aligned exactly 1 time
+    342346 (6.19%) aligned >1 times
+49.47% overall alignment rate
+5576608 reads; of these:
+  5576608 (100.00%) were unpaired; of these:
+    1869680 (33.53%) aligned 0 times
+    3078271 (55.20%) aligned exactly 1 time
+    628657 (11.27%) aligned >1 times
+66.47% overall alignment rate
+7415628 reads; of these:
+  7415628 (100.00%) were unpaired; of these:
+    2371924 (31.99%) aligned 0 times
+    4170374 (56.24%) aligned exactly 1 time
+    873330 (11.78%) aligned >1 times
+68.01% overall alignment rate
 
 
 ##Create abundance tables
