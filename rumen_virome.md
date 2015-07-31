@@ -605,6 +605,8 @@ Now, need to look at how reads are shared across samples in a pairwise fashion w
 
 In case, the script has been modified or moved, the script I used in the analysis is available at:
 
+	https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/get_comb_multi_old_median_kmer.py
+	chmod 775 get_comb_multi_old_median_kmer.py 
 
 To get it to work in our current khmer environment, use vi and alter the first line to be as follows, minus the single quotes (will need to change the path to match yours):
 
@@ -1484,29 +1486,41 @@ First, need to create a list of viral KOs from abundance table just created:
 
 Now, use custom perl script to filter based on criteria described above:
 
-	wget
+	wget https://raw.githubusercontent.com/chrisLanderson/rumen_virome/master/get_knum_phast_hits.pl
+	chmod 775 get_knum_phast_hits.pl 
 
 Ion Viral:
 
 	./get_knum_phast_hits.pl -phast_blast=vmg.ublast.phast.txt -orf_ko_assign=viral_blast2tsv/orf_ko_assignment.txt -knum=viral_all_kos.txt
 
-Number of unique differential k numbers found with ORFs: 2877
-Total number of PHAST top hits: 36850
-Contigs with phast and KO hit: 6810 
-ORFs on a contig with phast hit and ORF has a KO: 8520
-K numbers printed that were on a contig with PHAST hit and KO: 895
+Number of unique differential k numbers found with ORFs: 2226
+Total number of PHAST top hits: 28045
+Contigs with phast and KO hit: 4962 
+ORFs on a contig with phast hit and ORF has a KO: 6263
+K numbers printed that were on a contig with PHAST hit and KO: 792
 
 	mv orf_ko_phast_hits.txt viral_blast2tsv/
-	mv ko_w_phast_hits_list.txt viral_blast2tsv
+	mv ko_w_phast_hits_list.txt viral_blast2tsv/
 
 Use the ko_w_phast_hits_list.txt file to filter the KO abundance table generated previosuly:
 
-	source qiimeEnv/bin/activate
+	source anaconda/bin/activate rumenVirome
 	filter_otus_from_otu_table.py -i viral_blast2tsv/VMG.ko_corrected_abundances.biom -o viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.biom -e viral_blast2tsv/ko_w_phast_hits_list.txt --negate_ids_to_exclude
 	biom convert -i viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.biom -o viral_blast2tsv/VMG.ko_corrected_abundances_phast_filter.txt --table-type="OTU table" --to-tsv
 
 Illumina Viral:
 
+	./get_knum_phast_hits.pl -phast_blast=vmg.illumina.ublast.kegg.txt -orf_ko_assign=viral_illumina_blast2tsv/orf_ko_assignment.txt -knum=viral_illumina_all_kos.txt
+
+
+	mv orf_ko_phast_hits.txt viral_illumina_blast2tsv/
+	mv ko_w_phast_hits_list.txt viral_illumina_blast2tsv/
+	
+Use the ko_w_phast_hits_list.txt file to filter the KO abundance table generated previosuly:
+
+	source anaconda/bin/activate rumenVirome
+	filter_otus_from_otu_table.py -i viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances.biom -o viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances_phast_filter.biom -e viral_illumina_blast2tsv/ko_w_phast_hits_list.txt --negate_ids_to_exclude
+	biom convert -i viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances_phast_filter.biom -o viral_illumina_blast2tsv/VMG.illumina.ko_corrected_abundances_phast_filter.txt --table-type="OTU table" --to-tsv
 
 ##Find Differential Features KOs:
 We used LEfSe to identify differential KOs based on diet within the viral metagenome and total metagenome.  At the time, I had troubles getting LEfSe to operate via the command line so I used the version hosted on Galaxy.  If you try to recreate this step it may differ if there was changes in the LEfSe version hosted on galaxy, but the outputs are all available.

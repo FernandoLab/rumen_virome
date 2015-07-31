@@ -27,7 +27,6 @@ open (my $OUT2, ">ko_w_phast_hits_list.txt") or die "Can't open output file";
 
 my %knum_hash;
 my %contig_hash;
-my %orf_hash;
 my %knum_check_hash;
 my %knum_out_hash;
 my $top_hit_count = 0;
@@ -45,11 +44,13 @@ while (my $line = readline($ORF_KO)) {
 	my @split = split /\t/, $line;
 	if (exists $knum_hash{$split[2]}) {
 		my @split2 = split /\_length/, $split[0];
-		$contig_hash{$split2[0]} = "$split[2]\n";
-		$orf_hash{$split[0]} = "$split[1]\t$split[2]";
+		push(@{$contig_hash{$split2[0]}}, $line);
+		#$contig_hash{$split2[0]} = "$line";
 		++$knum_check_hash{$split[2]};
 	}
 }
+
+
 
 while (my $line = readline($PHAST)) {
 	chomp $line;
@@ -60,16 +61,12 @@ while (my $line = readline($PHAST)) {
 	$top_hit_count++;
 	my @split = split /\_length/, $blast_split[0];
 	if (exists $contig_hash{$split[0]}) {
-		while ( my ( $key1, $value1 ) = each %orf_hash ) { #too innefecient, fix, should have put ORF as value in contig hash, then went through each hash
-			my @split2 = split /\_length/, $key1;
-			if ($split2[0] eq $split[0]) {
-				#$orf_out++;
-				print $OUT "$key1\t$split[0]\t$value1\t$blast_split[0]\t$blast_split[1]\n";
-				my @split3 = split /\t/, $value1;
-				++$knum_out_hash{$split3[1]};
-				++$orf_out{$key1};
-				++$contig_out{$split[0]};
-			}
+		foreach my $nextORF (@{$contig_hash{$split[0]}}) {
+			my @nextORF_split = split /\t/, $nextORF;
+			print $OUT "$nextORF\t$blast_split[0]\t $blast_split[1]\n";
+			++$knum_out_hash{$nextORF_split[2]};
+			++$orf_out{$nextORF_split[0]};
+			++$contig_out{$split[0]};
 		}
 	}
 	$current = $blast_split[0];
@@ -80,7 +77,7 @@ my $count_check2 = 0;
 my $count_check3 = 0;
 my $count_check4 = 0;
 
-while ( my ( $key1, $value1 ) = each %knum_check_hash ) { #should equal the number of diff k nums input
+while ( my ( $key1, $value1 ) = each %knum_check_hash ) { #should equal the number of k nums input
 	$count_check++;
 }
 
