@@ -13,7 +13,13 @@ Generally, later RMarkdown files rely on outputs generated earlier.
 	7. circos_plots_total_mg.Rmd
 	8. annotation.Rmd
 	9. enzyme_analysis.Rmd
-	
+
+
+- wget <setup.sh>
+- chmod 775 setup.sh
+- ./setup.sh <usearch_link>
+- instructions to help install...
+
 - git clone https://github.com/chrisLanderson/rumen_virome.git
 - R
 - library(knitr)

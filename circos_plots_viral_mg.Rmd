@@ -17,7 +17,7 @@ for f in *subsample.fna
 do
     filename=$(basename "$f")
     filename="${filename%.*}"
-    load-into-counting.py -k 20 -N 4 -x 8e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
+    load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
 done
 
 ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt

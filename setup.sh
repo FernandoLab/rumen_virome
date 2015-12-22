@@ -27,13 +27,11 @@ tar -xvf prinseq-lite-0.20.4.tar.gz
 # anaconda, R, QIIME
 wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 bash Anaconda-2.3.0-Linux-x86_64.sh
-anaconda/bin/conda create -n rumenVirome python==2.7 pip numpy==1.9.2 matplotlib==1.4.3 scipy==0.16.0 pandas==0.16.2 cython mock==1.1.3 nose==1.3.7
+conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7
 source anaconda/bin/activate rumenVirome
-anaconda/bin/conda install -c https://conda.binstar.org/jorge qiime
-anaconda/bin/conda install -c r r==3.2.1
-anaconda/bin/conda install -c https://conda.binstar.org/r rpy2==2.5.6
-anaconda/bin/conda install -c https://conda.binstar.org/r r-mvtnorm
-pip install Cython --upgrade
+conda install -c r r=3.2.1
+conda install -c https://conda.binstar.org/r rpy2=2.5.6
+pip install qiime==1.9.1
 
 # cutadapt
 pip install cutadapt==1.8.1
@@ -57,7 +55,7 @@ tar -xvf rRNA_prediction.tar
 chmod 777 -R rRNA_prediction/
 
 # pandoc
-anaconda/bin/conda install -c https://conda.anaconda.org/asmeurer pandoc
+conda install -c https://conda.anaconda.org/asmeurer pandoc
 
 # R packages
 R CMD BATCH scripts/install_pack.R
