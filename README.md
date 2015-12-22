@@ -7,11 +7,13 @@ Generally, later RMarkdown files rely on outputs generated earlier.
 	1. setup.Rmd
 	2. get_data.Rmd
 	3. qc.Rmd
-	4. assembly.Rmd
-	5. beta_div.Rmd
-	6. circos_plots.Rmd
-	7. annotation.Rmd
-	8. enzyme_analysis.Rmd
+	4. assembly_and_orfs.Rmd
+	5. beta_div_viral_mg.Rmd
+	6. beta_div_total_mg.Rmd
+	7. circos_plots_viral_mg.Rmd
+	8. circos_plots_total_mg.Rmd
+	9. annotation.Rmd
+	10. enzyme_analysis.Rmd
 	
 - git clone https://github.com/chrisLanderson/rumen_virome.git
 - R
