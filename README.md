@@ -20,11 +20,8 @@ Generally, later RMarkdown files rely on outputs generated earlier.
 - ./setup.sh <usearch_link>
 - instructions to help install...
 
-- git clone https://github.com/chrisLanderson/rumen_virome.git
-- R
-- library(knitr)
-- library(rmarkdown)
-- render("Rmd_file", "all")
+To render a RMarkdown file:
+R CMD BATCH --args file
 
 Versions already rendered can be viewed in this repository with extension .md or .html.
 
