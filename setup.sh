@@ -3,11 +3,13 @@
 # software and associated packages in the hopes of creating a reproducible 
 # environment to work from over time. 
 
-# This would be ideally setup in a blank directory to begin with.
-
-# Clone the repository
-git clone https://github.com/chrisLanderson/rumen_virome.git
-cd rumen_virome
+#ensure that you have cloned the repository are in the directory
+result=${PWD##*/}
+if [ "$result" != "rumen_virome" ]
+then
+	echo "Current directory is not the cloned repository. See https://github.com/chrisLanderson/rumen_virome for instructions."
+	exit 1
+fi
 
 # trimmomatic
 wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip
@@ -27,7 +29,7 @@ tar -xvf prinseq-lite-0.20.4.tar.gz
 # anaconda, R, QIIME
 wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 bash Anaconda-2.3.0-Linux-x86_64.sh
-conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7
+anaconda/bin/conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7
 source anaconda/bin/activate rumenVirome
 conda install -c r r=3.2.1
 conda install -c https://conda.binstar.org/r rpy2=2.5.6
