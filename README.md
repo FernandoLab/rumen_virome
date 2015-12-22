@@ -15,13 +15,27 @@ Generally, later RMarkdown files rely on outputs generated earlier.
 	9. enzyme_analysis.Rmd
 
 
+
+Due to licensing issues, USEARCH can not be included in the setup. To obtain a download link, go to the USEARCH download page and select version USEARCH v for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
+
+Simply download the bash script from the github repository and run it (provide the link to download your licensed USEARCH version 8.0.1623 as an argument for setup.sh):
+
 - wget <setup.sh>
 - chmod 775 setup.sh
 - ./setup.sh <usearch_link>
-- instructions to help install...
 
-To render a RMarkdown file:
-R CMD BATCH --args file
+Anaconda is downloaded and prompts you during installataion of the packages above. The prompts are as follows:
+
+- Press enter to view the license agreement
+- Press enter to read the license and q to exit
+- Accept the terms
+- Prompts you where to install anaconda. Simply type anaconda to create a directory within the current directory. Should be: [/Users/user/anaconda] >>> anaconda
+- No to prepend anaconda to your path. Choosing yes should not impact the installation though.
+- Will be asked a few times if you wish to proceed with installing the packages...agree to it.
+- After installation, enter 'source anaconda/bin/activate rumenVirome' on the command line to activate the virtual enviornment
+
+To render one of the RMarkdown files:
+R CMD BATCH --no-restore --no-save --args file1.Rmd render.R
 
 Versions already rendered can be viewed in this repository with extension .md or .html.
 
