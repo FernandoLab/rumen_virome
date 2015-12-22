@@ -13,11 +13,11 @@ Generally, later RMarkdown files rely on outputs generated earlier.
 	7. annotation.Rmd
 	8. enzyme_analysis.Rmd
 	
-git clone
-R
-library(knitr)
-library(rmarkdown)
-render("Rmd_file", "all")
+- git clone
+- R
+- library(knitr)
+- library(rmarkdown)
+- render("Rmd_file", "all")
 
 Versions already rendered can be viewed in this repository with suffix .md or .html.
 
