@@ -24,7 +24,7 @@ Clone the github repository and run the setup.sh script (provide the link to dow
 - cd rumen_virome
 - ./setup.sh usearch_link
 
-Anaconda is downloaded and prompts you during installataion of the packages above. The prompts are as follows:
+Anaconda is downloaded and prompts you during installataion of the packages. The prompts are roughly as follows:
 
 - Press enter to view the license agreement
 - Press enter to read the license and q to exit
