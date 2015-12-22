@@ -1,3 +1,10 @@
+---
+title: "Viral Circos Plots"
+output:
+  html_document:
+    keep_md: true
+---
+
 # Generate Tables for Circos Plots - Viral Metagenome
 The code below calculates how reads are shared between samples and diets to generate tables that can be used to construct the Circos plots from the manuscript with a GUI (website - directions to do so at the bottom of this notebook). Results may differ slighly from what is observed in the manuscript due to differences in subsampling events.
 
@@ -73,5 +80,22 @@ paste circos_row_colors_40mdgs.txt circos_table2_sub.txt > circos_viral_40mdgs_u
 
 printf "labels\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n255,211,0\n211,211,211" > circos_row_colors_corn.txt
 paste circos_row_colors_corn.txt circos_table2_sub.txt > circos_viral_corn_upload.txt
-
 ```
+
+## Diet-Diet Comparisons
+```{r, engine='bash'}
+```
+
+```{r, engine='bash'}
+```
+
+```{r, engine='bash'}
+```
+
+```{r, engine='bash'}
+```
+
+```{r, engine='bash'}
+```
+
+

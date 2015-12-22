@@ -3,12 +3,18 @@
 # software and associated packages in the hopes of creating a reproducible 
 # environment to work from over time. 
 
-#ensure that you have cloned the repository are in the directory
+# ensure pwd is the cloned repository
 result=${PWD##*/}
 if [ "$result" != "rumen_virome" ]
 then
-	echo "Current directory is not the cloned repository. See https://github.com/chrisLanderson/rumen_virome for instructions."
+	printf "\nCurrent directory is not the cloned repository.\nSee https://github.com/chrisLanderson/rumen_virome for details.\n\n"
 	exit 1
+fi
+
+# ensure provided link to usearch download
+if [ "$1" = "" ]; then
+    printf "\nProvide a link for USEARCH download (from email) as argument.\nGet a license from http://www.drive5.com/usearch/download.html\nSee https://github.com/chrisLanderson/rumen_virome for details.\n\n"
+    exit 1
 fi
 
 # trimmomatic
@@ -47,8 +53,8 @@ unzip Mothur.cen_64.zip
 mv mothur/mothur anaconda/envs/rumenVirome/bin/
 
 # usearch
-wget $1 -o usearch8.0.1623
-chmod 775 usearch8.0.1623 
+wget -O anaconda/envs/rumenEnv/bin/usearch8.0.1623 $1
+chmod 775 anaconda/envs/rumenEnv/bin/usearch8.0.1623
 
 # rRNA prediction
 wget http://weizhong-lab.ucsd.edu/meta_rna/rRNA_prediction.tar.bz2
@@ -60,6 +66,7 @@ chmod 777 -R rRNA_prediction/
 conda install -c https://conda.anaconda.org/asmeurer pandoc
 
 # R packages
+printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
 
 # Get Data
@@ -67,6 +74,7 @@ mkdir raw_viral
 mkdir raw_total
 scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral.tgz raw_viral/
 scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz raw_total/
+#get illumina viral data and unzip
 tar -zxvf raw_viral.tgz
 tar -zxvf raw_total.tgz
 

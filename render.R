@@ -1,4 +1,4 @@
 args <- commandArgs(trailingOnly = TRUE)
 library(knitr)
 library(rmarkdown)
-render(args[1], "all")
+render(args[1])
