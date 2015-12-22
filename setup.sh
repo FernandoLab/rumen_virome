@@ -68,3 +68,10 @@ scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz raw_total/
 tar -zxvf raw_viral.tgz
 tar -zxvf raw_total.tgz
 
+# remove
+rm cd-hit-v4.6.1-2012-08-27.tgz
+rm prinseq-lite-0.20.4.tar.gz
+rm Mothur.cen_64.zip
+rm -rf __MACOSX
+rm Trimmomatic-0.33.zip
+rm Anaconda-2.3.0-Linux-x86_64.sh
