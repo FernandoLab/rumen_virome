@@ -84,8 +84,8 @@ mkdir raw_total
 mv BMG.*.fastq raw_total/
 tar -zxvf raw_illumina_viral_run1.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
-tar -zxvf raw_illumina_viral_run2.tgz
-tar -zxvf raw_illumina_viral_run2.tgz
+tar -zxvf raw_illumina_viral_run3.tgz
+tar -zxvf raw_illumina_viral_run4.tgz
 
 # remove
 rm cd-hit-v4.6.1-2012-08-27.tgz

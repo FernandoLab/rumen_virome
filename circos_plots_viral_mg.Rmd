@@ -10,7 +10,7 @@ The code below calculates how reads are shared between samples and diets to gene
 
 ## Sample-Sample Comparisons
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 cd prinseq_output/
  
 for f in *trimm_finalQC.fna
@@ -88,7 +88,7 @@ paste circos_row_colors_corn.txt circos_table2_sub.txt > circos_viral_corn_uploa
 ```
 
 ## Diet-Diet Comparisons
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 cd prinseq_output/
 mkdir sub_sample_comb
 mv *.comb.keep.txt sub_sample_comb
@@ -162,3 +162,5 @@ paste circos_row_colors_cat.txt circos_table_sub_cat2.txt > circos_viral_diets_u
 ```
 
 ## Circos GUI
+
+insert notes.
