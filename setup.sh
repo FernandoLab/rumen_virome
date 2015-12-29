@@ -70,13 +70,26 @@ printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
 
 # Get Data
-mkdir raw_viral
-mkdir raw_total
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral.tgz raw_viral/
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz raw_total/
-#get illumina viral data and unzip
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral.tgz ./
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz ./
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run1.tgz ./
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run2.tgz ./
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run3.tgz ./
+scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run4.tgz ./
+
 tar -zxvf raw_viral.tgz
+mkdir raw_viral
+mv VMG.*.fastq raw_viral/
+
 tar -zxvf raw_total.tgz
+mkdir raw_total
+mv BMG.*.fastq raw_total/
+
+tar -zxvf raw_illumina_viral_run1.tgz
+tar -zxvf raw_illumina_viral_run2.tgz
+tar -zxvf raw_illumina_viral_run2.tgz
+tar -zxvf raw_illumina_viral_run2.tgz
+
 
 # remove
 rm cd-hit-v4.6.1-2012-08-27.tgz
@@ -84,4 +97,12 @@ rm prinseq-lite-0.20.4.tar.gz
 rm Mothur.cen_64.zip
 rm -rf __MACOSX
 rm Trimmomatic-0.33.zip
+rm rRNA_prediction.tar
 rm Anaconda-2.3.0-Linux-x86_64.sh
+rm raw_viral.tgz
+rm raw_total.tgz
+rm raw_illumina_viral_run1.tgz
+rm raw_illumina_viral_run2.tgz
+rm raw_illumina_viral_run3.tgz
+rm raw_illumina_viral_run4.tgz
+
