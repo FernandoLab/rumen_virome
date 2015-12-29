@@ -34,7 +34,7 @@ The code below calculates how reads are shared between samples and diets to gene
 # printf "\n" >> config_sub.txt
 # printf "50000000" >> config_sub.txt
 # 
-# python ../get_comb_multi_old_median_kmer.py config_sub.txt
+# python ../scripts/get_comb_multi_old_median_kmer.py config_sub.txt
 # 
 # printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> config_sub.txt
 # printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> config_sub.txt
@@ -120,7 +120,7 @@ ls *sub_cat.fna | awk '{ ORS=" "; print; }' >> config_cat_sub.txt
 printf "\n" >> config_cat_sub.txt
 printf "50000000" >> config_cat_sub.txt
 
-python ../get_comb_multi_old_median_kmer.py config_cat_sub.txt
+python ../scripts/get_comb_multi_old_median_kmer.py config_cat_sub.txt
 
 printf "\n27CDS 40MDGS 55CS Corn" >> config_cat_sub.txt
 
