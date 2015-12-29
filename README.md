@@ -34,7 +34,7 @@ Anaconda is downloaded and prompts you during installataion of the packages. The
 - After installation, enter 'source anaconda/bin/activate rumenVirome' on the command line to activate the virtual enviornment
 
 To render one of the RMarkdown files:
-R CMD BATCH --no-restore --no-save --args file1.Rmd render.R
+R CMD BATCH --no-restore --no-save '--args file1.Rmd' render.R
 
 Versions already rendered can be viewed in this repository with extension .md or .html.
 
