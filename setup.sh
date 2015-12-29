@@ -70,26 +70,22 @@ printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
 
 # Get Data
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_viral.tgz ./
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_total.tgz ./
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run1.tgz ./
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run2.tgz ./
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run3.tgz ./
-scp canderson3@crane.unl.edu:/work/samodha/canderson3/raw_illumina_viral_run4.tgz ./
-
+wget ftp://129.93.221.145/public/raw_total.tgz
+wget ftp://129.93.221.145/public/raw_viral.tgz
+wget ftp://129.93.221.145/public/raw_illumina_viral_run1.tgz
+wget ftp://129.93.221.145/public/raw_illumina_viral_run2.tgz
+wget ftp://129.93.221.145/public/raw_illumina_viral_run3.tgz
+wget ftp://129.93.221.145/public/raw_illumina_viral_run4.tgz
 tar -zxvf raw_viral.tgz
 mkdir raw_viral
 mv VMG.*.fastq raw_viral/
-
 tar -zxvf raw_total.tgz
 mkdir raw_total
 mv BMG.*.fastq raw_total/
-
 tar -zxvf raw_illumina_viral_run1.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
-
 
 # remove
 rm cd-hit-v4.6.1-2012-08-27.tgz
