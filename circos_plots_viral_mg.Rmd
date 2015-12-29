@@ -10,82 +10,82 @@ The code below calculates how reads are shared between samples and diets to gene
 
 ## Sample-Sample Comparisons
 
-# ```{r, engine='bash'}
-# cd prinseq_output/
-# 
-# for f in *trimm_finalQC.fna
-# do
-#   filename=$(basename "$f")
-#   filename="${filename%_*}"
-#   mothur "#sub.sample(fasta=$f, size=100000)"
-# done
-# 
-# for f in *subsample.fna
-# do
-#     filename=$(basename "$f")
-#     filename="${filename%.*}"
-#     load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
-# done
-# 
-# 
-# ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt
-# printf "\n" >> config_sub.txt
-# ls *finalQC.subsample.fna | awk '{ ORS=" "; print; }' >> config_sub.txt
-# printf "\n" >> config_sub.txt
-# printf "50000000" >> config_sub.txt
-# 
-# python ../scripts/get_comb_multi_old_median_kmer.py config_sub.txt
-# 
-# printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> config_sub.txt
-# printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> config_sub.txt
-# 
-# cd ..
-# ```
-# 
-# Following script calcualtes the median shared k-mer content between each pair of samples. The script only considers reads that are shared with at least one other sample to avoid potential impact of sequencing errors on the interpretation.
-# 
-# ```{r, engine='bash'}
-# perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=prinseq_output -threshold=1
-# 
-# mv *.comb.keep.txt prinseq_output/
-# 
-# python scripts/circos_make_table.py -d prinseq_output/ -c prinseq_output/config_sub.txt -i T -s subsample.fna.comb.keep.txt > circos_list_sub.txt
-# ```
-# 
-# ```{r, cache=FALSE}
-# options(stringsAsFactors=FALSE)
-# matrix_out <- data.frame(matrix(NA, nrow = 15, ncol = 15))
-# pw <- read.table("circos_list_sub.txt", sep="\t", header=FALSE)
-# r_c_names <- unique(pw$V1)
-# row.names(matrix_out) <- r_c_names
-# colnames(matrix_out) <- r_c_names
-# 
-# for(i in 1:nrow(pw)) {
-# 	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
-# }
-# 
-# write.table(matrix_out, file="circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
-# ```
-# 
-# ```{r, engine='bash'}
-# sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' circos_table_sub.txt > circos_table2_sub.txt
-# 
-# printf "labels\n255,211,0\n0,159,107\n255,211,0\n196,2,51\n196,2,51\n196,2,51\n255,211,0\n0,159,107\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n0,135,189" > circos_row_colors.txt
-# 
-# paste circos_row_colors.txt circos_table2_sub.txt > circos_viral_all_samples_upload.txt
-# 
-# printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189" > circos_row_colors_27cds.txt
-# paste circos_row_colors_27cds.txt circos_table2_sub.txt > circos_viral_27cds_upload.txt
-# 
-# printf "labels\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n196,2,51\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > circos_row_colors_55cs.txt
-# paste circos_row_colors_55cs.txt circos_table2_sub.txt > circos_viral_55cs_upload.txt
-# 
-# printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211" > circos_row_colors_40mdgs.txt
-# paste circos_row_colors_40mdgs.txt circos_table2_sub.txt > circos_viral_40mdgs_upload.txt
-# 
-# printf "labels\n255,211,0\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n" > circos_row_colors_corn.txt
-# paste circos_row_colors_corn.txt circos_table2_sub.txt > circos_viral_corn_upload.txt
-# ```
+```{r, engine='bash'}
+cd prinseq_output/
+ 
+for f in *trimm_finalQC.fna
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  mothur "#sub.sample(fasta=$f, size=100000)"
+done
+
+for f in *subsample.fna
+do
+    filename=$(basename "$f")
+    filename="${filename%.*}"
+    load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
+done
+
+
+ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt
+printf "\n" >> config_sub.txt
+ls *finalQC.subsample.fna | awk '{ ORS=" "; print; }' >> config_sub.txt
+printf "\n" >> config_sub.txt
+printf "50000000" >> config_sub.txt
+
+python ../scripts/get_comb_multi_old_median_kmer.py config_sub.txt
+
+printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> config_sub.txt
+printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> config_sub.txt
+
+cd ..
+```
+
+Following script calcualtes the median shared k-mer content between each pair of samples. The script only considers reads that are shared with at least one other sample to avoid potential impact of sequencing errors on the interpretation.
+
+```{r, engine='bash'}
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=prinseq_output -threshold=1
+
+mv *.comb.keep.txt prinseq_output/
+
+python scripts/circos_make_table.py -d prinseq_output/ -c prinseq_output/config_sub.txt -i T -s subsample.fna.comb.keep.txt > circos_list_sub.txt
+```
+
+```{r, cache=FALSE}
+options(stringsAsFactors=FALSE)
+matrix_out <- data.frame(matrix(NA, nrow = 15, ncol = 15))
+pw <- read.table("circos_list_sub.txt", sep="\t", header=FALSE)
+r_c_names <- unique(pw$V1)
+row.names(matrix_out) <- r_c_names
+colnames(matrix_out) <- r_c_names
+
+for(i in 1:nrow(pw)) {
+	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
+}
+
+write.table(matrix_out, file="circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+```
+
+```{r, engine='bash'}
+sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' circos_table_sub.txt > circos_table2_sub.txt
+
+printf "labels\n255,211,0\n0,159,107\n255,211,0\n196,2,51\n196,2,51\n196,2,51\n255,211,0\n0,159,107\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n0,135,189" > circos_row_colors.txt
+
+paste circos_row_colors.txt circos_table2_sub.txt > circos_viral_all_samples_upload.txt
+
+printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189" > circos_row_colors_27cds.txt
+paste circos_row_colors_27cds.txt circos_table2_sub.txt > circos_viral_27cds_upload.txt
+
+printf "labels\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n196,2,51\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > circos_row_colors_55cs.txt
+paste circos_row_colors_55cs.txt circos_table2_sub.txt > circos_viral_55cs_upload.txt
+
+printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211" > circos_row_colors_40mdgs.txt
+paste circos_row_colors_40mdgs.txt circos_table2_sub.txt > circos_viral_40mdgs_upload.txt
+
+printf "labels\n255,211,0\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n" > circos_row_colors_corn.txt
+paste circos_row_colors_corn.txt circos_table2_sub.txt > circos_viral_corn_upload.txt
+```
 
 ## Diet-Diet Comparisons
 ```{r, engine='bash'}
@@ -133,12 +133,12 @@ mv *.comb.keep.txt prinseq_output/
 python scripts/circos_make_table.py -d prinseq_output/ -c prinseq_output/config_cat_sub.txt -i F -s sub_cat.fna.comb.keep.txt > circos_list_sub_cat.txt
 
 mkdir prinseq_output/sub_diet_comb
-mv prinseq_output/*.comb.keep.txt prinseq_output/sub_diet_comb
+mv prinseq_output/*sub_cat.fna.comb.keep.txt prinseq_output/sub_diet_comb
 ```
 
 ```{r, cache=FALSE}
 options(stringsAsFactors=FALSE)
-matrix_out <- data.frame(matrix(NA, nrow = 15, ncol = 15))
+matrix_out <- data.frame(matrix(NA, nrow = 4, ncol = 4))
 pw <- read.table("circos_list_sub_cat.txt", sep="\t", header=FALSE)
 r_c_names <- unique(pw$V1)
 row.names(matrix_out) <- r_c_names
@@ -152,9 +152,9 @@ write.table(matrix_out, file="circos_table_sub_cat.txt", sep="\t", row.names=TRU
 ```
 
 ```{r, engine='bash'}
-sed -E $'s/\tCorn/labels\tCorn/g' circos_table_sub_cat.txt > circos_table_sub_cat2.txt
+sed -E $'s/\40MDGS/labels\40MDGS/g' circos_table_sub_cat.txt > circos_table_sub_cat2.txt
 
-printf "labels\n255,211,0\n0,159,107\n196,2,51\n0,135,189" > circos_row_colors_cat.txt
+printf "labels\n0,159,107\n196,2,51\n0,135,189\n255,211,0" > circos_row_colors_cat.txt
 
 paste circos_row_colors_cat.txt circos_table_sub_cat2.txt > circos_table_sub_cat3.txt
 ```
