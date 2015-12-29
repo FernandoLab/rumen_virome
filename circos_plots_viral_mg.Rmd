@@ -1,5 +1,5 @@
 ---
-title: "Viral Circos Plots"
+title: "Viral Metagenome Circos Plots"
 output:
   html_document:
     keep_md: true
@@ -90,6 +90,10 @@ paste circos_row_colors_corn.txt circos_table2_sub.txt > circos_viral_corn_uploa
 ## Diet-Diet Comparisons
 ```{r, engine='bash'}
 cd prinseq_output/
+mkdir sub_sample_comb
+mv *.comb.keep.txt sub_sample_comb
+mv *subsample.fna.comb sub_sample_comb
+
 mothur "#sub.sample(fasta=VMG.13_trimm_finalQC.fna, size=133333)"
 mothur "#sub.sample(fasta=VMG.10_trimm_finalQC.fna, size=133333)"
 mothur "#sub.sample(fasta=VMG.4_trimm_finalQC.fna, size=133334)"
@@ -123,9 +127,6 @@ cd ..
 ```
 
 ```{r, engine='bash'}
-mkdir prinseq_output/sub_sample_comb
-mv prinseq_output/*.comb.keep.txt prinseq_output/sub_sample_comb
-
 perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=prinseq_output -threshold=1
 
 mv *.comb.keep.txt prinseq_output/
@@ -134,6 +135,7 @@ python scripts/circos_make_table.py -d prinseq_output/ -c prinseq_output/config_
 
 mkdir prinseq_output/sub_diet_comb
 mv prinseq_output/*sub_cat.fna.comb.keep.txt prinseq_output/sub_diet_comb
+mv prinseq_output/*sub_cat.fna.comb prinseq_output/sub_diet_comb
 ```
 
 ```{r, cache=FALSE}
@@ -152,11 +154,11 @@ write.table(matrix_out, file="circos_table_sub_cat.txt", sep="\t", row.names=TRU
 ```
 
 ```{r, engine='bash'}
-sed -E $'s/\40MDGS/labels\40MDGS/g' circos_table_sub_cat.txt > circos_table_sub_cat2.txt
+sed -E $'s/\t40MDGS/labels\t40MDGS/g' circos_table_sub_cat.txt > circos_table_sub_cat2.txt
 
 printf "labels\n0,159,107\n196,2,51\n0,135,189\n255,211,0" > circos_row_colors_cat.txt
 
-paste circos_row_colors_cat.txt circos_table_sub_cat2.txt > circos_table_sub_cat3.txt
+paste circos_row_colors_cat.txt circos_table_sub_cat2.txt > circos_viral_diets_upload.txt
 ```
 
-
+## Circos GUI
