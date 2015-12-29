@@ -38,7 +38,7 @@ bash Anaconda-2.3.0-Linux-x86_64.sh
 anaconda/bin/conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7
 source anaconda/bin/activate rumenVirome
 conda install -c r r=3.2.1
-conda install -c https://conda.binstar.org/r rpy2=2.5.6
+conda install -c https://conda.binstar.org/r rpy2=2.5.6 r-devtools r-rcurl
 pip install qiime==1.9.1
 
 # cutadapt

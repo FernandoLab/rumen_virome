@@ -9,8 +9,7 @@ sapply(pkg, require, character.only = TRUE)
 }
 
 packages <- c("ggplot2", "vegan", "reshape2", "RColorBrewer", "rmarkdown", 
-"knitr", "grid", "reshape", "data.table", "devtools", "ggvegan", "biom", "RCurl", 
-"gplots", "gridExtra", "mvtnorm")
+"knitr", "grid", "reshape", "data.table", "biom", "gplots", "gridExtra", "mvtnorm")
 
 ipak(packages)
 
