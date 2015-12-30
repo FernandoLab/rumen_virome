@@ -163,4 +163,29 @@ paste circos_row_colors_cat.txt circos_table_sub_cat2.txt > circos_viral_diets_u
 
 ## Circos GUI
 
-insert notes.
+GUI: http://mkweb.bcgsc.ca/tableviewer/visualize/
+
+Go to the settings tab at the top of the page and change the following (only needs to be done once):
+
+- Under labels, segment fold = bold
+- Under cell ribbons, ribbon order = cell size, descending and ribbon layer order = large on top of small
+- Under contribution tracks, check hide
+- Under image format, check hide relative tick marks, hide absolute tick marks, hide first tick label
+
+Click save. Switch to the visualize tab.
+
+Six files for upload:
+
+- circos_viral_all_samples_upload.txt (Figure __ in manuscript.)
+- circos_viral_corn_upload.txt (Figure __ in manuscript.)
+- circos_viral_55cs_upload.txt (Figure __ in manuscript.)
+- circos_viral_40mdgs_upload.txt (Figure __ in manuscript.)
+- circos_viral_27cds_upload.txt (Figure __ in manuscript.)
+- circos_viral_diets_upload.txt (Figure __ in manuscript.)
+
+Under section 2A, upload each file and check "col with row colors".
+
+Download the results.
+
+Click the visualize tab again to upload another file.
+
