@@ -65,6 +65,10 @@ chmod 777 -R rRNA_prediction/
 # pandoc
 conda install -c https://conda.anaconda.org/asmeurer pandoc
 
+# spades
+wget http://spades.bioinf.spbau.ru/release3.5.0/SPAdes-3.5.0-Linux.tar.gz
+tar -zxvf SPAdes-3.5.0-Linux.tar.gz
+
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R

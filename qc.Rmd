@@ -5,10 +5,10 @@ output:
     keep_md: true
 ---
 
-#Quality Control
+# Quality Control
 Description.
 
-##Viral Metagenome - Ion Torrent Data
+## Viral Metagenome - Ion Torrent Data
 
 After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
 
