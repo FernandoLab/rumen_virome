@@ -1,0 +1,335 @@
+---
+title: "Map Reads"
+output:
+  html_document:
+    keep_md: true
+---
+
+# Beta Diversity - Ion Torrent Viral Metagenomes
+Two methods - median k-mer counts and distribution of ORFs among samples.
+
+## Median K-mer Count
+
+Use khmer software to compare k-mer profiles of different metagenomes. Load all viral metagenomes into counting.
+
+```{r, engine='bash', results='hide'}
+cd /work/samodha/canderson3/prinseq_output
+for f in *_finalQC.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  load-into-counting.py -k 20 -N 4 -x 8e9 --report-total-kmers -s tsv "$filename""_k20.kh" $f
+done
+```
+
+The script below is from ____ (	https://github.com/qingpeng/igs-diversity/blob/master/scripts/get_comb_multi_old_median_kmer.py
+) and I have provided the version of the script used in this analysis. Finds the median k-mer abundance across samples.
+
+```{r, engine='bash', results='hide'}
+cd prinseq_output/
+ls *k20.kh | awk '{ ORS=" "; print; }' > config.txt
+printf "\n" >> config.txt
+ls *finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
+printf "\n" >> config.txt
+printf "55000000" >> config.txt
+	
+python ../scripts/get_comb_multi_old_median_kmer.py config.txt
+
+cd ..
+```
+
+Remove reads that are not shared with at least one other sample. This helps to alleviate differences diven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
+
+```{r, engine='bash', results='hide'}
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=prinseq_output -threshold=1
+
+mv *.comb.keep.txt prinseq_output
+
+cat prinseq_output/*.comb.keep.txt > prinseq_output/VMG.cat.comb.keep.txt
+
+awk '{print $1,$2/629489,$3/2712098,$4/470915,$5/920397,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' prinseq_output/VMG.cat.comb.keep.txt > prinseq_output/VMG.cat.comb.keep.norm.txt
+
+printf "ID VMG.10 VMG.11 VMG.12 VMG.13 VMG.14 VMG.15 VMG.1 VMG.2 VMG.3 VMG.4 VMG.5 VMG.6 VMG.7 VMG.8 VMG.9\n" > prinseq_output/VMG.read_table.txt
+
+cat prinseq_output/VMG.cat.comb.keep.norm.txt >> prinseq_output/VMG.read_table.txt
+
+tr ' ' \\t < prinseq_output/VMG.read_table.txt > prinseq_output/VMG.read_table.tab.txt
+
+biom convert -i prinseq_output/VMG.read_table.tab.txt -o prinseq_output/VMG.read_table.tab.biom --table-type="OTU table" --to-json
+```
+
+Calcualte the Bray-Curtis dissimilarity between samples based on the normalized median k-mer abundance and use the dissimilarities to construct an NMDS plot.
+
+```{r, engine='bash', results='hide'}
+beta_diversity.py -i prinseq_output/VMG.read_table.tab.biom -o prinseq_output/VMG.read_table_bc -m bray_curtis
+
+nmds.py -i prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -o prinseq_output/VMG.read_table_bc_nmds.txt
+```
+
+```{r}
+library(ggplot2)
+library(vegan)
+viral_bc <- read.table("prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt", header=TRUE, row.names=1)
+viral_bc_matrix <- as.matrix(viral_bc)
+viral_bc_dist <- as.dist(viral_bc_matrix)
+	
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
+viral_map$Animal <- as.factor(viral_map$Animal)
+```
+
+```{r}
+multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
+  library(grid)
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  if (is.null(layout)) {
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)), ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+    
+	if (numPlots == 1) {
+	  print(plots[[1]])
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row, layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+viral_nmds <- read.table("prinseq_output/VMG.read_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
+colnames(viral_nmds)[1] <- "ID"
+viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
+
+shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
+shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
+
+viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
+  shape = factor(Diet))) + xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
+  labs(fill = "")
+    
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
+  shape = factor(Animal))) + xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
+  labs(fill = "")
+    
+pdf("figures/viral_reads_nmds.pdf", height = 6, width = 12)
+multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
+dev.off()
+```
+
+Use PERMANOVA tests to investigate statisticial differences based on diet and animal the sample was collected from. Additionally, PERMANOVA can be used on continous data - so broke down the diets into their main components and tested which component had a signifincant impact on viral community structure.
+
+```{r}
+adonis_out <- adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+
+adonis_out <- adonis(viral_bc_dist ~ TDN + NDF + Protein + VFA,  permutations=999, data=viral_map)
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+
+```
+
+Test for assumptions. Assumption of equal variance among samples is violated, but this is due to the very large diversity among one treatment - the corn diet - and can be visually seen in the NMDS plot above.
+
+```{r}
+adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Diet))
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+
+adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Animal))
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+
+adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Diet))
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+
+adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Animal))
+capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+```
+
+Also used dbRDA to investigate differences in viral communities based on dietary components. Plot the resulting ordination.
+
+```{r}
+library(data.table)
+library(ggvegan)
+library(grid)
+
+viral_tab <- fread("prinseq_output/VMG.read_table.tab.txt", header=TRUE, sep="\t")
+viral_df <- as.data.frame(viral_tab)
+row.names(viral_df) <- viral_df$ID
+viral_df <- subset(viral_df, select=-c(ID))
+viral_df_t <- t(viral_df)
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
+
+viral_cap <- capscale(viral_df_t ~ TDN + NDF + Protein + VFA, data=viral_map, dist="bray")
+viral_cap
+
+anova(viral_cap)
+anova(viral_cap, by="terms")
+
+#save(viral_cap, file="viral_cap.RData")
+#load("viral_cap.RData")
+
+test <- fortify(viral_cap)
+site_df <- subset(test, test$Score == "sites")
+biplot_df <- subset(test, test$Score == "biplot")
+site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
+
+viral_cap_plot <- ggplot(data = site_df2, aes(Dim1, Dim2)) + 
+ 		geom_point(aes(color = diet)) +
+  	geom_segment(data=biplot_df,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(length = unit(0.3, "cm")),colour="black",inherit_aes=FALSE) + 
+  	geom_text(data=biplot_df,aes(x=Dim1+0.1,y=Dim2+0.1,label=Label),size=4)+
+  	labs(x="CAP1", y="CAP2")+
+  	coord_fixed()
+
+```
+
+Get the average and median pairwise distances between samples.
+
+```{r, engine='bash'}
+printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> prinseq_output/config.txt
+printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=55CS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=Corn -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=Corn -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+```
+
+## Open Reading Frames
+
+Same approach as above, just using the abundance of ORFs across samples instead of median k-mer counts.
+
+```{r, engine='bash', results='hide'}
+for f in viral_blast2tsv/*orf_abundance.txt
+do
+	filename=$(basename "$f")
+	filename="${filename%.txt}"
+	biom convert --table-type="OTU table" --to-json -i $f -o viral_blast2tsv/$filename.biom
+done
+
+merge_otu_tables.py -i viral_blast2tsv/VMG.10_trimm.orf_abundance.biom,viral_blast2tsv/VMG.11_trimm.orf_abundance.biom,viral_blast2tsv/VMG.12_trimm.orf_abundance.biom,viral_blast2tsv/VMG.13_trimm.orf_abundance.biom,viral_blast2tsv/VMG.14_trimm.orf_abundance.biom,viral_blast2tsv/VMG.15_trimm.orf_abundance.biom,viral_blast2tsv/VMG.1_trimm.orf_abundance.biom,viral_blast2tsv/VMG.2_trimm.orf_abundance.biom,viral_blast2tsv/VMG.3_trimm.orf_abundance.biom,viral_blast2tsv/VMG.4_trimm.orf_abundance.biom,viral_blast2tsv/VMG.5_trimm.orf_abundance.biom,viral_blast2tsv/VMG.6_trimm.orf_abundance.biom,viral_blast2tsv/VMG.7_trimm.orf_abundance.biom,viral_blast2tsv/VMG.8_trimm.orf_abundance.biom,viral_blast2tsv/VMG.9_trimm.orf_abundance.biom -o viral_blast2tsv/VMG_trimm.orf_abundance.biom
+
+biom summarize-table -i viral_blast2tsv/VMG_trimm.orf_abundance.biom -o viral_blast2tsv/VMG_trimm.orf_abundance_summarize.txt
+
+biom convert -i viral_blast2tsv/VMG_trimm.orf_abundance.biom -o viral_blast2tsv/VMG_trimm.orf_abundance.txt --table-type="OTU table" --to-tsv
+
+awk '{print $1,$2/629489,$3/2712098,$4/470915,$5/920397,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' viral_blast2tsv/VMG_trimm.orf_abundance.txt > viral_blast2tsv/VMG_trimm.orf_abundance.norm.txt
+
+printf "ID VMG.10 VMG.11 VMG.12 VMG.13 VMG.14 VMG.15 VMG.1 VMG.2 VMG.3 VMG.4 VMG.5 VMG.6 VMG.7 VMG.8 VMG.9\n" > viral_blast2tsv/VMG.orf_table.txt
+
+awk 'NR>2 {print}' viral_blast2tsv/VMG_trimm.orf_abundance.norm.txt >> viral_blast2tsv/VMG.orf_table.txt
+
+tr ' ' \\t < viral_blast2tsv/VMG.orf_table.txt > viral_blast2tsv/VMG.orf_table.tab.txt
+
+biom convert -i viral_blast2tsv/VMG.orf_table.tab.txt -o viral_blast2tsv/VMG.orf_table.tab.biom --table-type="OTU table" --to-json
+```
+
+Calculate Bray-Curtis dissimilarity and plot NMDS.
+
+```{r, engine='bash', results='hide'}
+beta_diversity.py -i viral_blast2tsv/VMG.orf_table.tab.biom -o viral_blast2tsv/VMG.orf_table_bc -m bray_curtis
+
+nmds.py -i viral_blast2tsv/VMG.orf_table_bc/bray_curtis_VMG.orf_table.tab.txt -o viral_blast2tsv/VMG.orf_table_bc_nmds.txt
+```
+
+```{r}
+viral_bc <- read.table("viral_blast2tsv/VMG.orf_table_bc/bray_curtis_VMG.orf_table.tab.txt", header=TRUE, row.names=1)
+viral_bc_matrix <- as.matrix(viral_bc)
+viral_bc_dist <- as.dist(viral_bc_matrix)
+
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
+viral_map$Animal <- as.factor(viral_map$Animal)
+```
+
+```{r}
+viral_nmds <- read.table("viral_blast2tsv/VMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
+colnames(viral_nmds)[1] <- "ID"
+viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
+
+shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
+shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
+
+viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
+    shape = factor(Diet))) + xlab("NMDS1") + ylab("NMDS2") + 
+    guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
+    labs(fill = "")
+    
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
+    shape = factor(Animal))) + xlab("NMDS1") + ylab("NMDS2") + 
+    guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
+    labs(fill = "")
+    
+pdf("viral_orf_nmds.pdf", height = 6, width = 12)
+multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
+dev.off()	
+```
+
+PERMANOVA Stats.
+
+```{r}
+adonis_out <- adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+
+adonis_out <- adonis(viral_bc_dist ~ TDN + NDF + Protein + VFA,  permutations=999, data=viral_map)
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+```
+
+Test assumptions.
+
+```{r}
+adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Diet))
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+
+adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Animal))
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+	
+adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Diet))
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+  
+adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Animal))
+capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+```
+
+dbRDA analysis and ordination plot (!!!check order of samples for coloring since code copied from above!!!)
+
+```{r}
+viral_tab <- fread("viral_blast2tsv/VMG.orf_table.tab.txt", header=TRUE, sep="\t")
+viral_df <- as.data.frame(viral_tab)
+row.names(viral_df) <- viral_df$ID
+viral_df <- subset(viral_df, select=-c(ID))
+viral_df_t <- t(viral_df)
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
+
+viral_cap <- capscale(viral_df_t ~ TDN + NDF + Protein + VFA, data=viral_map, dist="bray")
+viral_cap
+
+anova(viral_cap)
+anova(viral_cap, by="terms")
+
+#save(viral_cap, file="viral_cap.RData")
+#load("viral_cap.RData")
+
+test <- fortify(viral_cap)
+site_df <- subset(test, test$Score == "sites")
+biplot_df <- subset(test, test$Score == "biplot")
+site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
+
+viral_cap_plot <- ggplot(data = site_df2, aes(Dim1, Dim2)) + 
+ 		geom_point(aes(color = diet)) +
+  	geom_segment(data=biplot_df,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(length = unit(0.3, "cm")),colour="black",inherit_aes=FALSE) + 
+  	geom_text(data=biplot_df,aes(x=Dim1+0.1,y=Dim2+0.1,label=Label),size=4)+
+  	labs(x="CAP1", y="CAP2")+
+  	coord_fixed()
+```
+
+
+
+
