@@ -1,0 +1,65 @@
+---
+title: "Annotation"
+output:
+  html_document:
+    keep_md: true
+---
+
+# Annotation of Predicted Open Reading Frames
+Description.
+
+Unfortunately, we do use a licensed version of KEGG and usearch for large searches and I can not share those, but the outputs from the search are available at: . If you wish to use the free version of usearch (up to 4GB RAM), it can be downloaded from http://www.drive5.com/usearch/download.html and is straightforward to install and get running.
+
+We prefer ublast from userach to do our large scale blasting.  Here, we will be doing protein-protein searches.  First, we need to configure the usearch datbase from the KEGG sequeneces:
+
+```{r, engine='bash'}
+./usearch7.0.10 -makeudb_ublast keggV69.genes.pep.txt -output keggV69.genes.pep.udb
+```
+
+I included the exact version of PHAST viral database used in the original search (April 15, 2015) in the intermediate_results directory. You can download the latest version though using: wget http://phast.wishartlab.com/phage_finder/DB/prophage_virus.db
+	
+I like to replace all spaces in PHAST database with underscores so usearch outputs the whole entry in the output file.  Did so manually in a text editor.
+
+Create the userach database for PHAST as well:
+
+```{r, engine='bash'}
+	./usearch7.0.10 -makeudb_ublast prophage_virus.db -output prophage_virus.udb
+```
+
+Search Viral against KEGG:
+
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast vmg.orfs_aa.filter.fasta -db keggV69.genes.pep.udb -evalue 1e-5 -blast6out vmg.ublast.kegg.txt -strand both -top_hits_only -threads 15
+```
+
+Search Viral against PHAST:
+
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast vmg.orfs_aa.filter.fasta -db prophage_virus.udb -evalue 1e-5 -blast6out vmg.ublast.phast.txt -strand both -top_hits_only -threads 15
+```
+
+Search Total against KEGG:
+
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast bmg.orfs_aa.filter.fasta -db keggV69.genes.pep.udb -evalue 1e-5 -blast6out bmg.ublast.kegg.txt -strand both -top_hits_only -threads 15
+```
+
+Search Total against PHAST:
+	
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast bmg.orfs_aa.filter.fasta -db prophage_virus.udb -evalue 1e-5 -blast6out bmg.ublast.phast.txt -strand both -top_hits_only -threads 15
+```
+
+Search Illumina Viral against KEGG:
+
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast vmg.illumina.orfs_aa.filter.fasta -db keggV69.genes.pep.udb -evalue 1e-5 -blast6out vmg.illumina.ublast.kegg.txt -strand both -top_hits_only -threads 15
+```
+
+Search Illumina Viral against PHAST:
+	
+```{r, engine='bash'}
+	./usearch7.0.10 -ublast vmg.illumina.orfs_aa.filter.fasta -db prophage_virus.udb -evalue 1e-5 -blast6out vmg.illumina.ublast.phast.txt -strand both -top_hits_only -threads 15
+```
+
+
