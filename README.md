@@ -11,8 +11,8 @@ Generally, the markdown files rely on previously generate outputs, so rendering 
 	3. qc_miseq_viral_mg.Rmd
 	4. assembly_and_orfs.Rmd
 	5. map_reads.Rmd
-	6. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs from search available in intermediate_results directory)
-	7. abundance_tables.Rmd
+	6. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
+	7. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script_
 	8. beta_div_viral_mg.Rmd
 	9. beta_div_total_mg.Rmd
 	10. circos_plots_viral_mg.Rmd

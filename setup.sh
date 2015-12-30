@@ -85,7 +85,7 @@ unzip bowtie-2.2.5.source.zip
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
 
-# Get Data
+# get Data
 wget ftp://129.93.221.145/public/raw_total.tgz
 wget ftp://129.93.221.145/public/raw_viral.tgz
 wget ftp://129.93.221.145/public/raw_illumina_viral_run1.tgz
@@ -98,6 +98,10 @@ tar -zxvf raw_illumina_viral_run1.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
 tar -zxvf raw_illumina_viral_run3.tgz
 tar -zxvf raw_illumina_viral_run4.tgz
+
+# get intermediate_results directory
+
+
 
 # remove
 rm cd-hit-v4.6.1-2012-08-27.tgz

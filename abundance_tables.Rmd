@@ -8,8 +8,12 @@ output:
 # Create Abundance Tables
 Description.
 
-```{r, engine='bash'}
+KEGG file ko_genes.list not available due to licensing. Outputs from the script can be found in the intermediate_results directory.
 
+```{r, engine='bash'}
+perl scripts/blast2tsv.pl -blast_file=intermediate_results/vmg.ublast.kegg.txt -bowtie_dir=vmg_orfs_bowtie -gene_ko=ko_genes.list
 ```
+
+
 
 
