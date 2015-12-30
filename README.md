@@ -2,9 +2,9 @@ Analysis to recreate the rumen virome manuscript.
 
 The analysis is separated into several RMarkdown files.
 
-You can render them using the instruction below.
+You can setup the same environment used to analyze the data and render the markdown files using the instructions below.
 
-Generally, later RMarkdown files rely on outputs generated earlier, so rendering in this order likely matters.
+Generally, the markdown files rely on previously generate outputs, so rendering in this order likely matters.
 
 	1. qc.Rmd
 	2. assembly_and_orfs.Rmd
