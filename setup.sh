@@ -100,8 +100,9 @@ tar -zxvf raw_illumina_viral_run3.tgz
 tar -zxvf raw_illumina_viral_run4.tgz
 
 # get intermediate_results directory
-
-
+wget -m ftp://129.93.221.145/public/intermediate_results
+mv 129.93.221.145/public/intermediate_results ./
+rm -rf 129.93.221.145/
 
 # remove
 rm cd-hit-v4.6.1-2012-08-27.tgz
