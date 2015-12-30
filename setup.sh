@@ -69,6 +69,15 @@ conda install -c https://conda.anaconda.org/asmeurer pandoc
 wget http://spades.bioinf.spbau.ru/release3.5.0/SPAdes-3.5.0-Linux.tar.gz
 tar -zxvf SPAdes-3.5.0-Linux.tar.gz
 
+# prodigal
+wget https://github.com/hyattpd/Prodigal/releases/download/v2.6.2/prodigal.linux
+wget https://github.com/hyattpd/Prodigal/archive/v2.6.2.zip
+unzip v2.6.2.zip
+cur=$(pwd)
+cd Prodigal-2.6.2/
+make install INSTALLDIR=$cur
+cd ..
+
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
