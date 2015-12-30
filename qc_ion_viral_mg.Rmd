@@ -20,44 +20,44 @@ Explain prep and issues with it. Also diff library sizes, so some different filt
 
 The file transp_adapt_remove.cat.txt was supplied to direct removal of adaptors, barcodes, and transposon seqeunces. Further, observed GC and k-mer bias was noted in the 5' and 3' ends.  In order to begin to alleviate those biases, the first 20 bp of the read was trimmed and a sample dependent trimming from the 3' end was done (more 3' trimming later).
 
-```{r, engine='bash'}
-# mkdir trimmomatic_output
-# mv transp_adapt_remove.cat.txt Trimmomatic-0.33/
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.1.fastq trimmomatic_output/VMG.1_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.2.fastq trimmomatic_output/VMG.2_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.3.fastq trimmomatic_output/VMG.3_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.4.fastq trimmomatic_output/VMG.4_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.5.fastq trimmomatic_output/VMG.5_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:100 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.6.fastq trimmomatic_output/VMG.6_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.7.fastq trimmomatic_output/VMG.7_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.8.fastq trimmomatic_output/VMG.8_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.9.fastq trimmomatic_output/VMG.9_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.10.fastq trimmomatic_output/VMG.10_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.11.fastq trimmomatic_output/VMG.11_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.12.fastq trimmomatic_output/VMG.12_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.13.fastq trimmomatic_output/VMG.13_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.14.fastq trimmomatic_output/VMG.14_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
-# 
-# java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.15.fastq trimmomatic_output/VMG.15_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+```{r, engine='bash', results='hide'}
+mkdir trimmomatic_output
+mv transp_adapt_remove.cat.txt Trimmomatic-0.33/
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.1.fastq trimmomatic_output/VMG.1_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.2.fastq trimmomatic_output/VMG.2_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.3.fastq trimmomatic_output/VMG.3_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.4.fastq trimmomatic_output/VMG.4_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.5.fastq trimmomatic_output/VMG.5_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:100 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.6.fastq trimmomatic_output/VMG.6_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.7.fastq trimmomatic_output/VMG.7_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.8.fastq trimmomatic_output/VMG.8_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.9.fastq trimmomatic_output/VMG.9_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.10.fastq trimmomatic_output/VMG.10_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.11.fastq trimmomatic_output/VMG.11_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.12.fastq trimmomatic_output/VMG.12_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.13.fastq trimmomatic_output/VMG.13_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.14.fastq trimmomatic_output/VMG.14_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/VMG.15.fastq trimmomatic_output/VMG.15_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 ```
 
 To remove artifical duplicates we use cd-hit-454.  We noticed early on the transposon library preps with the Ion Torrent Museek kits introduces (unfortunately sometimes many) duplicates (associated with viral sample?). While the software was originally designed for 454 sequencing, Ion Torrent shares many of the same error profiles as 454 and cd-hit-454 appears to work fairly well for removing duplicates in our data.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 export OMP_NUM_THREADS=10
 mkdir cd_hit_454_output
 
@@ -71,7 +71,7 @@ done
 
 Now, we wanted to check for other types of duplicates and some that may have been missed by cd-hit-454. Further, we can use prinseq to remove transposon associated seqeunces that kept showing up in the 3' end.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 mkdir prinseq_output
 for f in cd_hit_454_output/*.fastq
 do
@@ -83,7 +83,7 @@ done
 
 Use prefix length to remove duplicates with exact matches over first 75 basepairs.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 for f in prinseq_output/*.fastq
 do
   filename=$(basename "$f")
@@ -94,7 +94,7 @@ done
 
 Use qiime to remove those identified as prefix duplicates and khmer to get a FASTA version.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 cd prinseq_output
 for f in *truncatederep.fasta
 do
@@ -111,473 +111,4 @@ Read counts.
 
 ```{r, engine='bash'}
 grep -c ">" prinseq_output/*finalQC.fna
-```
-
-## Total Metagenome - Ion Torrent Data
-
-Describe prep. Less issues as a result. 20 samples, not 15.
-
-```{r, engine='bash'}
-mkdir trimmomatic_output_total
-mv total_adapt_remove.cat.txt Trimmomatic-0.33/
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.1.fastq trimmomatic_output_total/BMG.1_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.2.fastq trimmomatic_output_total/BMG.2_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.3.fastq trimmomatic_output_total/BMG.3_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.4.fastq trimmomatic_output_total/BMG.4_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.5.fastq trimmomatic_output_total/BMG.5_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.6.fastq trimmomatic_output_total/BMG.6_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.7.fastq trimmomatic_output_total/BMG.7_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.8.fastq trimmomatic_output_total/BMG.8_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.9.fastq trimmomatic_output_total/BMG.9_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.10.fastq trimmomatic_output_total/BMG.10_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.11.fastq trimmomatic_output_total/BMG.11_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-  
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.12.fastq trimmomatic_output_total/BMG.12_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.13.fastq trimmomatic_output_total/BMG.13_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.14.fastq trimmomatic_output_total/BMG.14_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.15.fastq trimmomatic_output_total/BMG.15_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.16.fastq trimmomatic_output_total/BMG.16_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.17.fastq trimmomatic_output_total/BMG.17_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.18.fastq trimmomatic_output_total/BMG.18_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.19.fastq trimmomatic_output_total/BMG.19_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-    
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_total/BMG.20.fastq trimmomatic_output_total/BMG.20_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
-```
-
-Now remove all artificial duplicates.
-
-```{r, engine='bash'}
-export OMP_NUM_THREADS=10
-
-mkdir cd_hit_454_output_total
-for f in trimmomatic_output_total/*.fastq
-do
-  filename=$(basename "$f")
-  filename="${filename%_*}"
-  cd-hit-v4.6.1-2012-08-27/./cd-hit-454 -i $f -o cd_hit_454_output_total/"$filename""_cd454.fastq" -M 6100 -T 10
-done
-```
-
-Get a FASTA version.
-
-```{r, engine='bash'}
-for f in cd_hit_454_output_total/*cd454.fastq
-do
-  filename=$(basename "$f")
-  filename="${filename%.*}"
-  fastq-to-fasta.py $f -o cd_hit_454_output_total/"$filename"".fna"
-done
-```
-
-Read counts.
-
-```{r, engine='bash'}
-grep -c ">" cd_hit_454_output_total/*.fna
-```
-
-## Viral Metagenome - Illumina MiSeq Data
-
-Different QC steps (minor, mostly in how we trim off adaptors and dealing with ambiguous bases/homopolymers that were dealt with by the torrent server previously) were used for the illumina viral metagenome data. Once again, there apperas to be duplication issues associated with the transposon preps presumambly, so we must be careful in dealing with them to ensure their removal. There were a few rounds of sequencing multiplexed with other samples, and hence trimming a few different files and then combining the reads.
-
-```{r, engine='bash'}
-mkdir cutadapt_qc
-
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V4_S1_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V4_S1_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V9_S2_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V9_S2_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V10_S3_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V10_S3_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V11_S4_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V11_S4_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V12_S5_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V12_S5_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V13_S6_L001_R1_001.trim.fastq.gz raw_illumina_viral_run1/V13_S6_L001_R1_001.fastq.gz
-
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V4_S1_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V4_S1_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V9_S2_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V9_S2_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V10_S3_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V10_S3_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V11_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V11_S4_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V12_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V12_S5_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc/V13_S6_L001_R2_001.trim.fastq.gz raw_illumina_viral_run1/V13_S6_L001_R2_001.fastq.gz
-```
-
-```{r, engine='bash'}
-mkdir cutadapt_qc2
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V4_S1_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V4_S1_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V9_S2_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V9_S2_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V10_S3_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V10_S3_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V11_S4_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V11_S4_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V12_S5_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V12_S5_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V13_S6_L001_R1_001.trim.fastq.gz raw_illumina_viral_run2/V13_S6_L001_R1_001.fastq.gz
-
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V4_S1_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V4_S1_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V9_S2_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V9_S2_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V10_S3_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V10_S3_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V11_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V11_S4_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V12_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V12_S5_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc2/V13_S6_L001_R2_001.trim.fastq.gz raw_illumina_viral_run2/V13_S6_L001_R2_001.fastq.gz
-```
-
-```{r, engine='bash'}
-mkdir cutadapt_qc3
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v9_S2_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v9_S2_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v10_S3_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v10_S3_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v12_S4_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v12_S4_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v13_S5_L001_R1_001.trim.fastq.gz raw_illumina_viral_run3/v13_S5_L001_R1_001.fastq.gz
-
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v9_S2_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v9_S2_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v10_S3_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v10_S3_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v12_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v12_S4_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc3/v13_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run3/v13_S5_L001_R2_001.fastq.gz
-```
-
-```{r, engine='bash'}
-mkdir cutadapt_qc4
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v4_S1_L001_R1_001.trim.fastq.gz raw_illumina_viral_run4/v4_S1_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v10_S2_L001_R1_001.trim.fastq.gz raw_illumina_viral_run4/v10_S2_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v11_S3_L001_R1_001.trim.fastq.gz raw_illumina_viral_run4/v11_S3_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v12_S4_L001_R1_001.trim.fastq.gz raw_illumina_viral_run4/v12_S4_L001_R1_001.fastq.gz
-	
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v13_S5_L001_R1_001.trim.fastq.gz raw_illumina_viral_run4/v13_S5_L001_R1_001.fastq.gz
-
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v4_S1_L001_R2_001.trim.fastq.gz raw_illumina_viral_run4/v4_S1_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v10_S2_L001_R2_001.trim.fastq.gz raw_illumina_viral_run4/v10_S2_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v11_S3_L001_R2_001.trim.fastq.gz raw_illumina_viral_run4/v11_S3_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v12_S4_L001_R2_001.trim.fastq.gz raw_illumina_viral_run4/v12_S4_L001_R2_001.fastq.gz
-	
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o cutadapt_qc4/v13_S5_L001_R2_001.trim.fastq.gz raw_illumina_viral_run4/v13_S5_L001_R2_001.fastq.gz
-```
-
-Remove seqeunces that have an estimated error rate >1%:
-
-```{r, engine='bash'}
-mkdir usearch_qc
-gunzip -d cutadapt_qc/*
-	
-usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-```
-
-```{r, engine='bash'}
-mkdir usearch_qc2
-gunzip -d cutadapt_qc2/*
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R1_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V11_S4_L001_R2_001.trim.fastq -fastqout usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R1_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V12_S5_L001_R2_001.trim.fastq -fastqout usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R1_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc2/V13_S6_L001_R2_001.trim.fastq -fastqout usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-```
-
-```{r, engine='bash'}
-mkdir usearch_qc3
-gunzip -d cutadapt_qc3/*
-	
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v9_S2_L001_R1_001.trim.fastq -fastqout usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v9_S2_L001_R2_001.trim.fastq -fastqout usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v10_S3_L001_R1_001.trim.fastq -fastqout usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v10_S3_L001_R2_001.trim.fastq -fastqout usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v12_S4_L001_R1_001.trim.fastq -fastqout usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v12_S4_L001_R2_001.trim.fastq -fastqout usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v13_S5_L001_R1_001.trim.fastq -fastqout usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc3/v13_S5_L001_R2_001.trim.fastq -fastqout usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-```
-
-```{r, engine='bash'}
-mkdir usearch_qc4
-gunzip -d cutadapt_qc4/*
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v4_S1_L001_R1_001.trim.fastq -fastqout usearch_qc4/v4_S1_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v4_S1_L001_R2_001.trim.fastq -fastqout usearch_qc4/v4_S1_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v10_S2_L001_R1_001.trim.fastq -fastqout usearch_qc4/v10_S2_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v10_S2_L001_R2_001.trim.fastq -fastqout usearch_qc4/v10_S2_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v11_S3_L001_R1_001.trim.fastq -fastqout usearch_qc4/v11_S3_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v11_S3_L001_R2_001.trim.fastq -fastqout usearch_qc4/v11_S3_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v12_S4_L001_R1_001.trim.fastq -fastqout usearch_qc4/v12_S4_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v12_S4_L001_R2_001.trim.fastq -fastqout usearch_qc4/v12_S4_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v13_S5_L001_R1_001.trim.fastq -fastqout usearch_qc4/v13_S5_L001_R1_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-
-usearch8.0.1623 -fastq_filter cutadapt_qc4/v13_S5_L001_R2_001.trim.fastq -fastqout usearch_qc4/v13_S5_L001_R2_001_usearch_error.fastq -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
-```
-
-merge read1 and read2 together, many of reverse reads lost due to quality falling off early in V3 chemistry, not worth getting pairs back together.
-
-```{r, engine='bash'}
-cat usearch_qc/V4_S1_L001_R1_001_usearch_error.fastq usearch_qc/V4_S1_L001_R2_001_usearch_error.fastq > usearch_qc/V4_S1_L001_R1_R2.fastq
-
-cat usearch_qc/V9_S2_L001_R1_001_usearch_error.fastq usearch_qc/V9_S2_L001_R2_001_usearch_error.fastq > usearch_qc/V9_S2_L001_R1_R2.fastq
-
-cat usearch_qc/V10_S3_L001_R1_001_usearch_error.fastq usearch_qc/V10_S3_L001_R2_001_usearch_error.fastq > usearch_qc/V10_S3_L001_R1_R2.fastq
-
-cat usearch_qc/V11_S4_L001_R1_001_usearch_error.fastq usearch_qc/V11_S4_L001_R2_001_usearch_error.fastq > usearch_qc/V11_S4_L001_R1_R2.fastq
-
-cat usearch_qc/V12_S5_L001_R1_001_usearch_error.fastq usearch_qc/V12_S5_L001_R2_001_usearch_error.fastq > usearch_qc/V12_S5_L001_R1_R2.fastq
-
-cat usearch_qc/V13_S6_L001_R1_001_usearch_error.fastq usearch_qc/V13_S6_L001_R2_001_usearch_error.fastq > usearch_qc/V13_S6_L001_R1_R2.fastq
-
-cat usearch_qc2/V4_S1_L001_R1_001_usearch_error.fastq usearch_qc2/V4_S1_L001_R2_001_usearch_error.fastq > usearch_qc2/V4_S1_L001_R1_R2.fastq
-
-cat usearch_qc2/V9_S2_L001_R1_001_usearch_error.fastq usearch_qc2/V9_S2_L001_R2_001_usearch_error.fastq > usearch_qc2/V9_S2_L001_R1_R2.fastq
-
-cat usearch_qc2/V10_S3_L001_R1_001_usearch_error.fastq usearch_qc2/V10_S3_L001_R2_001_usearch_error.fastq > usearch_qc2/V10_S3_L001_R1_R2.fastq
-
-cat usearch_qc2/V11_S4_L001_R1_001_usearch_error.fastq usearch_qc2/V11_S4_L001_R2_001_usearch_error.fastq > usearch_qc2/V11_S4_L001_R1_R2.fastq
-
-cat usearch_qc2/V12_S5_L001_R1_001_usearch_error.fastq usearch_qc2/V12_S5_L001_R2_001_usearch_error.fastq > usearch_qc2/V12_S5_L001_R1_R2.fastq
-
-cat usearch_qc2/V13_S6_L001_R1_001_usearch_error.fastq usearch_qc2/V13_S6_L001_R2_001_usearch_error.fastq > usearch_qc2/V13_S6_L001_R1_R2.fastq
-
-cat usearch_qc3/v9_S2_L001_R1_001_usearch_error.fastq usearch_qc3/v9_S2_L001_R2_001_usearch_error.fastq > usearch_qc3/v9_S2_L001_R1_R2.fastq
-
-cat usearch_qc3/v10_S3_L001_R1_001_usearch_error.fastq usearch_qc3/v10_S3_L001_R2_001_usearch_error.fastq > usearch_qc3/v10_S3_L001_R1_R2.fastq
-
-cat usearch_qc3/v12_S4_L001_R1_001_usearch_error.fastq usearch_qc3/v12_S4_L001_R2_001_usearch_error.fastq > usearch_qc3/v12_S4_L001_R1_R2.fastq
-
-cat usearch_qc3/v13_S5_L001_R1_001_usearch_error.fastq usearch_qc3/v13_S5_L001_R2_001_usearch_error.fastq > usearch_qc3/v13_S5_L001_R1_R2.fastq
-
-cat usearch_qc4/v4_S1_L001_R1_001_usearch_error.fastq usearch_qc4/v4_S1_L001_R2_001_usearch_error.fastq > usearch_qc4/v4_S1_L001_R1_R2.fastq
-
-cat usearch_qc4/v10_S2_L001_R1_001_usearch_error.fastq usearch_qc4/v10_S2_L001_R2_001_usearch_error.fastq > usearch_qc4/v10_S2_L001_R1_R2.fastq
-
-cat usearch_qc4/v11_S3_L001_R1_001_usearch_error.fastq usearch_qc4/v11_S3_L001_R2_001_usearch_error.fastq > usearch_qc4/v11_S3_L001_R1_R2.fastq
-
-cat usearch_qc4/v12_S4_L001_R1_001_usearch_error.fastq usearch_qc4/v12_S4_L001_R2_001_usearch_error.fastq > usearch_qc4/v12_S4_L001_R1_R2.fastq
-
-cat usearch_qc4/v13_S5_L001_R1_001_usearch_error.fastq usearch_qc4/v13_S5_L001_R2_001_usearch_error.fastq > usearch_qc4/v13_S5_L001_R1_R2.fastq
-```
-
-Use prinseq to remove duplicates with prefix filter of 80 bp.
-
-```{r, engine='bash'}
-for f in usearch_qc/*_R2.fastq
-do
-  filename=$(basename "$f")
-	filename="${filename%_*}"
-	perl prinseq-lite-0.20.4/prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good usearch_qc/"$filename""_R2_truncatederep"
-	grep ">" usearch_qc/"$filename""_R2_truncatederep.fasta" | cut -c 2- > usearch_qc/"$filename""_R2_keep_ids.txt"
-	filter_fasta.py -f $f -s usearch_qc/"$filename""_R2_keep_ids.txt" -o usearch_qc/"$filename""_R2_finalQC.fastq"
-done
-	
-for f in usearch_qc2/*_R2.fastq
-do
-	filename=$(basename "$f")
-	filename="${filename%_*}"
-	perl prinseq-lite-0.20.4/prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good usearch_qc2/"$filename""_R2_truncatederep"
-	grep ">" usearch_qc2/"$filename""_R2_truncatederep.fasta" | cut -c 2- > usearch_qc2/"$filename""_R2_keep_ids.txt"
-	filter_fasta.py -f $f -s usearch_qc2/"$filename""_R2_keep_ids.txt" -o usearch_qc2/"$filename""_R2_finalQC.fastq"
-done
-	
-for f in usearch_qc3/*_R2.fastq
-do
-	filename=$(basename "$f")
-	filename="${filename%_*}"
-	perl prinseq-lite-0.20.4/prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good usearch_qc3/"$filename""_R2_truncatederep"
-	grep ">" usearch_qc3/"$filename""_R2_truncatederep.fasta" | cut -c 2- > usearch_qc3/"$filename""_R2_keep_ids.txt"
-	filter_fasta.py -f $f -s usearch_qc3/"$filename""_R2_keep_ids.txt" -o usearch_qc3/"$filename""_R2_finalQC.fastq"
-done
-	
-for f in usearch_qc4/*_R2.fastq
-do
-	filename=$(basename "$f")
-	filename="${filename%_*}"
-	perl prinseq-lite-0.20.4/prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good usearch_qc4/"$filename""_R2_truncatederep"
-	grep ">" usearch_qc4/"$filename""_R2_truncatederep.fasta" | cut -c 2- > usearch_qc4/"$filename""_R2_keep_ids.txt"
-	filter_fasta.py -f $f -s usearch_qc4/"$filename""_R2_keep_ids.txt" -o usearch_qc4/"$filename""_R2_finalQC.fastq"
-done
-```
-
-Combine reads from all runs together for each sample.
-
-```{r, engine='bash'}
-cat usearch_qc/V4_S1_L001_R1_R2_finalQC.fastq usearch_qc2/V4_S1_L001_R1_R2_finalQC.fastq usearch_qc4/v4_S1_L001_R1_R2_finalQC.fastq > V4.illumina.cat.fastq
-
-cat usearch_qc/V9_S2_L001_R1_R2_finalQC.fastq usearch_qc2/V9_S2_L001_R1_R2_finalQC.fastq usearch_qc3/v9_S2_L001_R1_R2_finalQC.fastq > V9.illumina.cat.fastq
-
-cat usearch_qc/V10_S3_L001_R1_R2_finalQC.fastq usearch_qc2/V10_S3_L001_R1_R2_finalQC.fastq usearch_qc3/v10_S3_L001_R1_R2_finalQC.fastq usearch_qc4/v10_S2_L001_R1_R2_finalQC.fastq > V10.illumina.cat.fastq
-
-cat usearch_qc/V11_S4_L001_R1_R2_finalQC.fastq usearch_qc2/V11_S4_L001_R1_R2_finalQC.fastq usearch_qc4/v11_S3_L001_R1_R2_finalQC.fastq > V11.illumina.cat.fastq
-
-cat usearch_qc/V12_S5_L001_R1_R2_finalQC.fastq usearch_qc2/V12_S5_L001_R1_R2_finalQC.fastq usearch_qc3/v12_S4_L001_R1_R2_finalQC.fastq usearch_qc4/v12_S4_L001_R1_R2_finalQC.fastq > V12.illumina.cat.fastq
-
-cat usearch_qc/V13_S6_L001_R1_R2_finalQC.fastq usearch_qc2/V13_S6_L001_R1_R2_finalQC.fastq usearch_qc3/v13_S5_L001_R1_R2_finalQC.fastq usearch_qc4/v13_S5_L001_R1_R2_finalQC.fastq > V13.illumina.cat.fastq
-```
-
-Get a FASTA version.
-
-```{r, engine='bash'}
-for f in *cat.fastq
-do
-  filename=$(basename "$f")
-  filename="${filename%.*}"
-  fastq-to-fasta.py $f -o "$filename"".fna"
-done
-```
-
-Resulting read numbers.
-
-```{r, engine='bash'}
-grep -c ">" *.cat.fastq
-```
-
-
-## rRNA contamination - Viral Metagenome - Ion Torrent Data
-
-Look at rRNA contamination rates. For some reason I can only get this to run from within the examples folder.  So, move all the fasta files generated to the examples folder within rRNA predictor.
-
-```{r, engine='bash'}
-mkdir rRNA_prediction/examples/e1/viral_input
-mkdir rRNA_prediction/examples/e1/viral_output
-cp prinseq_output/*.fna rRNA_prediction/examples/e1/viral_input/
-
-cd rRNA_prediction/examples/e1
-export PATH=//work/samodha/canderson3/rRNA_prediction/rRNA_hmm_fs_wst_v0:$PATH
-/work/samodha/canderson3/rRNA_prediction/scripts/rRNA_hmm_run_wst_v0.pl  viral_input viral_output
-cd ../../..
-```
-
-Check the number of rRNA hits for each sample using custom script to parse outputs:
-
-```{r, engine='bash'}
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.1_trimm_finalQC.fna.coord scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.2_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.3_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.4_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.5_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.6_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.7_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.8_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.9_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.10_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.11_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.12_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.13_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.14_trimm_finalQC.fna.coord
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_output/VMG.15_trimm_finalQC.fna.coord ```
-```
-
-## rRNA contamination - Viral Metagenome - Illumina MiSeq Data
-
-Same procedure, just focusing on reads from the MiSeq data.
-
-```{r, engine='bash'}
-cp *.illumina.cat.fna rRNA_prediction/examples/e1/viral_illumina_input/
-cd rRNA_prediction/examples/e1
-export PATH=//work/samodha/canderson3/rRNA_prediction/rRNA_hmm_fs_wst_v0:$PATH
-/work/samodha/canderson3/rRNA_prediction/scripts/rRNA_hmm_run_wst_v0.pl  viral_illumina_input viral_illumina_output
-cd ../../..
-```
-
-Check the results.
-
-```{r, engine='bash'}
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V4.illumina.cat.fna.coord 
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V9.illumina.cat.fna.coord 
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V10.illumina.cat.fna.coord 
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V11.illumina.cat.fna.coord 
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V12.illumina.cat.fna.coord 
-scripts/./parse_rRNA_output.pl -rrna rRNA_prediction/examples/e1/viral_illumina_output/V13.illumina.cat.fna.coord 
 ```

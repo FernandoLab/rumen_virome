@@ -70,13 +70,16 @@ wget http://spades.bioinf.spbau.ru/release3.5.0/SPAdes-3.5.0-Linux.tar.gz
 tar -zxvf SPAdes-3.5.0-Linux.tar.gz
 
 # prodigal
-wget https://github.com/hyattpd/Prodigal/releases/download/v2.6.2/prodigal.linux
 wget https://github.com/hyattpd/Prodigal/archive/v2.6.2.zip
 unzip v2.6.2.zip
 cur=$(pwd)
 cd Prodigal-2.6.2/
 make install INSTALLDIR=$cur
 cd ..
+
+# bowtie2
+wget http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.5/bowtie2-2.2.5-linux-x86_64.zip/download -O bowtie-2.2.5.source.zip
+unzip bowtie-2.2.5.source.zip
 
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
@@ -89,12 +92,8 @@ wget ftp://129.93.221.145/public/raw_illumina_viral_run1.tgz
 wget ftp://129.93.221.145/public/raw_illumina_viral_run2.tgz
 wget ftp://129.93.221.145/public/raw_illumina_viral_run3.tgz
 wget ftp://129.93.221.145/public/raw_illumina_viral_run4.tgz
-tar -zxvf raw_viral.tgz
-mkdir raw_viral
-mv VMG.*.fastq raw_viral/
 tar -zxvf raw_total.tgz
-mkdir raw_total
-mv BMG.*.fastq raw_total/
+tar -zxvf raw_viral.tgz
 tar -zxvf raw_illumina_viral_run1.tgz
 tar -zxvf raw_illumina_viral_run2.tgz
 tar -zxvf raw_illumina_viral_run3.tgz
@@ -108,10 +107,11 @@ rm -rf __MACOSX
 rm Trimmomatic-0.33.zip
 rm rRNA_prediction.tar
 rm Anaconda-2.3.0-Linux-x86_64.sh
+rm v2.6.2.zip
+rm SPAdes-3.5.0-Linux.tar.gz
 rm raw_viral.tgz
 rm raw_total.tgz
 rm raw_illumina_viral_run1.tgz
 rm raw_illumina_viral_run2.tgz
 rm raw_illumina_viral_run3.tgz
 rm raw_illumina_viral_run4.tgz
-
