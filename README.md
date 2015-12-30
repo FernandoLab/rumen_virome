@@ -36,5 +36,5 @@ Anaconda is downloaded and prompts you during installataion of the packages. The
 To render one of the RMarkdown files:
 R CMD BATCH --no-restore --no-save '--args file1.Rmd' render.R
 
-Versions already rendered can be viewed in this repository with extension .md or .html.
+Rendered results can be found in this repository with file extension .md or .html.
 
