@@ -8,8 +8,51 @@ output:
 # Map Reads to Open Reading Frames
 Description.
 
-```{r, engine='bash'}
+Make bowtie databases for all datasets.
 
+```{r, engine='bash'}
+mkdir vmg_orfs_bowtie
+bowtie2-2.2.5/bowtie2-build vmg.orfs_nt.filter.fasta vmg_orfs_bowtie/vmg_orfs_bowtie_db
+
+mkdir bmg_orfs_bowtie
+bowtie2-2.2.5/bowtie2-build bmg.orfs_nt.filter.fasta bmg_orfs_bowtie/bmg_orfs_bowtie_db
+
+mkdir vmg_illumina_orfs_bowtie
+bowtie2-2.2.5/bowtie2-build vmg.illumina.orfs_nt.filter.fasta vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db
+```	
+
+Align Ion Torrent viral metagenome reads to nt ORFs.
+
+```{r, engine='bash'}
+for f in prinseq_output/*finalQC.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x vmg_orfs_bowtie/vmg_orfs_bowtie_db -S vmg_orfs_bowtie/$filename.psl --un vmg_orfs_bowtie/$filename.unaligned.txt --al vmg_orfs_bowtie/$filename.aligned.txt
+done
+
+```
+
+Align total metagenome reads to nt ORFs.
+
+```{r, engine='bash'}	
+for f in cd_hit_454_output_total/*cd454.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x bmg_orfs_bowtie/bmg_orfs_bowtie_db -S bmg_orfs_bowtie/$filename.psl --un bmg_orfs_bowtie/$filename.unaligned.txt --al bmg_orfs_bowtie/$filename.aligned.txt 
+done
+```
+	
+Align Illumina MiSeq viral metagenome reads to nt ORFs.
+
+```{r, engine='bash'}
+for f in *illumina.cat.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  bowtie2-2.2.5/bowtie2 -U $f --end-to-end --sensitive -x vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db -S vmg_illumina_orfs_bowtie/$filename.psl --un vmg_illumina_orfs_bowtie/$filename.unaligned.txt --al vmg_illumina_orfs_bowtie/$filename.aligned.txt 
+done
 ```
 
 
