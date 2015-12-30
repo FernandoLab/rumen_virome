@@ -11,102 +11,102 @@ The code below calculates how reads are shared between samples and diets to gene
 ## Sample-Sample Comparisons
 
 ```{r, engine='bash', results='hide'}
-# cd cd_hit_454_output_total/
-#  
-# for f in *.fna
-# do
-#   filename=$(basename "$f")
-#   filename="${filename%.*}"
-#   mothur "#sub.sample(fasta=$f, size=450000)"
-# done
-# 
-# for f in *subsample.fna
-# do
-#     filename=$(basename "$f")
-#     filename="${filename%.*}"
-#     load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
-# done
-# 
-# 
-# ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt
-# printf "\n" >> config_sub.txt
-# ls *subsample.fna | awk '{ ORS=" "; print; }' >> config_sub.txt
-# printf "\n" >> config_sub.txt
-# printf "55000000" >> config_sub.txt
-#  
-# python ../scripts/get_comb_multi_old_median_kmer.py config_sub.txt
-#  
-# printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS 27CDS 27CDS 55CS 40MDGS Corn Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> config_sub.txt
-# printf "\n259 346 3244 222 3257 259 346 3244 222 3257 346 259 3244 222 3257 259 346 3244 222 3257" >> config_sub.txt
-#  
-# cd ..
+cd cd_hit_454_output_total/
+ 
+for f in *.fna
+do
+  filename=$(basename "$f")
+  filename="${filename%.*}"
+  mothur "#sub.sample(fasta=$f, size=450000)"
+done
+
+for f in *subsample.fna
+do
+    filename=$(basename "$f")
+    filename="${filename%.*}"
+    load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
+done
+
+
+ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt
+printf "\n" >> config_sub.txt
+ls *subsample.fna | awk '{ ORS=" "; print; }' >> config_sub.txt
+printf "\n" >> config_sub.txt
+printf "55000000" >> config_sub.txt
+ 
+python ../scripts/get_comb_multi_old_median_kmer.py config_sub.txt
+ 
+printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS 27CDS 27CDS 55CS 40MDGS Corn Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> config_sub.txt
+printf "\n259 346 3244 222 3257 259 346 3244 222 3257 346 259 3244 222 3257 259 346 3244 222 3257" >> config_sub.txt
+ 
+cd ..
 ```
 
 Following script calcualtes the median shared k-mer content between each pair of samples. The script only considers reads that are shared with at least one other sample to avoid potential impact of sequencing errors on the interpretation.
 
 ```{r, engine='bash'}
-# perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=cd_hit_454_output_total -threshold=1
-# 
-# mv *.comb.keep.txt cd_hit_454_output_total/
-# 
-# python scripts/circos_make_table.py -d cd_hit_454_output_total/ -c cd_hit_454_output_total/config_sub.txt -i T -s subsample.fna.comb.keep.txt > total_circos_list_sub.txt
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=cd_hit_454_output_total -threshold=1
+
+mv *.comb.keep.txt cd_hit_454_output_total/
+
+python scripts/circos_make_table.py -d cd_hit_454_output_total/ -c cd_hit_454_output_total/config_sub.txt -i T -s subsample.fna.comb.keep.txt > total_circos_list_sub.txt
 ```
 
 ```{r, cache=FALSE}
-# options(stringsAsFactors=FALSE)
-# matrix_out <- data.frame(matrix(NA, nrow = 20, ncol = 20))
-# pw <- read.table("total_circos_list_sub.txt", sep="\t", header=FALSE)
-# r_c_names <- unique(pw$V1)
-# row.names(matrix_out) <- r_c_names
-# colnames(matrix_out) <- r_c_names
-# 
-# for(i in 1:nrow(pw)) {
-# 	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
-# }
-# 
-# write.table(matrix_out, file="total_circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+options(stringsAsFactors=FALSE)
+matrix_out <- data.frame(matrix(NA, nrow = 20, ncol = 20))
+pw <- read.table("total_circos_list_sub.txt", sep="\t", header=FALSE)
+r_c_names <- unique(pw$V1)
+row.names(matrix_out) <- r_c_names
+colnames(matrix_out) <- r_c_names
+
+for(i in 1:nrow(pw)) {
+	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
+}
+
+write.table(matrix_out, file="total_circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
 ```
 
 ```{r, engine='bash'}
-# sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' total_circos_table_sub.txt > total_circos_table2_sub.txt
-# 
-# printf "labels\n255,211,0\n0,159,107\n196,2,51\n196,2,51\n0,135,189\n196,2,51\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n255,211,0\n0,135,189\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n255,211,0\n0,159,107\n196,2,51\n255,211,0" > total_circos_row_colors.txt
-# paste total_circos_row_colors.txt total_circos_table2_sub.txt > circos_total_all_samples_upload.txt
-# 
-# printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > total_circos_row_colors_27cds.txt
-# paste total_circos_row_colors_27cds.txt total_circos_table2_sub.txt > circos_total_27cds_upload.txt
-# 
-# printf "labels\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211" > total_circos_row_colors_55cs.txt
-# paste total_circos_row_colors_55cs.txt total_circos_table2_sub.txt > circos_total_55cs_upload.txt
-# 
-# printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211" > total_circos_row_colors_40mdgs.txt
-# paste total_circos_row_colors_40mdgs.txt total_circos_table2_sub.txt > circos_total_40mdgs_upload.txt
-# 
-# printf "labels\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n255,211,0" > total_circos_row_colors_corn.txt
-# paste total_circos_row_colors_corn.txt total_circos_table2_sub.txt > circos_total_corn_upload.txt
+sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' total_circos_table_sub.txt > total_circos_table2_sub.txt
+
+printf "labels\n255,211,0\n0,159,107\n196,2,51\n196,2,51\n0,135,189\n196,2,51\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n255,211,0\n0,135,189\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n255,211,0\n0,159,107\n196,2,51\n255,211,0" > total_circos_row_colors.txt
+paste total_circos_row_colors.txt total_circos_table2_sub.txt > circos_total_all_samples_upload.txt
+
+printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > total_circos_row_colors_27cds.txt
+paste total_circos_row_colors_27cds.txt total_circos_table2_sub.txt > circos_total_27cds_upload.txt
+
+printf "labels\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211" > total_circos_row_colors_55cs.txt
+paste total_circos_row_colors_55cs.txt total_circos_table2_sub.txt > circos_total_55cs_upload.txt
+
+printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211" > total_circos_row_colors_40mdgs.txt
+paste total_circos_row_colors_40mdgs.txt total_circos_table2_sub.txt > circos_total_40mdgs_upload.txt
+
+printf "labels\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n255,211,0" > total_circos_row_colors_corn.txt
+paste total_circos_row_colors_corn.txt total_circos_table2_sub.txt > circos_total_corn_upload.txt
 ```
 
 ## Diet-Diet Comparisons
 ```{r, engine='bash', results='hide'}
 cd cd_hit_454_output_total/
-# mkdir sub_sample_comb
-# mv *.comb.keep.txt sub_sample_comb
-# mv *subsample.fna.comb sub_sample_comb
-# 
-# cat BMG.4_cd454.subsample.fna BMG.10_cd454.subsample.fna BMG.13_cd454.subsample.fna BMG.16_cd454.subsample.fna BMG.17_cd454.subsample.fna > 27cds_sub_cat.fna
-# 
-# cat BMG.14_cd454.subsample.fna BMG.1_cd454.subsample.fna BMG.2_cd454.subsample.fna BMG.8_cd454.subsample.fna BMG.20_cd454.subsample.fna > corn_sub_cat.fna
-# 
-# cat BMG.15_cd454.subsample.fna BMG.3_cd454.subsample.fna BMG.6_cd454.subsample.fna BMG.7_cd454.subsample.fna BMG.19_cd454.subsample.fna > 40mdgs_sub_cat.fna
-# 
-# cat BMG.5_cd454.subsample.fna BMG.11_cd454.subsample.fna BMG.12_cd454.subsample.fna BMG.9_cd454.subsample.fna BMG.18_cd454.subsample.fna > 55cs_sub_cat.fna
-# 
-# for f in *sub_cat.fna
-# do
-#     filename=$(basename "$f")
-#     filename="${filename%.*}"
-#     load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_sub_cat_k20.kh" $f
-# done
+mkdir sub_sample_comb
+mv *.comb.keep.txt sub_sample_comb
+mv *subsample.fna.comb sub_sample_comb
+
+cat BMG.4_cd454.subsample.fna BMG.10_cd454.subsample.fna BMG.13_cd454.subsample.fna BMG.16_cd454.subsample.fna BMG.17_cd454.subsample.fna > 27cds_sub_cat.fna
+
+cat BMG.14_cd454.subsample.fna BMG.1_cd454.subsample.fna BMG.2_cd454.subsample.fna BMG.8_cd454.subsample.fna BMG.20_cd454.subsample.fna > corn_sub_cat.fna
+
+cat BMG.15_cd454.subsample.fna BMG.3_cd454.subsample.fna BMG.6_cd454.subsample.fna BMG.7_cd454.subsample.fna BMG.19_cd454.subsample.fna > 40mdgs_sub_cat.fna
+
+cat BMG.5_cd454.subsample.fna BMG.11_cd454.subsample.fna BMG.12_cd454.subsample.fna BMG.9_cd454.subsample.fna BMG.18_cd454.subsample.fna > 55cs_sub_cat.fna
+
+for f in *sub_cat.fna
+do
+    filename=$(basename "$f")
+    filename="${filename%.*}"
+    load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_sub_cat_k20.kh" $f
+done
 
 ls *sub_cat_k20.kh | awk '{ ORS=" "; print; }' > config_cat_sub.txt
 printf "\n" >> config_cat_sub.txt
