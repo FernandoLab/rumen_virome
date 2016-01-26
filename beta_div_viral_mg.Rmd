@@ -1,5 +1,5 @@
 ---
-title: "Map Reads"
+title: "Viral Beta Diversity"
 output:
   html_document:
     keep_md: true
@@ -64,6 +64,8 @@ Calcualte the Bray-Curtis dissimilarity between samples based on the normalized 
 beta_diversity.py -i prinseq_output/VMG.read_table.tab.biom -o prinseq_output/VMG.read_table_bc -m bray_curtis
 
 nmds.py -i prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -o prinseq_output/VMG.read_table_bc_nmds.txt
+
+mkdir figures/
 ```
 
 ```{r}
@@ -105,17 +107,17 @@ viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
 shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
 shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
 
-viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
-  shape = factor(Diet))) + xlab("NMDS1") + ylab("NMDS2") + 
+viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
   labs(fill = "")
     
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
-  shape = factor(Animal))) + xlab("NMDS1") + ylab("NMDS2") + 
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
   labs(fill = "")
     
-pdf("figures/viral_reads_nmds.pdf", height = 6, width = 12)
+tiff("figures/viral_reads_nmds.tiff", height = 6, width = 12, units='in', res=300)
 multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
 dev.off()
 ```
@@ -123,68 +125,114 @@ dev.off()
 Use PERMANOVA tests to investigate statisticial differences based on diet and animal the sample was collected from. Additionally, PERMANOVA can be used on continous data - so broke down the diets into their main components and tested which component had a signifincant impact on viral community structure.
 
 ```{r}
-adonis_out <- adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
 
-adonis_out <- adonis(viral_bc_dist ~ TDN + NDF + Protein + VFA,  permutations=999, data=viral_map)
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
+#Test for assumptions. Assumption of equal variance among samples is violated, but this is due to the very large diversity among one treatment - the corn diet - and can be visually seen in the NMDS plot above.
 
+anova(betadisper(viral_bc_dist,viral_map$Diet))
+
+anova(betadisper(viral_bc_dist,viral_map$Animal))
+
+permutest(betadisper(viral_bc_dist,viral_map$Diet))
+
+permutest(betadisper(viral_bc_dist,viral_map$Animal))
 ```
 
-Test for assumptions. Assumption of equal variance among samples is violated, but this is due to the very large diversity among one treatment - the corn diet - and can be visually seen in the NMDS plot above.
-
-```{r}
-adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Diet))
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
-
-adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Animal))
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
-
-adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Diet))
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
-
-adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Animal))
-capture.output(adonis_out,file="viral_reads_stats.txt", append=TRUE)
-```
-
-Also used dbRDA to investigate differences in viral communities based on dietary components. Plot the resulting ordination.
+Also used dbRDA, adonis, and subsequent ordination plots to investigate influence of environmental factors (i.e. dietary components) on viral communities.
 
 ```{r}
 library(data.table)
 library(ggvegan)
 library(grid)
 
+map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo")]
+cor(map2)
+
 viral_tab <- fread("prinseq_output/VMG.read_table.tab.txt", header=TRUE, sep="\t")
 viral_df <- as.data.frame(viral_tab)
 row.names(viral_df) <- viral_df$ID
 viral_df <- subset(viral_df, select=-c(ID))
 viral_df_t <- t(viral_df)
-viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
 
-viral_cap <- capscale(viral_df_t ~ TDN + NDF + Protein + VFA, data=viral_map, dist="bray")
-viral_cap
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+#save(viral_cap, file="viral_cap_read.RData")
+#load("viral_cap_read.RData")
 
-anova(viral_cap)
-anova(viral_cap, by="terms")
 
-#save(viral_cap, file="viral_cap.RData")
-#load("viral_cap.RData")
+viral_cap <- capscale(viral_df_t ~ TDN + Protein + Zn, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
 
+viral_cap <- capscale(viral_df_t ~ Protein + Zn + TDN, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Protein + TDN + Zn, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Zn + TDN + Protein, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Zn + Protein + TDN, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+adonis(viral_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=viral_map)
+
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
 test <- fortify(viral_cap)
 site_df <- subset(test, test$Score == "sites")
+site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","40MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
 biplot_df <- subset(test, test$Score == "biplot")
-site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
+biplot_df2 <- data.frame(text_x = as.numeric(c("-0.6", "-0.32", "-0.225")), biplot_df)
+biplot_df3 <- data.frame(text_y = as.numeric(c("-0.57", "-0.93", "-0.315")), biplot_df2)
+biplot_df3$Label[3] = "Pro"
 
-viral_cap_plot <- ggplot(data = site_df2, aes(Dim1, Dim2)) + 
- 		geom_point(aes(color = diet)) +
-  	geom_segment(data=biplot_df,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(length = unit(0.3, "cm")),colour="black",inherit_aes=FALSE) + 
-  	geom_text(data=biplot_df,aes(x=Dim1+0.1,y=Dim2+0.1,label=Label),size=4)+
-  	labs(x="CAP1", y="CAP2")+
-  	coord_fixed()
-
+tiff("figures/viral_read_dbRDA.tiff", width = 6, height = 6, units = 'in', res = 300)
+ggplot(data = site_df2, aes(Dim1, Dim2)) + 
+    geom_point(aes(color = diet)) +
+  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
+  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=3)+
+  	labs(x="CAP1 (??.??% of Constrained Variation)", y="CAP2 (??.??% of Constrained Variation)")+
+	  theme_bw() +
+	  theme(legend.title=element_blank(),
+		legend.background = element_rect(fill = "white"),
+		panel.grid.major = element_line(colour = "grey40"),
+		panel.grid.minor = element_blank(),
+		legend.key = element_blank()) +
+  	coord_fixed() +
+  	xlim(-2.0, 2.0) +
+  	ylim(-2.1, 2.1)
+dev.off()
 ```
 
-Get the average and median pairwise distances between samples.
+Get the average pairwise distances between samples.
 
 ```{r, engine='bash'}
 printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> prinseq_output/config.txt
@@ -202,6 +250,7 @@ perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=prins
 
 perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
 ```
+
 
 ## Open Reading Frames
 
@@ -257,17 +306,17 @@ viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
 shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
 shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
 
-viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
-    shape = factor(Diet))) + xlab("NMDS1") + ylab("NMDS2") + 
-    guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-    labs(fill = "")
+viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
+  labs(fill = "")
     
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(size = 4, 
-    shape = factor(Animal))) + xlab("NMDS1") + ylab("NMDS2") + 
-    guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-    labs(fill = "")
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
+  labs(fill = "")
     
-pdf("viral_orf_nmds.pdf", height = 6, width = 12)
+tiff("figures/viral_orf_nmds.tiff", height = 6, width = 12, units='in', res=300)
 multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
 dev.off()	
 ```
@@ -275,61 +324,84 @@ dev.off()
 PERMANOVA Stats.
 
 ```{r}
-adonis_out <- adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+#Since we used Type I sums of squares and our dataset was mildly unbalanced (data from only 3 plots were missing), we repeated the PERMANCOVA with the various independent variables entered in different orders and verified that variable order within the model did not alter results.
+adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
 
-adonis_out <- adonis(viral_bc_dist ~ TDN + NDF + Protein + VFA,  permutations=999, data=viral_map)
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+#Test assumptions.
+
+anova(betadisper(viral_bc_dist,viral_map$Diet))
+
+anova(betadisper(viral_bc_dist,viral_map$Animal))
+
+permutest(betadisper(viral_bc_dist,viral_map$Diet))
+
+permutest(betadisper(viral_bc_dist,viral_map$Animal))
 ```
 
-Test assumptions.
+adonis and dbRDA analysis to investigate the influence of environmental factors
 
 ```{r}
-adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Diet))
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
+map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo")]
+cor(map2)
 
-adonis_out <- anova(betadisper(viral_bc_dist,viral_map$Animal))
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
-	
-adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Diet))
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
-  
-adonis_out <- permutest(betadisper(viral_bc_dist,viral_map$Animal))
-capture.output(adonis_out,file="viral_orf_stats.txt", append=TRUE)
-```
-
-dbRDA analysis and ordination plot (!!!check order of samples for coloring since code copied from above!!!)
-
-```{r}
 viral_tab <- fread("viral_blast2tsv/VMG.orf_table.tab.txt", header=TRUE, sep="\t")
 viral_df <- as.data.frame(viral_tab)
 row.names(viral_df) <- viral_df$ID
 viral_df <- subset(viral_df, select=-c(ID))
 viral_df_t <- t(viral_df)
-viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
 
-viral_cap <- capscale(viral_df_t ~ TDN + NDF + Protein + VFA, data=viral_map, dist="bray")
-viral_cap
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + K + Protein + pH + VFA, data=viral_map, dist="bray")
 
-anova(viral_cap)
-anova(viral_cap, by="terms")
+ordistep(viral_cap, direction="backward")
 
-#save(viral_cap, file="viral_cap.RData")
-#load("viral_cap.RData")
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
 
-test <- fortify(viral_cap)
-site_df <- subset(test, test$Score == "sites")
-biplot_df <- subset(test, test$Score == "biplot")
-site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
+viral_cap <- capscale(viral_df_t ~ TDN + Protein + Zn, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
 
-viral_cap_plot <- ggplot(data = site_df2, aes(Dim1, Dim2)) + 
- 		geom_point(aes(color = diet)) +
-  	geom_segment(data=biplot_df,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(length = unit(0.3, "cm")),colour="black",inherit_aes=FALSE) + 
-  	geom_text(data=biplot_df,aes(x=Dim1+0.1,y=Dim2+0.1,label=Label),size=4)+
-  	labs(x="CAP1", y="CAP2")+
-  	coord_fixed()
+viral_cap <- capscale(viral_df_t ~ Protein + Zn + TDN, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Protein + TDN + Zn, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Zn + TDN + Protein, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+viral_cap <- capscale(viral_df_t ~ Zn + Protein + TDN, data = viral_map, distance = "bray")
+anova.cca(viral_cap)
+anova.cca(viral_cap, by="terms")
+anova.cca(viral_cap, by="axis")
+RsquareAdj(viral_cap)
+
+#save(viral_cap, file="viral_cap_orf.RData")
+#load("viral_cap_orf.RData")
+
+adonis(viral_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=viral_map)
+
+adonis(viral_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=viral_map)
 ```
-
-
-
-

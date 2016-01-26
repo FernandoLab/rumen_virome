@@ -53,8 +53,9 @@ unzip Mothur.cen_64.zip
 mv mothur/mothur anaconda/envs/rumenVirome/bin/
 
 # usearch
-wget -O anaconda/envs/rumenEnv/bin/usearch8.0.1623 $1
-chmod 775 anaconda/envs/rumenEnv/bin/usearch8.0.1623
+wget $1 -O usearch8.0.1623
+chmod 775 usearch8.0.1623
+mv usearch8.0.1623 anaconda/envs/rumenVirome/bin/
 
 # rRNA prediction
 wget http://weizhong-lab.ucsd.edu/meta_rna/rRNA_prediction.tar.bz2

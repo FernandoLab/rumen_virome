@@ -1,0 +1,404 @@
+---
+title: "Total Beta Diversity"
+output:
+  html_document:
+    keep_md: true
+---
+
+# Beta Diversity - Ion Torrent Total Metagenomes
+Two methods - median k-mer counts and distribution of ORFs among samples.
+
+## Median K-mer Count
+
+Use khmer software to compare k-mer profiles of different metagenomes. Load all total metagenomes into counting.
+
+```{r, engine='bash', results='hide'}
+cd cd_hit_454_output_total
+for f in *.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  load-into-counting.py -k 20 -N 4 -x 8e9 --report-total-kmers -s tsv "$filename""_k20.kh" $f
+done
+```
+
+The script below is from ____ (	https://github.com/qingpeng/igs-diversity/blob/master/scripts/get_comb_multi_old_median_kmer.py
+) and I have provided the version of the script used in this analysis. Finds the median k-mer abundance across samples.
+
+```{r, engine='bash', results='hide'}
+cd cd_hit_454_output_total/
+ls *k20.kh | awk '{ ORS=" "; print; }' > config.txt
+printf "\n" >> config.txt
+ls *.fastq | awk '{ ORS=" "; print; }' >> config.txt
+printf "\n" >> config.txt
+printf "200000000" >> config.txt
+	
+python ../scripts/get_comb_multi_old_median_kmer.py config.txt
+
+cd ..
+```
+
+Remove reads that are not shared with at least one other sample. This helps to alleviate differences diven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
+
+```{r, engine='bash', results='hide'}
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=cd_hit_454_output_total -threshold=1
+
+mv *.comb.keep.txt cd_hit_454_output_total
+	
+cat cd_hit_454_output_total/*.comb.keep.txt > cd_hit_454_output_total/BMG.cat.comb.keep.txt
+ 	
+awk '{print $1,$2/631225,$3/2261004,$4/1591514,$5/972805,$6/2475541,$7/734576,$8/2011286,$9/509528,$10/1240812,$11/995310,$12/931099,$13/888555,$14/1331228,$15/2070496,$16/3165966,$17/666970,$18/2344185,$19/484852,$20/884957,$21/667046}' cd_hit_454_output_total/BMG.cat.comb.keep.txt > cd_hit_454_output_total/BMG.cat.comb.keep.norm.txt
+ 	
+printf "ID BMG.10 BMG.11 BMG.12 BMG.13 BMG.14 BMG.15 BMG.16 BMG.17 BMG.18 BMG.19 BMG.1 BMG.20 BMG.2 BMG.3 BMG.4 BMG.5 BMG.6 BMG.7 BMG.8 BMG.9\n" > cd_hit_454_output_total/BMG.read_table.txt
+	
+cat cd_hit_454_output_total/BMG.cat.comb.keep.norm.txt >> cd_hit_454_output_total/BMG.read_table.txt
+	
+tr ' ' \\t < cd_hit_454_output_total/BMG.read_table.txt > cd_hit_454_output_total/BMG.read_table.tab.txt
+	
+biom convert -i cd_hit_454_output_total/BMG.read_table.tab.txt -o cd_hit_454_output_total/BMG.read_table.tab.biom --table-type="OTU table" --to-json
+```
+
+Calcualte the Bray-Curtis dissimilarity between samples based on the normalized median k-mer abundance and use the dissimilarities to construct an NMDS plot.
+
+```{r, engine='bash', results='hide'}
+beta_diversity.py -i cd_hit_454_output_total/BMG.read_table.tab.biom -o cd_hit_454_output_total/BMG.read_table_bc -m bray_curtis
+
+nmds.py -i cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -o cd_hit_454_output_total/BMG.read_table_bc_nmds.txt
+```
+
+```{r}
+library(ggplot2)
+library(vegan)
+total_bc <- read.table("cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt", header=TRUE, row.names=1)
+total_bc_matrix <- as.matrix(total_bc)
+total_bc_dist <- as.dist(total_bc_matrix)
+	
+total_map <- read.table("total_mapping.txt", sep="\t", header=TRUE)
+total_map$Animal <- as.factor(total_map$Animal)
+```
+
+```{r}
+multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
+  library(grid)
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  if (is.null(layout)) {
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)), ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+    
+	if (numPlots == 1) {
+	  print(plots[[1]])
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row, layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
+shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
+	
+total_nmds <- read.table("cd_hit_454_output_total/BMG.read_table_bc_nmds.txt", nrow = 20, sep = "\t", header=TRUE)
+colnames(total_nmds)[1] <- "ID"
+total_nmds_map <- merge(total_nmds, total_map, by = "ID")
+	
+total_diet_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) + 
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
+  labs(fill = "")
+    
+total_animal_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) + 
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
+  labs(fill = "")
+
+tiff("figures/total_reads_nmds.tiff", height = 6, width = 12, units='in', res=300)
+multiplot(total_diet_nmds, total_animal_nmds, cols = 2)
+dev.off()
+```
+
+Use PERMANOVA tests to investigate statisticial differences based on diet and animal the sample was collected from. Additionally, PERMANOVA can be used on continous data - so broke down the diets into their main components and tested which component had a signifincant impact on total microbial community structure.
+
+```{r}
+adonis(total_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=total_map)
+
+#Test for assumptions.
+
+anova(betadisper(total_bc_dist,total_map$Diet))
+
+anova(betadisper(total_bc_dist,total_map$Animal))
+
+permutest(betadisper(total_bc_dist,total_map$Diet))
+
+permutest(betadisper(total_bc_dist,total_map$Animal))
+```
+
+Also used dbRDA, adonis, and subsequent ordination plots to investigate influence of environmental factors (i.e. dietary components) on viral communities.
+
+```{r}
+library(data.table)
+library(ggvegan)
+library(grid)
+
+map2 <- total_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "K", "Mg", "Mn", "S", "Na", "Mo")]
+cor(map2)
+
+total_tab <- fread("cd_hit_454_output_total/BMG.read_table.tab.txt", header=TRUE, sep="\t")
+total_df <- as.data.frame(total_tab)
+row.names(total_df) <- total_df$ID
+total_df <- subset(total_df, select=-c(ID))
+total_df_t <- t(total_df)
+
+total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+#save(total_cap, file="total_cap_read.RData")
+#load("total_cap_read.RData")
+
+total_cap <- capscale(total_df_t ~ TDN + Protein + Zn, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Protein + Zn + TDN, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Protein + TDN + Zn, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Zn + TDN + Protein, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Zn + Protein + TDN, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+adonis(total_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=total_map)
+
+total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
+test <- fortify(total_cap)
+site_df <- subset(test, test$Score == "sites")
+site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","40MDGS", "27CDS", "27CDS", "55CS", "40MDGS","Corn","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
+biplot_df <- subset(test, test$Score == "biplot")
+biplot_df2 <- data.frame(text_x = as.numeric(c("0.98", "-0.9", "0.56")), biplot_df)
+biplot_df3 <- data.frame(text_y = as.numeric(c("-0.12", "-0.55", "0.068")), biplot_df2)
+biplot_df3$Label[3] = "Pro"
+
+tiff("figures/total_read_dbRDA.tiff", width = 6, height = 6, units = 'in', res = 300)
+ggplot(data = site_df2, aes(Dim1, Dim2)) + 
+    geom_point(aes(color = diet)) +
+  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
+  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=3)+
+  	labs(x="CAP1 (??.??% of Constrained Variation)", y="CAP2 (??.??% of Constrained Variation)")+
+	  theme_bw() +
+	  theme(legend.title=element_blank(),
+		legend.background = element_rect(fill = "white"),
+		panel.grid.major = element_line(colour = "grey40"),
+		panel.grid.minor = element_blank(),
+		legend.key = element_blank()) +
+  	coord_fixed() +
+  	xlim(-2.0, 2.0) +
+    ylim(-2.1, 2.1)
+dev.off()
+```
+
+Get the average pairwise distances between samples.
+
+```{r, engine='bash'}
+printf "\n27CDS 55CS 55CS 27CDS Control 40MDGS 27CDS 27CDS 55CS 40MDGS Control Control Control 40MDGS 27CDS 55CS 40MDGS 40MDGS Control 55CS" >> cd_hit_454_output_total/config.txt
+printf "\n259 346 3244 222 3257 259 346 3244 222 3257 346 259 3244 222 3257 259 346 3244 222 3257" >> cd_hit_454_output_total/config.txt
+	
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=55CS -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=Corn -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=40MDGS -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=Corn -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+
+perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=cd_hit_454_output_total/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=cd_hit_454_output_total/config.txt
+```
+
+## Open Reading Frames
+
+Same approach as above, just using the abundance of ORFs across samples instead of median k-mer counts.
+
+```{r, engine='bash', results='hide'}
+for f in bmg_blast2tsv/*orf_abundance.txt
+do
+	filename=$(basename "$f")
+	filename="${filename%.txt}"
+	biom convert --table-type="OTU table" --to-json -i $f -o bmg_blast2tsv/$filename.biom
+done
+
+merge_otu_tables.py -i bmg_blast2tsv/BMG.10.orf_abundance.biom,bmg_blast2tsv/BMG.11.orf_abundance.biom,bmg_blast2tsv/BMG.12.orf_abundance.biom,bmg_blast2tsv/BMG.13.orf_abundance.biom,bmg_blast2tsv/BMG.14.orf_abundance.biom,bmg_blast2tsv/BMG.15.orf_abundance.biom,bmg_blast2tsv/BMG.16.orf_abundance.biom,bmg_blast2tsv/BMG.17.orf_abundance.biom,bmg_blast2tsv/BMG.18.orf_abundance.biom,bmg_blast2tsv/BMG.19.orf_abundance.biom,bmg_blast2tsv/BMG.1.orf_abundance.biom,bmg_blast2tsv/BMG.20.orf_abundance.biom,bmg_blast2tsv/BMG.2.orf_abundance.biom,bmg_blast2tsv/BMG.3.orf_abundance.biom,bmg_blast2tsv/BMG.4.orf_abundance.biom,bmg_blast2tsv/BMG.5.orf_abundance.biom,bmg_blast2tsv/BMG.6.orf_abundance.biom,bmg_blast2tsv/BMG.7.orf_abundance.biom,bmg_blast2tsv/BMG.8.orf_abundance.biom,bmg_blast2tsv/BMG.9.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance.biom
+	
+biom summarize-table -i bmg_blast2tsv/BMG.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance_summarize.txt
+
+biom convert -i bmg_blast2tsv/BMG.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance.txt --table-type="OTU table" --to-tsv
+
+awk '{print $1,$2/631225,$3/2261004,$4/1591514,$5/972805,$6/2475541,$7/734576,$8/2011286,$9/509528,$10/1240812,$11/995310,$12/931099,$13/888555,$14/1331228,$15/2070496,$16/3165966,$17/666970,$18/2344185,$19/484852,$20/884957,$21/667046}' bmg_blast2tsv/BMG.orf_abundance.txt > bmg_blast2tsv/BMG.orf_abundance.norm.txt
+ 	
+printf "ID BMG.10 BMG.11 BMG.12 BMG.13 BMG.14 BMG.15 BMG.16 BMG.17 BMG.18 BMG.19 BMG.1 BMG.20 BMG.2 BMG.3 BMG.4 BMG.5 BMG.6 BMG.7 BMG.8 BMG.9\n" > bmg_blast2tsv/BMG.orf_table.txt
+	
+awk 'NR>2 {print}' bmg_blast2tsv/BMG.orf_abundance.norm.txt >> bmg_blast2tsv/BMG.orf_table.txt
+	
+tr ' ' \\t < bmg_blast2tsv/BMG.orf_table.txt > bmg_blast2tsv/BMG.orf_table.tab.txt
+	
+biom convert -i bmg_blast2tsv/BMG.orf_table.tab.txt -o bmg_blast2tsv/BMG.orf_table.tab.biom --table-type="OTU table" --to-json
+```
+
+Calculate Bray-Curtis dissimilarity and plot NMDS.
+
+```{r, engine='bash', results='hide'}
+beta_diversity.py -i bmg_blast2tsv/BMG.orf_table.tab.biom -o bmg_blast2tsv/BMG.orf_table_bc -m bray_curtis
+	
+nmds.py -i bmg_blast2tsv/BMG.orf_table_bc/bray_curtis_BMG.orf_table.tab.txt -o bmg_blast2tsv/BMG.orf_table_bc_nmds.txt
+```
+
+```{r}
+total_bc <- read.table("bmg_blast2tsv/BMG.orf_table_bc/bray_curtis_BMG.orf_table.tab.txt", header=TRUE, row.names=1)
+total_bc_matrix <- as.matrix(total_bc)
+total_bc_dist <- as.dist(total_bc_matrix)
+	
+total_map <- read.table("total_mapping.txt", sep="\t", header=TRUE)
+total_map$Animal <- as.factor(total_map$Animal)
+```
+
+```{r}
+total_nmds <- read.table("bmg_blast2tsv/BMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
+colnames(total_nmds)[1] <- "ID"
+total_nmds_map <- merge(total_nmds, total_map, by = "ID")
+	
+total_diet_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
+  labs(fill = "")
+    
+total_animal_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
+  labs(fill = "")
+    
+tiff("figures/total_orf_nmds.tiff", height = 6, width = 12, units='in', res=300)
+multiplot(total_diet_nmds, total_animal_nmds, cols = 2)
+dev.off()
+```
+
+PERMANOVA Stats.
+
+```{r}
+adonis(total_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=total_map)
+
+#Test assumptions.
+
+anova(betadisper(total_bc_dist,total_map$Diet))
+
+anova(betadisper(total_bc_dist,total_map$Animal))
+
+permutest(betadisper(total_bc_dist,total_map$Diet))
+
+permutest(betadisper(total_bc_dist,total_map$Animal))
+```
+
+dbRDA analysis and ordination plot
+
+```{r}
+map2 <- total_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "K", "Mg", "Mn", "S", "Na", "Mo")]
+cor(map2)
+
+total_tab <- fread("bmg_blast2tsv/BMG.orf_table.tab.txt", header=TRUE, sep="\t")
+total_df <- as.data.frame(total_tab)
+row.names(total_df) <- total_df$ID
+total_df <- subset(total_df, select=-c(ID))
+total_df_t <- t(total_df)
+
+total_cap <- capscale(total_df_t ~ TDN + Zn + K + Protein + pH + VFA, data=total_map, dist="bray")
+ordistep(total_cap, direction="backward")
+
+total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ TDN + Protein + Zn, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Protein + Zn + TDN, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Protein + TDN + Zn, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Zn + TDN + Protein, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+total_cap <- capscale(total_df_t ~ Zn + Protein + TDN, data = total_map, distance = "bray")
+anova.cca(total_cap)
+anova.cca(total_cap, by="terms")
+anova.cca(total_cap, by="axis")
+RsquareAdj(total_cap)
+
+#save(total_cap, file="total_cap_orf.RData")
+#load("total_cap_orf.RData")
+
+
+adonis(total_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=total_map)
+
+adonis(total_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=total_map)
+
+```
+
+
+
+

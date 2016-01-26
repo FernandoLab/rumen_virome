@@ -1,0 +1,214 @@
+---
+title: "Partial Least Squares Regression"
+output:
+  html_document:
+    keep_md: true
+---
+
+# Partial Least Squares Regression - Ion Torrent Viral Metagenomes
+
+Investigating multivariate linear relationships between rlog tranformed KO annotations in the viral metagenome and dietary components. This is followed up by a univariate multiple linear regressions (MLR) for each KO to confirm the potetnial relationships identified by PLSR.
+
+```{r,}
+library(pls)
+library(phyloseq)
+library(DESeq2)
+library(vsn)
+library(KEGGREST)
+library(car)
+library(parallel)
+library(QuantPsyc)
+library(reshape2)
+
+table <- read.table("viral_blast2tsv_filter2/VMG.ko_raw_abundances.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")
+table_matrix <- as.matrix(table)
+map <- read.table("viral_mapping_ko.txt", sep="\t", header=TRUE, row.names=1)
+OTU = otu_table(table_matrix, taxa_are_rows = TRUE)
+SAMPLEDATA = sample_data(map)
+physeq = phyloseq(OTU, SAMPLEDATA)
+dds = phyloseq_to_deseq2(physeq, ~Diet)
+
+rld <- rlog(dds, blind = FALSE)
+rlogmat <- assay(rld)
+rlogdf <- as.data.frame(rlogmat)
+write.table(rlogdf, file="viral_blast2tsv_filter2/VMG.ko_rlog.txt", col.names=NA, row.names=TRUE, quote=FALSE, sep="\t")
+rlogmat_t <- t(rlogmat)
+map2 <- as.matrix(map[c("TDN", "Zn", "Protein")])
+pls_df <- data.frame(y=I(rlogmat_t), x=I(map2))
+pls.options(parallel = 4)
+pls_result <- plsr(y ~ x, data = pls_df, validation = "LOO", scale=TRUE)
+capture.output(summary(pls_result, what="training"), file="plsr_result.txt")
+summaryfile <- read.table("plsr_result.txt", skip=7)
+pls_top <- summaryfile[ which(summaryfile$V2 > 30), ]
+dim(pls_top)
+```
+
+MLR on KOs that have >= 30% variation explained by first component.
+
+```{r,}
+rlogdf2 <- as.data.frame(rlogmat)
+rlogdf2$id <- row.names(rlogdf2)
+select_rows <- rlogdf2[which(rlogdf2$id %in% pls_top$V1), "id"]
+rlog_psl <- rlogdf[select_rows,]
+rlog_psl_t <- t(rlog_psl)
+
+res <- data.frame(id = character(0), radj=character(0), tdn_p=character(0), zn_p=character(0), protein_p=character(0), vif_tdn=character(0), vif_zn=character(0),  vif_protein=character(0), coeff_tdn=character(0), coeff_zn=character(0), coeff_protein=character(0), coeff_stand_tdn=character(0), coeff_stand_zn=character(0), coeff_stand_protein=character(0))
+
+options(stringsAsFactors=FALSE)
+
+for (i in 1:ncol(rlog_psl_t)) {
+	mlr <- lm(rlog_psl_t[,i] ~ TDN + Zn + Protein, data=map)
+	summ <- summary(mlr)
+	tdn_p <- summ$coefficients[14]
+	zn_p <- summ$coefficients[15]
+	protein_p <- summ$coefficients[16]
+	radj <-  summ$adj.r.squared
+	name <- colnames(rlogmat_t)[i]
+	vif_r <- vif(mlr)
+	vif_tdn <- vif_r[1]
+	vif_zn <- vif_r[2]
+	vif_protein <- vif_r[3]
+	coeff_tdn <- mlr$coefficients[2]
+	coeff_zn <- mlr$coefficients[3]
+	coeff_protein <- mlr$coefficients[4]
+	coeff_stand_tdn <- lm.beta(mlr)[1]
+	coeff_stand_zn <- lm.beta(mlr)[2]
+	coeff_stand_protein <- lm.beta(mlr)[3]
+	res[i, ] <- c(name, radj, tdn_p, zn_p, protein_p, vif_tdn, vif_zn, vif_protein, coeff_tdn, coeff_zn, coeff_protein, coeff_stand_tdn, coeff_stand_zn, coeff_stand_protein)
+}
+
+tdn_df <- res[c("id", "tdn_p")]
+colnames(tdn_df)[2] <- "p"
+tdn_df$component <- "tdn"
+dim(tdn_df)
+
+zn_df <- res[c("id", "zn_p")]
+colnames(zn_df)[2] <- "p"
+zn_df$component <- "zn"
+dim(zn_df)
+
+protein_df <- res[c("id", "protein_p")]
+colnames(protein_df)[2] <- "p"
+protein_df$component <- "protein"
+dim(protein_df)
+
+df <- rbind(tdn_df, zn_df, protein_df)
+dim(df)
+
+df$fdr <- p.adjust(df$p, method="fdr")
+
+tdn <- subset(df, component == "tdn")
+colnames(tdn)[2] <- "p_tdn"
+colnames(tdn)[4] <- "fdr_tdn"
+
+zn <- subset(df, component == "zn")
+colnames(zn)[2] <- "p_zn"
+colnames(zn)[4] <- "fdr_zn"
+
+protein <- subset(df, component == "protein")
+colnames(protein)[4] <- "fdr_protein"
+colnames(protein)[2] <- "p_protein"
+
+tdn_sig <- subset(df, fdr < 0.05 & component == "tdn")
+zn_sig <- subset(df, fdr < 0.05 & component == "zn")
+protein_sig <- subset(df, fdr < 0.05 & component == "protein")
+
+dim(tdn_sig) #57
+dim(zn_sig) #5
+dim(protein_sig) #3
+
+length(intersect(tdn_sig$id, zn_sig$id)) #5
+length(intersect(tdn_sig$id, protein_sig$id)) #3
+length(intersect(protein_sig$id, zn_sig$id)) #2
+```
+
+Heatmap of MLR results.
+
+```{r}
+library(RCurl)
+library(R.utils)
+library(pheatmap)
+
+res3 <- merge(res, tdn, by="id") 
+res4 <- merge(res3, zn, by="id") 
+final_pls_table <- merge(res4, protein, by="id") 
+reg_sign <- subset(final_pls_table, fdr_tdn < 0.05 | fdr_zn < 0.05 | fdr_protein < 0.05)
+
+reg_hm <- data.frame(id = character(0), TDN=numeric(0), Zn=numeric(0), Protein=numeric(0))
+options(stringsAsFactors=FALSE)
+for (i in 1:nrow(reg_sign)) {
+	id <- reg_sign[i, "id"]
+
+	fdr_tdn <- reg_sign[i,"fdr_tdn"]
+	if (fdr_tdn < 0.05) {
+		tdn <- reg_sign[i,"coeff_stand_tdn"]
+	} else {
+		tdn <- 0
+	}
+
+	fdr_zn <- reg_sign[i,"fdr_zn"]
+	if (fdr_zn < 0.05) {
+		zn <- reg_sign[i,"coeff_stand_zn"]
+	} else {
+		zn <- 0
+	}
+	
+	fdr_protein <- reg_sign[i,"fdr_protein"]
+	if (fdr_protein < 0.05) {
+		protein <- reg_sign[i,"coeff_stand_protein"]
+	} else {
+		protein <- 0
+	}
+	
+	reg_hm[i, ] <- c(id, tdn, zn, protein)
+}
+
+reg_hm$TDN <- as.numeric(reg_hm$TDN)
+reg_hm$Zn <- as.numeric(reg_hm$Zn)
+reg_hm$Protein <- as.numeric(reg_hm$Protein)
+is.num <- sapply(reg_hm, is.numeric)
+reg_hm[is.num] <- lapply(reg_hm[is.num], round, 3)
+
+enz_list <- reg_hm$id
+enz_names <- data.frame(ID = character(0), Name = character(0), Def=character(0))	
+options(stringsAsFactors=FALSE)
+for (i in 1:length(enz_list)) {
+	enz <- enz_list[i]
+	enz2 <- noquote(enz)
+	url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
+	names <- getURL(url_get)
+	Sys.sleep(1) 
+	names <- gsub("[\r\n]", "", names)
+	url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
+	defs <- getURL(url_get2)
+	Sys.sleep(1) 
+	defs <- gsub("[\r\n]", "", defs)	
+	enz_names[i, ] <- c(enz, names, defs)
+}
+
+colnames(enz_names)[1] <- "id"
+
+enz_names2 <- enz_names
+enz_names2$Def2 <- gsub(" \\[EC(.)+", "", enz_names2$Def)
+enz_names2$Def3 <- capitalize(enz_names2$Def2)
+reg_hm2 <- merge(reg_hm, enz_names2, by="id")
+rownames(reg_hm) <- reg_hm$id
+reg_hm <- reg_hm[c(-1)]
+reg_hm_mat <- as.matrix(reg_hm)
+
+bk <- c(-1.500, -1.125, -0.750, -0.375, -0.0001, 0.0001, 0.375, 0.750, 1.125, 1.500)  
+col_pal <- c("#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac")
+
+tiff("figures/reg_std_heatmap.tiff", height=7, width=7, res=600, units = 'in')
+pheatmap(reg_hm_mat, 
+	cluster_row = F,
+    cluster_cols = F,
+    color = col_pal,
+    fontsize = 6.5,
+    fontsize_row=6, 
+    fontsize_col = 12,
+    labels_row = reg_hm2$Def3,
+    border_color = "black",
+    breaks=bk)
+dev.off()
+```
