@@ -118,5 +118,3 @@ rm -rf Prodigal-2.6.2
 rm install_pack.Rout
 mv transp_adapt_remove.cat.txt anaconda/envs/rumenVirome/bin/
 mv total_adapt_remove.cat.txt anaconda/envs/rumenVirome/bin/
-mkdir markdowns
-mv *.Rmd markdowns
