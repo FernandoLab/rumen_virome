@@ -1,0 +1,44 @@
+---
+title: "Data Curation"
+output:
+  html_document:
+    keep_md: true
+---
+
+# Data Curation
+Description.
+
+## Total Metagenome - Ion Torrent Data
+
+After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
+
+--barcode-mode 1 --barcode-cutoff 0 --min-read-length 100 --trim-min-read-len 100
+
+Resulting reads are found in the short read archive (SRA).
+
+```{r, engine='bash', results='hide'}
+
+#save to directory raw_microbial
+```
+
+
+## Viral Metagenome - Ion Torrent Data
+
+After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
+
+--barcode-mode 1 --barcode-cutoff 0 --min-read-length 100 --trim-min-read-len 100
+
+Resulting reads are found in the short read archive (SRA).
+
+```{r, engine='bash', results='hide'}
+
+#save to directory raw_viral
+```
+
+## Deep Viral Metagenome - Illumina MiSeq Data
+
+```{r, engine='bash', results='hide'}
+
+
+#save to raw_illumina_viral
+```

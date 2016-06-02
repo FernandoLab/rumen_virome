@@ -19,6 +19,7 @@ library(car)
 library(parallel)
 library(QuantPsyc)
 library(reshape2)
+options(stringsAsFactors=FALSE)
 
 table <- read.table("viral_blast2tsv_filter2/VMG.ko_raw_abundances.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")
 table_matrix <- as.matrix(table)
@@ -39,87 +40,78 @@ pls.options(parallel = 4)
 pls_result <- plsr(y ~ x, data = pls_df, validation = "LOO", scale=TRUE)
 capture.output(summary(pls_result, what="training"), file="plsr_result.txt")
 summaryfile <- read.table("plsr_result.txt", skip=7)
-pls_top <- summaryfile[ which(summaryfile$V2 > 30), ]
-dim(pls_top)
+summaryfile$C1_exp <- summaryfile$V2
+summaryfile$C2_exp <- (summaryfile$V3 - summaryfile$V2)
+summaryfile$C3_exp <- (summaryfile$V4 - summaryfile$V3)
+c1_top <- summaryfile[ which(summaryfile$C1_exp > 30), ]
+dim(c1_top)
+c2_top <- summaryfile[ which(summaryfile$C2_exp > 30), ]
+dim(c2_top)
+c3_top <- summaryfile[ which(summaryfile$C3_exp > 30), ]
+dim(c3_top)
+pls_top <- rbind(c1_top,c2_top,c3_top)
+pls_top_list <- unique(pls_top$V1) #101
 ```
 
-MLR on KOs that have >= 30% variation explained by first component.
+MLR on KOs that have >= 30% variation explained by any component.
 
 ```{r,}
-rlogdf2 <- as.data.frame(rlogmat)
-rlogdf2$id <- row.names(rlogdf2)
-select_rows <- rlogdf2[which(rlogdf2$id %in% pls_top$V1), "id"]
-rlog_psl <- rlogdf[select_rows,]
+rlog_psl <- rlogdf[pls_top_list,]
 rlog_psl_t <- t(rlog_psl)
 
-res <- data.frame(id = character(0), radj=character(0), tdn_p=character(0), zn_p=character(0), protein_p=character(0), vif_tdn=character(0), vif_zn=character(0),  vif_protein=character(0), coeff_tdn=character(0), coeff_zn=character(0), coeff_protein=character(0), coeff_stand_tdn=character(0), coeff_stand_zn=character(0), coeff_stand_protein=character(0))
 
-options(stringsAsFactors=FALSE)
-
+res_tdn <- data.frame(id = character(0), tdn_radj=character(0), tdn_p_val=character(0), tdn_coeff=character(0), tdn_coeff_stand=character(0))
 for (i in 1:ncol(rlog_psl_t)) {
-	mlr <- lm(rlog_psl_t[,i] ~ TDN + Zn + Protein, data=map)
+	mlr <- lm(rlog_psl_t[,i] ~ TDN, data=map)
 	summ <- summary(mlr)
-	tdn_p <- summ$coefficients[14]
-	zn_p <- summ$coefficients[15]
-	protein_p <- summ$coefficients[16]
-	radj <-  summ$adj.r.squared
-	name <- colnames(rlogmat_t)[i]
-	vif_r <- vif(mlr)
-	vif_tdn <- vif_r[1]
-	vif_zn <- vif_r[2]
-	vif_protein <- vif_r[3]
-	coeff_tdn <- mlr$coefficients[2]
-	coeff_zn <- mlr$coefficients[3]
-	coeff_protein <- mlr$coefficients[4]
-	coeff_stand_tdn <- lm.beta(mlr)[1]
-	coeff_stand_zn <- lm.beta(mlr)[2]
-	coeff_stand_protein <- lm.beta(mlr)[3]
-	res[i, ] <- c(name, radj, tdn_p, zn_p, protein_p, vif_tdn, vif_zn, vif_protein, coeff_tdn, coeff_zn, coeff_protein, coeff_stand_tdn, coeff_stand_zn, coeff_stand_protein)
+	tdn_p_val <- summ$coefficients[8]
+	tdn_radj <-  summ$adj.r.squared
+	name <- colnames(rlog_psl_t)[i]
+	tdn_coeff <- mlr$coefficients[2]
+	tdn_coeff_stand <- lm.beta(mlr)[1]
+	res_tdn[i, ] <- c(name, tdn_radj, tdn_p_val, tdn_coeff, tdn_coeff_stand)
 }
 
-tdn_df <- res[c("id", "tdn_p")]
-colnames(tdn_df)[2] <- "p"
-tdn_df$component <- "tdn"
-dim(tdn_df)
+tdn_sig <- subset(res_tdn, tdn_p_val < 0.05)
+dim(tdn_sig) #71
 
-zn_df <- res[c("id", "zn_p")]
-colnames(zn_df)[2] <- "p"
-zn_df$component <- "zn"
-dim(zn_df)
 
-protein_df <- res[c("id", "protein_p")]
-colnames(protein_df)[2] <- "p"
-protein_df$component <- "protein"
-dim(protein_df)
+res_zn <- data.frame(id = character(0), zn_radj=character(0), zn_p_val=character(0), zn_coeff=character(0), zn_coeff_stand=character(0))
+for (i in 1:ncol(rlog_psl_t)) {
+	mlr <- lm(rlog_psl_t[,i] ~ Zn, data=map)
+	summ <- summary(mlr)
+	zn_p_val <- summ$coefficients[8]
+	zn_radj <-  summ$adj.r.squared
+	name <- colnames(rlog_psl_t)[i]
+	zn_coeff <- mlr$coefficients[2]
+	zn_coeff_stand <- lm.beta(mlr)[1]
+	res_zn[i, ] <- c(name, zn_radj, zn_p_val, zn_coeff, zn_coeff_stand)
+}
 
-df <- rbind(tdn_df, zn_df, protein_df)
-dim(df)
+zn_sig <- subset(res_zn, zn_p_val < 0.05)
+dim(zn_sig) #14
 
-df$fdr <- p.adjust(df$p, method="fdr")
 
-tdn <- subset(df, component == "tdn")
-colnames(tdn)[2] <- "p_tdn"
-colnames(tdn)[4] <- "fdr_tdn"
+res_protein <- data.frame(id = character(0), protein_radj=character(0), protein_p_val=character(0), protein_coeff=character(0), protein_coeff_stand=character(0))
+for (i in 1:ncol(rlog_psl_t)) {
+	mlr <- lm(rlog_psl_t[,i] ~ Protein, data=map)
+	summ <- summary(mlr)
+	protein_p_val <- summ$coefficients[8]
+	protein_radj <-  summ$adj.r.squared
+	name <- colnames(rlog_psl_t)[i]
+	protein_coeff <- mlr$coefficients[2]
+	protein_coeff_stand <- lm.beta(mlr)[1]
+	res_protein[i, ] <- c(name, protein_radj, protein_p_val, protein_coeff, protein_coeff_stand)
+}
 
-zn <- subset(df, component == "zn")
-colnames(zn)[2] <- "p_zn"
-colnames(zn)[4] <- "fdr_zn"
+protein_sig <- subset(res_protein, protein_p_val < 0.05)
+dim(protein_sig) #4
 
-protein <- subset(df, component == "protein")
-colnames(protein)[4] <- "fdr_protein"
-colnames(protein)[2] <- "p_protein"
 
-tdn_sig <- subset(df, fdr < 0.05 & component == "tdn")
-zn_sig <- subset(df, fdr < 0.05 & component == "zn")
-protein_sig <- subset(df, fdr < 0.05 & component == "protein")
+length(intersect(tdn_sig$id, zn_sig$id)) #1
+length(intersect(tdn_sig$id, protein_sig$id)) #2
+length(intersect(protein_sig$id, zn_sig$id)) #0
 
-dim(tdn_sig) #57
-dim(zn_sig) #5
-dim(protein_sig) #3
-
-length(intersect(tdn_sig$id, zn_sig$id)) #5
-length(intersect(tdn_sig$id, protein_sig$id)) #3
-length(intersect(protein_sig$id, zn_sig$id)) #2
 ```
 
 Heatmap of MLR results.
@@ -129,33 +121,34 @@ library(RCurl)
 library(R.utils)
 library(pheatmap)
 
-res3 <- merge(res, tdn, by="id") 
-res4 <- merge(res3, zn, by="id") 
-final_pls_table <- merge(res4, protein, by="id") 
-reg_sign <- subset(final_pls_table, fdr_tdn < 0.05 | fdr_zn < 0.05 | fdr_protein < 0.05)
+res1 <- merge(res_tdn, res_zn, by="id")
+final_pls_table <- merge(res1, res_protein, by="id")
+reg_sign <- subset(final_pls_table, tdn_p_val < 0.05 | zn_p_val < 0.05 | protein_p_val < 0.05)
+
+
 
 reg_hm <- data.frame(id = character(0), TDN=numeric(0), Zn=numeric(0), Protein=numeric(0))
 options(stringsAsFactors=FALSE)
 for (i in 1:nrow(reg_sign)) {
 	id <- reg_sign[i, "id"]
 
-	fdr_tdn <- reg_sign[i,"fdr_tdn"]
-	if (fdr_tdn < 0.05) {
-		tdn <- reg_sign[i,"coeff_stand_tdn"]
+	tdn_p <- reg_sign[i,"tdn_p_val"]
+	if (tdn_p < 0.05) {
+		tdn <- reg_sign[i,"tdn_coeff_stand"]
 	} else {
 		tdn <- 0
 	}
 
-	fdr_zn <- reg_sign[i,"fdr_zn"]
-	if (fdr_zn < 0.05) {
-		zn <- reg_sign[i,"coeff_stand_zn"]
+	zn_p <- reg_sign[i,"zn_p_val"]
+	if (zn_p < 0.05) {
+		zn <- reg_sign[i,"zn_coeff_stand"]
 	} else {
 		zn <- 0
 	}
 	
-	fdr_protein <- reg_sign[i,"fdr_protein"]
-	if (fdr_protein < 0.05) {
-		protein <- reg_sign[i,"coeff_stand_protein"]
+	protein_p <- reg_sign[i,"protein_p_val"]
+	if (protein_p < 0.05) {
+		protein <- reg_sign[i,"protein_coeff_stand"]
 	} else {
 		protein <- 0
 	}
@@ -196,10 +189,17 @@ rownames(reg_hm) <- reg_hm$id
 reg_hm <- reg_hm[c(-1)]
 reg_hm_mat <- as.matrix(reg_hm)
 
+reg_hm3 <- reg_hm2[c("id", "Def", "TDN", "Zn", "Protein")]
+write.table(reg_hm3, file="plsr_mlr_hm_data.txt", row.names=FALSE, quote=FALSE, sep="\t")
+
+reg_hm_sort <- reg_hm3[order(reg_hm3$TDN),]
+write.table(reg_hm_sort, file="plsr_mlr_hm_data_sort.txt", row.names=FALSE, quote=FALSE, sep="\t")
+
+
 bk <- c(-1.500, -1.125, -0.750, -0.375, -0.0001, 0.0001, 0.375, 0.750, 1.125, 1.500)  
 col_pal <- c("#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac")
 
-tiff("figures/reg_std_heatmap.tiff", height=7, width=7, res=600, units = 'in')
+tiff("figures/figure_s3_nolabel.tiff", height=8, width=6, res=600, units = 'in', compression=c("lzw"))
 pheatmap(reg_hm_mat, 
 	cluster_row = F,
     cluster_cols = F,

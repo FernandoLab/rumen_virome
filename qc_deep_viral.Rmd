@@ -1,0 +1,184 @@
+---
+title: "Quality Control Deep Viral Metagenomes"
+output:
+  html_document:
+    keep_md: true
+---
+
+Different QC steps (minor, mostly in how we trim off adaptors and dealing with ambiguous bases/homopolymers that were dealt with by the torrent server previously) were used for the illumina viral metagenome data. Once again, there apperas to be duplication issues associated with the transposon preps presumambly, so we must be careful in dealing with them to ensure their removal. There were a few rounds of sequencing multiplexed with other samples, and hence trimming a few different files and then combining the reads.
+
+Not using a loop beacuse outputting names that match mapping files and code used in the analysis. These names are not congruent with the SRA file names. Also some files require different quality filtering due to run specific quality patterns.
+
+```{r, engine='bash', results='hide'}
+mkdir deep_viral_qc
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run1_S1_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run1_S1_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run2_S1_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run2_S1_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run4_R1_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run4_S1_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run4_R2_trim.fastq raw_illumina_viral/deep_viral_p2_A3257_27cds_run4_S1_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run1_S2_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run1_S2_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run2_S2_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run2_S2_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run3_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run3_S2_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V9_run3_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A3257_55cs_run3_S2_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run1_S3_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run1_S3_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run2_S3_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run2_S3_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run3_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run3_S3_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run3_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run3_S3_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run4_R1_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run4_S3_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V10_run4_R2_trim.fastq raw_illumina_viral/deep_viral_p3_A259_27cds_run4_S3_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run1_S4_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run1_S4_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run2_S4_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run2_S4_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run4_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run4_S4_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V11_run4_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A346_55cs_run4_S4_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run1_S5_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run1_S5_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run2_S5_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run2_S5_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run3_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run3_S5_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run3_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run3_S5_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run4_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run4_S5_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V12_run4_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A3244_55cs_run4_S5_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run1_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run1_S6_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run1_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run1_S6_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run2_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run2_S6_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run2_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run2_S6_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run3_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run3_S6_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run3_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run3_S6_L001_R2_001.fastq.gz
+
+cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run4_R1_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run4_S6_L001_R1_001.fastq.gz
+
+cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V13_run4_R2_trim.fastq raw_illumina_viral/deep_viral_p4_A222_27cds_run4_S6_L001_R2_001.fastq.gz
+```
+
+Remove seqeunces that have an estimated error rate >1%:
+
+```{r, engine='bash', results='hide'}
+mkdir deep_viral_qc
+
+for f in deep_viral_qc/*_trim.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  usearch8.0.1623 -fastq_filter $f -fastqout deep_viral_qc/"$filename""_error.fastq" -fastq_maxns 1 -fastq_maxee_rate 0.01 -fastq_minlen 80
+done
+```
+
+merge read1 and read2 together, many of reverse reads lost due to quality falling off early in V3 chemistry, not worth getting pairs back together.
+
+```{r, engine='bash', results='hide'}
+for f in deep_viral_qc/*_R1_error.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_R1*}"
+  cat deep_viral_qc/"${filename}_R1_error.fastq" deep_viral_qc/"${filename}_R2_error.fastq" > deep_viral_qc/"${filename}_R1_R2_error.fastq"
+done
+```
+
+Use prinseq to remove duplicates with prefix filter of 80 bp.
+
+```{r, engine='bash', results='hide'}
+for f in deep_viral_qc/*_R1_R2_error.fastq
+do
+  filename=$(basename "$f")
+	filename="${filename%_*}"
+	perl prinseq-lite-0.20.4/prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good deep_viral_qc/"$filename""_R1_R2_truncatederep"
+	grep ">" deep_viral_qc/"$filename""_R1_R2_truncatederep.fasta" | cut -c 2- > deep_viral_qc/"$filename""_R1_R2_keep_ids.txt"
+	filter_fasta.py -f $f -s deep_viral_qc/"$filename""_R1_R2_keep_ids.txt" -o deep_viral_qc/"$filename""_R1_R2_finalQC.fastq"
+done
+```
+
+Combine reads from all runs together for each sample.
+
+```{r, engine='bash'}
+for f in deep_viral_qc/*R1_R2_finalQC.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_run1_R1_R2_finalQC.fastq*}"
+  cat deep_viral_qc/"${filename}"* > deep_viral_qc/"${filename}.illumina.cat.fastq"
+done
+```
+
+Get a FASTA version.
+
+```{r, engine='bash', results='hide'}
+for f in deep_viral_qc/*.cat.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%.*}"
+  fastq-to-fasta.py $f -o deep_viral_qc/"$filename"".fna"
+done
+```
+
+Resulting read numbers.
+
+```{r, engine='bash'}
+grep -c ">" deep_viral_qc/*.cat.fna
+```
+
+
+Look at viral contamination. Same procedure, just focusing on reads from the MiSeq data.
+
+```{r, engine='bash'}
+mkdir rRNA_prediction/examples/e1/deep_viral_input
+mkdir rRNA_prediction/examples/e1/deep_viral_output  
+cp *.illumina.cat.fna rRNA_prediction/examples/e1/deep_viral_input/
+cd rRNA_prediction/examples/e1
+export PATH=//work/samodha/canderson3/rRNA_prediction/rRNA_hmm_fs_wst_v0:$PATH
+/work/samodha/canderson3/rRNA_prediction/scripts/rRNA_hmm_run_wst_v0.pl deep_viral_input deep_viral_output
+cd ../../..
+```
+
+Check the results.
+
+```{r, engine='bash'}
+for f in rRNA_prediction/examples/e1/deep_viral_output/*.coord
+  scripts/./parse_rRNA_output.pl -rrna $f
+done
+```

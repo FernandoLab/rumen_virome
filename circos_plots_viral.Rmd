@@ -167,10 +167,12 @@ GUI: http://mkweb.bcgsc.ca/tableviewer/visualize/
 
 Go to the settings tab at the top of the page and change the following (only needs to be done once):
 
-- Under labels, segment fold = bold
+- Under labels, segment font = bold
 - Under cell ribbons, ribbon order = cell size, descending and ribbon layer order = large on top of small
 - Under contribution tracks, check hide
 - Under image format, check hide relative tick marks, hide absolute tick marks, hide first tick label
+
+#-Hide labels? or condensed?
 
 Click save. Switch to the visualize tab.
 

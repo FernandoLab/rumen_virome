@@ -13,12 +13,12 @@ Two methods - median k-mer counts and distribution of ORFs among samples.
 Use khmer software to compare k-mer profiles of different metagenomes. Load all viral metagenomes into counting.
 
 ```{r, engine='bash', results='hide'}
-cd /work/samodha/canderson3/prinseq_output
-for f in *_finalQC.fastq
+mkdir viral_beta_div
+for f in viral_qc/*finalQC.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
-  load-into-counting.py -k 20 -N 4 -x 8e9 --report-total-kmers -s tsv "$filename""_k20.kh" $f
+  load-into-counting.py -k 20 -N 4 -x 8e9 --report-total-kmers -s tsv viral_beta_div/"$filename""_k20.kh" $f
 done
 ```
 
@@ -26,7 +26,7 @@ The script below is from ____ (	https://github.com/qingpeng/igs-diversity/blob/m
 ) and I have provided the version of the script used in this analysis. Finds the median k-mer abundance across samples.
 
 ```{r, engine='bash', results='hide'}
-cd prinseq_output/
+cd viral_beta_div/
 ls *k20.kh | awk '{ ORS=" "; print; }' > config.txt
 printf "\n" >> config.txt
 ls *finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
@@ -41,29 +41,29 @@ cd ..
 Remove reads that are not shared with at least one other sample. This helps to alleviate differences diven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
 
 ```{r, engine='bash', results='hide'}
-perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=prinseq_output -threshold=1
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=viral_beta_div -threshold=1
 
-mv *.comb.keep.txt prinseq_output
+mv *.comb.keep.txt viral_beta_div
 
-cat prinseq_output/*.comb.keep.txt > prinseq_output/VMG.cat.comb.keep.txt
+cat viral_beta_div/*.comb.keep.txt > viral_beta_div/VMG.cat.comb.keep.txt
 
-awk '{print $1,$2/629489,$3/2712098,$4/470915,$5/920397,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' prinseq_output/VMG.cat.comb.keep.txt > prinseq_output/VMG.cat.comb.keep.norm.txt
+awk '{print $1,$2/629489,$3/2712098,$4/470915,$5/920397,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' viral_beta_div/VMG.cat.comb.keep.txt > viral_beta_div/VMG.cat.comb.keep.norm.txt
 
-printf "ID VMG.10 VMG.11 VMG.12 VMG.13 VMG.14 VMG.15 VMG.1 VMG.2 VMG.3 VMG.4 VMG.5 VMG.6 VMG.7 VMG.8 VMG.9\n" > prinseq_output/VMG.read_table.txt
+printf "ID VMG.10 VMG.11 VMG.12 VMG.13 VMG.14 VMG.15 VMG.1 VMG.2 VMG.3 VMG.4 VMG.5 VMG.6 VMG.7 VMG.8 VMG.9\n" > viral_beta_div/VMG.read_table.txt
 
-cat prinseq_output/VMG.cat.comb.keep.norm.txt >> prinseq_output/VMG.read_table.txt
+cat viral_beta_div/VMG.cat.comb.keep.norm.txt >> viral_beta_div/VMG.read_table.txt
 
-tr ' ' \\t < prinseq_output/VMG.read_table.txt > prinseq_output/VMG.read_table.tab.txt
+tr ' ' \\t < viral_beta_div/VMG.read_table.txt > viral_beta_div/VMG.read_table.tab.txt
 
-biom convert -i prinseq_output/VMG.read_table.tab.txt -o prinseq_output/VMG.read_table.tab.biom --table-type="OTU table" --to-json
+biom convert -i viral_beta_div/VMG.read_table.tab.txt -o viral_beta_div/VMG.read_table.tab.biom --table-type="OTU table" --to-json
 ```
 
 Calcualte the Bray-Curtis dissimilarity between samples based on the normalized median k-mer abundance and use the dissimilarities to construct an NMDS plot.
 
 ```{r, engine='bash', results='hide'}
-beta_diversity.py -i prinseq_output/VMG.read_table.tab.biom -o prinseq_output/VMG.read_table_bc -m bray_curtis
+beta_diversity.py -i viral_beta_div/VMG.read_table.tab.biom -o viral_beta_div/VMG.read_table_bc -m bray_curtis
 
-nmds.py -i prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -o prinseq_output/VMG.read_table_bc_nmds.txt
+nmds.py -i viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -o viral_beta_div/VMG.read_table_bc_nmds.txt
 
 mkdir figures/
 ```
@@ -71,7 +71,7 @@ mkdir figures/
 ```{r}
 library(ggplot2)
 library(vegan)
-viral_bc <- read.table("prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt", header=TRUE, row.names=1)
+viral_bc <- read.table("viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt", header=TRUE, row.names=1)
 viral_bc_matrix <- as.matrix(viral_bc)
 viral_bc_dist <- as.dist(viral_bc_matrix)
 	
@@ -100,9 +100,10 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
   }
 }
 
-viral_nmds <- read.table("prinseq_output/VMG.read_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
+viral_nmds <- read.table("viral_beta_div/VMG.read_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
 colnames(viral_nmds)[1] <- "ID"
 viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
+names(viral_nmds_map)[5] <- "Steer"
 
 shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
 shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
@@ -110,14 +111,16 @@ shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
 viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
   xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "")
+  labs(fill = "") +
+  theme(legend.key = element_blank())
     
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Steer), size=2.5) +
   xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "")
+  labs(fill = "") +
+  theme(legend.key = element_blank())
     
-tiff("figures/viral_reads_nmds.tiff", height = 6, width = 12, units='in', res=300)
+tiff("figures/figure_s2b_nolabel.tiff", height = 6, width = 12, units='in', res=600)
 multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
 dev.off()
 ```
@@ -148,7 +151,7 @@ library(grid)
 map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo")]
 cor(map2)
 
-viral_tab <- fread("prinseq_output/VMG.read_table.tab.txt", header=TRUE, sep="\t")
+viral_tab <- fread("viral_beta_div/VMG.read_table.tab.txt", header=TRUE, sep="\t")
 viral_df <- as.data.frame(viral_tab)
 row.names(viral_df) <- viral_df$ID
 viral_df <- subset(viral_df, select=-c(ID))
@@ -210,8 +213,8 @@ test <- fortify(viral_cap)
 site_df <- subset(test, test$Score == "sites")
 site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","40MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
 biplot_df <- subset(test, test$Score == "biplot")
-biplot_df2 <- data.frame(text_x = as.numeric(c("-0.6", "-0.32", "-0.225")), biplot_df)
-biplot_df3 <- data.frame(text_y = as.numeric(c("-0.57", "-0.93", "-0.315")), biplot_df2)
+biplot_df2 <- data.frame(text_x = as.numeric(c("0.82", "-0.30", "-0.25")), biplot_df)
+biplot_df3 <- data.frame(text_y = as.numeric(c("0.33", "-0.95", "-0.30")), biplot_df2)
 biplot_df3$Label[3] = "Pro"
 
 tiff("figures/viral_read_dbRDA.tiff", width = 6, height = 6, units = 'in', res = 300)
@@ -219,7 +222,7 @@ ggplot(data = site_df2, aes(Dim1, Dim2)) +
     geom_point(aes(color = diet)) +
   	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
   	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=3)+
-  	labs(x="CAP1 (??.??% of Constrained Variation)", y="CAP2 (??.??% of Constrained Variation)")+
+  	labs(x="CAP1 (64.02% of Constrained Variation)", y="CAP2 (18.34% of Constrained Variation)")+
 	  theme_bw() +
 	  theme(legend.title=element_blank(),
 		legend.background = element_rect(fill = "white"),
@@ -235,20 +238,20 @@ dev.off()
 Get the average pairwise distances between samples.
 
 ```{r, engine='bash'}
-printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> prinseq_output/config.txt
-printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> prinseq_output/config.txt
+printf "\n27CDS 55CS 55CS 27CDS Corn 40MDGS Corn Corn 40MDGS 27CDS 55CS 40MDGS 40MDGS Corn 55CS" >> viral_beta_div/config.txt
+printf "\n259 346 3244 222 3257 259 346 3244 222 3257 259 346 3244 222 3257" >> viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=55CS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=55CS -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=Corn -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=Corn -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=40MDGS -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=Corn -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=Corn -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=prinseq_output/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=prinseq_output/config.txt
+perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -config=viral_beta_div/config.txt
 ```
 
 
@@ -302,6 +305,7 @@ viral_map$Animal <- as.factor(viral_map$Animal)
 viral_nmds <- read.table("viral_blast2tsv/VMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
 colnames(viral_nmds)[1] <- "ID"
 viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
+names(viral_nmds_map)[5] <- "Steer"
 
 shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
 shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
@@ -309,16 +313,20 @@ shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
 viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
   xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "")
+  labs(fill = "") +
+  ggtitle("Viral - ORFs - Diet") +
+  theme(legend.title=element_blank(), legend.key = element_blank())
     
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
+viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Steer), size=2.5) +
   xlab("NMDS1") + ylab("NMDS2") + 
   guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "")
+  labs(fill = "") +
+  ggtitle("Viral - ORFs - Steer") +
+  theme(legend.title=element_blank(), legend.key = element_blank())
     
-tiff("figures/viral_orf_nmds.tiff", height = 6, width = 12, units='in', res=300)
-multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
-dev.off()	
+#tiff("figures/figure_s2a_orfs_nolabel.tiff", height = 6, width = 12, units='in', res=600)
+#multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
+#dev.off()
 ```
 
 PERMANOVA Stats.
