@@ -6,20 +6,22 @@ You can setup the same environment used to analyze the data and render the markd
 
 Generally, the markdown files rely on previously generate outputs, so rendering in this order likely matters.
 
-	1. qc_ion_viral_mg.Rmd
-	2. qc_ion_total_mg.Rmd
-	3. qc_miseq_viral_mg.Rmd
-	4. assembly_and_orfs.Rmd
-	5. map_reads.Rmd
-	6. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
-	7. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
-	8. beta_div_viral_mg.Rmd
-	9. beta_div_total_mg.Rmd
-	10. circos_plots_viral_mg.Rmd
-	11. circos_plots_total_mg.Rmd
-	12. plsr.Rmd
-	13. filter_viral.Rmd
-	14. enzyme_analysis.Rmd
+	1. data_curation.Rmd
+	2. qc_viral.Rmd
+	3. qc_microbial.Rmd
+	4. qc_deep_viral.Rmd
+	5. assembly_and_orfs.Rmd
+	6. map_reads.Rmd
+	7. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
+	8. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
+	9. beta_div_viral.Rmd
+	10. beta_div_microbial.Rmd
+	11. circos_plots_viral.Rmd
+	12. circos_plots_microbial.Rmd
+	13. plsr.Rmd
+	14. filter_viral.Rmd
+	15. enzyme_analysis.Rmd
+	16. taxonomy.Rmd
 
 Due to licensing issues, USEARCH can not be included in the setup. To obtain a download link, go to the USEARCH download page and select version USEARCH v8.0.1623 for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
 

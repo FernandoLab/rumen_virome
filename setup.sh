@@ -38,7 +38,7 @@ mv prinseq-lite-0.20.4/prinseq-lite.pl anaconda/envs/rumenVirome/bin/
 # anaconda 
 wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.3.0-Linux-x86_64.sh
 bash Anaconda-2.3.0-Linux-x86_64.sh
-anaconda/bin/conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7 urllib beautifulsoup4
+anaconda/bin/conda create -n rumenVirome python=2.7 pip numpy=1.9.2 matplotlib=1.4.3 scipy=0.16.0 pandas=0.16.2 cython mock=1.1.3 nose=1.3.7 urllib3 beautifulsoup4
 source anaconda/bin/activate rumenVirome
 
 # R
