@@ -6,39 +6,49 @@ output:
 ---
 
 # Data Curation
-Description.
+The following scripts get the raw sequences from the Sequence Read Archive (SRA) and renames the fastq files. The file sra_to_samples.txt has the accession numbers for each sample in the study and the identifiers that will be used throughout the analysis for each sample. The idenitfiers seem arbitrary, but were used throughout the analysis from the beginning. The mapping files contain a link from the identifier to the diets, animals the sample was collected from, etc.
 
-## Total Metagenome - Ion Torrent Data
-
-After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
-
+For the Ion Torrent data (microbial and viral metagenomes), the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
 --barcode-mode 1 --barcode-cutoff 0 --min-read-length 100 --trim-min-read-len 100
 
-Resulting reads are found in the short read archive (SRA).
+For the MiSeq data (deep viral metagenomes), demultiplexing was done on instrument and the resulting reads were downloaded.
+
+After retrieving and renaming the data, the raw files will be located in three directories: raw_microbial, raw_viral, and raw_deep_viral.
 
 ```{r, engine='bash', results='hide'}
 
-#save to directory raw_microbial
-```
+#download data from SRA
+wget --quiet -r --no-parent ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP076/SRP076028/
+mv ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP076/SRP076028/*/*.sra ./
+rm -rf ftp-trace.ncbi.nih.gov/
+
+#dump fastq files from sra file
+for sra in *.sra
+do
+  sratoolkit.2.6.3-centos_linux64/bin/fastq-dump --split-3 "$sra" &
+done
+wait
+
+rm -f *.sra
+
+#rename files using sample identifiers used throughout analysis
+while read sra new
+do
+    for srafile in $sra*
+    do
+        newfile="$new""$(echo "$srafile" | cut -c11-)"
+        mv "$srafile" "$newfile" 
+    done
+done < sra_to_samples.txt
 
 
-## Viral Metagenome - Ion Torrent Data
+mkdir raw_deep_viral
+mv V*_illumina_*.fastq raw_deep_viral
 
-After seqeuncing the Torrent Server software demulitplexed samples, trimed off adaptors and barcodes, and removed reads less than 100 basepairs. More precisley the following commands were used within the Torrent Server:
+mkdir raw_microbial
+mv B*.fastq raw_microbial
 
---barcode-mode 1 --barcode-cutoff 0 --min-read-length 100 --trim-min-read-len 100
+mkdir raw_viral
+mv V*.fastq raw_viral
 
-Resulting reads are found in the short read archive (SRA).
-
-```{r, engine='bash', results='hide'}
-
-#save to directory raw_viral
-```
-
-## Deep Viral Metagenome - Illumina MiSeq Data
-
-```{r, engine='bash', results='hide'}
-
-
-#save to raw_illumina_viral
 ```
