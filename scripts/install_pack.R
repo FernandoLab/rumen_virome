@@ -3,6 +3,7 @@ biocLite("Heatplus")
 biocLite("DESeq2")
 biocLite("phyloseq")
 biocLite("KEGGREST")
+biocLite("mmnet")
 
 ipak <- function(pkg){
 new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
