@@ -86,6 +86,10 @@ unzip bowtie-2.2.5.source.zip
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
 
+#sra toolkit
+wget ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-centos_linux64.tar.gz
+tar -xzf sratoolkit.current-centos_linux64.tar.gz
+
 # clean up
 mv total_adapt_remove.cat.txt Trimmomatic-0.33/
 mv transp_adapt_remove.cat.txt Trimmomatic-0.33/
@@ -93,25 +97,28 @@ rm Trimmomatic-0.33.zip
 Trimmomatic-0.33/ tools/
 mv cd-hit-v4.6.1-2012-08-27/cd-hit-454 anaconda/envs/rumenVirome/bin/
 rm cd-hit-v4.6.1-2012-08-27.tgz
-rm -rf cd-hit-v4.6.1-2012-08-27
+rm -r cd-hit-v4.6.1-2012-08-27
 mv prinseq-lite-0.20.4/prinseq-lite.pl anaconda/envs/rumenVirome/bin/
 chmod 775 prinseq-lite-0.20.4/prinseq-lite.pl
-rm -rf prinseq-lite-0.20.4
+rm -r prinseq-lite-0.20.4
 rm prinseq-lite-0.20.4.tar.gz
 mv mothur/mothur anaconda/envs/rumenVirome/bin/
 rm v2.6.2.zip
 rm -rf mothur
 rm Mothur.cen_64.zip
-rm -rf __MACOSX
+rm -r __MACOSX
 mv usearch8.0.1623 anaconda/envs/rumenVirome/bin/
 rm SPAdes-3.5.0-Linux.tar.gz
 chmod 775 prodigal
 mv prodigal anaconda/envs/rumenVirome/bin/
-rm -rf Prodigal-2.6.2
+rm -r Prodigal-2.6.2
 chmod 775 bowtie2-2.2.5/*
 mv bowtie2-2.2.5/* anaconda/envs/rumenVirome/bin/
 rm bowtie-2.2.5.source.zip
-rm -rf bowtie2-2.2.5
+rm -r bowtie2-2.2.5
+mv sratoolkit.2.6.3-centos_linux64/bin/fastq-dump anaconda/envs/rumenVirome/bin/
+rm sratoolkit.current-centos_linux64.tar.gz
+rm -r sratoolkit.2.6.3-centos_linux64
 rm rRNA_prediction.tar
 rm Anaconda-2.3.0-Linux-x86_64.sh
 rm install_pack.Rout
