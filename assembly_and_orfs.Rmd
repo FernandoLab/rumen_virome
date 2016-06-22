@@ -13,7 +13,7 @@ Description.
 Assembly the Ion Torrent viral metagenome data using Spades.
 
 ```{r, engine='bash'}
-cat prinseq_output/*_finalQC.fastq > VMG.cat.fastq
+cat viral_qc/*_finalQC.fastq > VMG.cat.fastq
 
 python SPAdes-3.5.0-Linux/bin/spades.py -k 21,33,55,77,99,127 --only-assembler --sc -s VMG.cat.fastq -m 60000 -t 2 -o vmg_cat_sc
 ```
@@ -38,12 +38,12 @@ perl prinseq-lite-0.20.4/./prinseq-lite.pl -fasta vmg.orfs_nt.fasta -min_len 300
 filter_fasta.py -f vmg.orfs_aa.fasta -a vmg.orfs_nt.filter.fasta -o vmg.orfs_aa.filter.fasta
 ```
 
-## Total Metagenome - Ion Torrent Data
+## Microbial Metagenome - Ion Torrent Data
 
 Assembly the Ion Torrent total metagenome data using Spades.
 
 ```{r, engine='bash'}
-cat cd_hit_454_output_total/*.fastq > BMG.cat.fastq
+cat microbial_qc/*.fastq > BMG.cat.fastq
 
 python SPAdes-3.5.0-Linux/bin/spades.py -k 21,33,55,77,99,127 --only-assembler --sc -s BMG.cat.fastq -m 200000 -t 2 -o bmg_cat_sc
 ```
@@ -72,7 +72,7 @@ filter_fasta.py -f bmg.orfs_aa.fasta -a bmg.orfs_nt.filter.fasta -o bmg.orfs_aa.
 Assembly the Illumina MiSeq viral metagenome data using Spades.
 
 ```{r, engine='bash'}
-cat *.illumina.cat.fastq > VMG.illumina.cat.fastq
+cat deep_viral_qc/*.illumina.cat.fastq > VMG.illumina.cat.fastq
 
 python SPAdes-3.5.0-Linux/bin/spades.py -k 21,33,55,77,99,127 --sc -s VMG.illumina.cat.fastq -m 250000 -t 2 -o vmg_illumina_cat_sc
 ```

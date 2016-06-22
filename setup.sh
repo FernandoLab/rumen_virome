@@ -63,7 +63,7 @@ tar -xvf rRNA_prediction.tar
 chmod 777 -R rRNA_prediction/
 
 # pandoc
-conda install -c https://conda.anaconda.org/asmeurer pandoc=1.13.1
+conda install -c https://conda.binstar.org/asmeurer pandoc
 
 # spades
 wget http://spades.bioinf.spbau.ru/release3.5.0/SPAdes-3.5.0-Linux.tar.gz
@@ -114,6 +114,7 @@ chmod 775 bowtie2-2.2.5/*
 mv bowtie2-2.2.5/* anaconda/envs/rumenVirome/bin/
 rm bowtie-2.2.5.source.zip
 rm -r bowtie2-2.2.5
+rm sratoolkit.current-centos_linux64.tar.gz
 rm rRNA_prediction.tar
 rm Anaconda-2.3.0-Linux-x86_64.sh
 rm install_pack.Rout

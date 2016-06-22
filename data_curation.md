@@ -1,9 +1,4 @@
----
-title: "Data Curation"
-output:
-  html_document:
-    keep_md: true
----
+# Data Curation
 
 The following scripts get the raw sequences from the Sequence Read Archive (SRA) and renames the fastq files. The file sra_to_samples.txt has the accession numbers for each sample in the study and the identifiers that will be used throughout the analysis for each sample. The idenitfiers seem arbitrary, but were used throughout the analysis from the beginning. The mapping files contain a link from the identifier to the diets, animals the sample was collected from, etc.
 
@@ -14,7 +9,8 @@ For the MiSeq data (deep viral metagenomes), demultiplexing was done on instrume
 
 After retrieving and renaming the data, the raw files will be located in three directories: raw_microbial, raw_viral, and raw_deep_viral.
 
-```{r, engine='bash', results='hide'}
+
+```bash
 
 #download data from SRA
 wget --quiet -r --no-parent ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP076/SRP076028/
