@@ -62,8 +62,6 @@ Calcualte the Bray-Curtis dissimilarity between samples based on the normalized 
 beta_diversity.py -i viral_beta_div/VMG.read_table.tab.biom -o viral_beta_div/VMG.read_table_bc -m bray_curtis
 
 nmds.py -i viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -o viral_beta_div/VMG.read_table_bc_nmds.txt
-
-mkdir figures/
 ```
 
 ```{r}
@@ -127,8 +125,6 @@ Use PERMANOVA tests to investigate statisticial differences based on diet and an
 
 ```{r}
 adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
-
-#Test for assumptions. Assumption of equal variance among samples is violated, but this is due to the very large diversity among one treatment - the corn diet - and can be visually seen in the NMDS plot above.
 
 anova(betadisper(viral_bc_dist,viral_map$Diet))
 
@@ -317,7 +313,6 @@ viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(
 PERMANOVA Stats.
 
 ```{r}
-#Since we used Type I sums of squares and our dataset was mildly unbalanced (data from only 3 plots were missing), we repeated the PERMANCOVA with the various independent variables entered in different orders and verified that variable order within the model did not alter results.
 adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
 
 #Test assumptions.
