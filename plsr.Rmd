@@ -14,7 +14,6 @@ library(DESeq2)
 library(QuantPsyc)
 library(reshape2)
 library(parallel)
-library(vsn)
 options(stringsAsFactors=FALSE)
 
 table <- read.table("intermediate_results/VMG.ko_raw_abundance.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")

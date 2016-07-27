@@ -105,8 +105,6 @@ do
 	unzip $f -d intermediate_results/
 done
 
-rm intermediate_results/*.zip
-
 for f in intermediate_results/*.biom
 do
 	filename=$(basename "$f")
@@ -115,6 +113,7 @@ do
 done
 
 # clean up
+rm intermediate_results/*.zip
 mv total_adapt_remove.cat.txt Trimmomatic-0.33/
 mv transp_adapt_remove.cat.txt Trimmomatic-0.33/
 rm Trimmomatic-0.33.zip
