@@ -112,6 +112,8 @@ do
 	biom convert --table-type="OTU table" --to-tsv -i $f -o intermediate_results/$filename.txt
 done
 
+unzip prophage_virus.db.zip
+
 # clean up
 rm intermediate_results/*.zip
 mv total_adapt_remove.cat.txt Trimmomatic-0.33/
