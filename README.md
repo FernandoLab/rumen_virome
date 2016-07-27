@@ -1,4 +1,4 @@
-Analysis to recreate the rumen virome manuscript.
+Analysis to recreate the manuscript "Digestible energy content drives the dynamic response of bovine rumen viral communities to dietary change".
 
 The analysis is separated into several RMarkdown files.
 
