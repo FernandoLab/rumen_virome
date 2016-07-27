@@ -1,0 +1,353 @@
+---
+title: "Enzyme Enrichment"
+output:
+  html_document:
+    keep_md: true
+---
+
+Identify differentially abundant KOs in the deep viral metagenomes (diets 55CS and 27CDS) and microbial metagenomes from the same diets. We use DESEQ2 package implemented in QIIME to find differential features. Due to KEGG licensing though, can't ontain the pathways in the same manner the analysis was originally carried out. Code pertaining to obtaining and counting the frequency of pathways from KOs is commented out but the outputs are available in the intermediate_results directory.
+
+```{r, engine='bash'}
+biom convert -i intermediate_results/VMG.illumina.ko_raw_abundance.biom -o intermediate_results/VMG.illumina.ko_raw_abundance.json.biom  --table-type="OTU table" --to-json
+
+differential_abundance.py -i intermediate_results/VMG.illumina.ko_raw_abundance.json.biom -o deep_viral_deseq2.txt -a DESeq2_nbinom -m viral_illumina_mapping_ko_qiime.txt -c Diet -x 27CDS -y 55CS -d
+
+biom convert -i intermediate_results/BMG.ko_raw_abundance.biom -o intermediate_results/BMG.ko_raw_abundance.json.biom  --table-type="OTU table" --to-json
+
+differential_abundance.py -i intermediate_results/BMG.ko_raw_abundance.json.biom -o microbial_deseq2.txt -a DESeq2_nbinom -m total_mapping_ko_qiime.txt -c Diet -x 27CDS -y 55CS -d
+```
+
+Volcano plots of the results.
+
+```{r}
+library(ggplot2)
+library(RCurl)
+library(dplyr)
+
+res <- read.table("deep_viral_deseq2.txt", sep="\t", header=TRUE)
+res$log10p <- -log10(res$padj)
+res_filt <- na.omit(res)
+res_filt$split <- (res_filt$padj < 0.05)
+res_split <- split(res_filt, res_filt$split)
+res_sign <- as.data.frame(res_split$`TRUE`)
+res_sign$col <- "yes"
+res_no_sign <- as.data.frame(res_split$`FALSE`)
+res_no_sign$col <- "no"
+res_merge <- rbind(res_no_sign,res_sign)
+		
+tiff("figure_s2b.tiff", width = 5, height = 6, units = 'in', res = 600, compression = c("lzw"))
+ggplot(data=res_merge, aes(x=log2FoldChange, y=log10p)) +
+  geom_point(size=0.5, aes(color=col)) +
+	scale_colour_manual(values = c("black","red")) +
+	theme(legend.position="none") +
+	xlab(expression(log["2"]~fold~change)) + ylab(expression(-log["10"](adjusted~p-value))) +
+	scale_x_continuous(limits = c(-6, 6)) +
+	scale_y_continuous(limits = c(-0, 6))
+dev.off()
+	
+res <- read.table("microbial_deseq2.txt", sep="\t", header=TRUE)
+res$log10p <- -log10(res$padj)
+res_filt <- na.omit(res)
+res_filt$split <- (res_filt$padj < 0.05)
+res_split <- split(res_filt, res_filt$split)
+res_sign <- as.data.frame(res_split$`TRUE`)
+res_sign$col <- "yes"
+res_no_sign <- as.data.frame(res_split$`FALSE`)
+res_no_sign$col <- "no"
+res_merge <- rbind(res_no_sign,res_sign)
+		
+tiff("figure_s2a.tiff", width = 5, height = 6, units = 'in', res = 600, compression = c("lzw"))
+ggplot(data=res_merge, aes(x=log2FoldChange, y=log10p)) +
+	geom_point(size=0.5, aes(color=col)) +
+	scale_colour_manual(values = c("black","red")) +
+	theme(legend.position="none") +
+	xlab(expression(log["2"]~fold~change)) + ylab(expression(-log["10"](adjusted~p-value))) +
+	scale_x_continuous(limits = c(-6, 6)) +
+	scale_y_continuous(limits = c(-0, 6))
+dev.off()
+```
+
+For each diet, identify the pathways that the differential KOs from the deep viral metagenomes map to.
+
+```{r}
+options(stringsAsFactors=FALSE)
+
+deseq <- read.table("deep_viral_deseq2.txt", header=TRUE, sep="\t")
+colnames(deseq)[1] = "id"
+diff <- subset(deseq, padj < 0.05)
+
+sub1 <- diff$id[1:285]
+sub2 <- diff$id[286:570]
+sub3 <- diff$id[571:855]
+
+enz1 <- paste(sub1, collapse = ',')
+enz2 <- noquote(enz1)
+url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
+names <- getURL(url_get)
+url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
+defs <- getURL(url_get2)
+names_list <- strsplit(names, "\n")
+defs_list <- strsplit(defs, "\n")
+enz_list <- strsplit(enz2, ",")
+
+sub1_enz_names <- data.frame(id = character(0), Name = character(0), Def=character(0))	
+options(stringsAsFactors=FALSE)
+df_len <- lapply(enz_list[1], length)
+df_len2 <- df_len[[1]]
+for (i in 1:df_len2) {
+	enz <- enz_list[[1]][i]
+	name <- names_list[[1]][i]
+	def <- defs_list[[1]][i]	
+	sub1_enz_names[i, ] <- c(enz, name, def)
+}
+
+enz1 <- paste(sub2, collapse = ',')
+enz2 <- noquote(enz1)
+url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
+names <- getURL(url_get)
+url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
+defs <- getURL(url_get2)
+names_list <- strsplit(names, "\n")
+defs_list <- strsplit(defs, "\n")
+enz_list <- strsplit(enz2, ",")
+
+sub2_enz_names <- data.frame(id = character(0), Name = character(0), Def=character(0))	
+options(stringsAsFactors=FALSE)
+df_len <- lapply(enz_list[1], length)
+df_len2 <- df_len[[1]]
+for (i in 1:df_len2) {
+	enz <- enz_list[[1]][i]
+	name <- names_list[[1]][i]
+	def <- defs_list[[1]][i]	
+	sub2_enz_names[i, ] <- c(enz, name, def)
+}
+
+enz1 <- paste(sub3, collapse = ',')
+enz2 <- noquote(enz1)
+url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
+names <- getURL(url_get)
+url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
+defs <- getURL(url_get2)
+names_list <- strsplit(names, "\n")
+defs_list <- strsplit(defs, "\n")
+enz_list <- strsplit(enz2, ",")
+
+sub3_enz_names <- data.frame(id = character(0), Name = character(0), Def=character(0))	
+options(stringsAsFactors=FALSE)
+df_len <- lapply(enz_list[1], length)
+df_len2 <- df_len[[1]]
+for (i in 1:df_len2) {
+	enz <- enz_list[[1]][i]
+	name <- names_list[[1]][i]
+	def <- defs_list[[1]][i]	
+	sub3_enz_names[i, ] <- c(enz, name, def)
+}
+
+enz_names <- rbind(sub1_enz_names, sub2_enz_names, sub3_enz_names)
+#dim(diff)
+diff_names <- merge(diff, enz_names, by="id")
+#dim(diff_names)
+
+#file not available due to lisencing restrictions.
+#ko_pw <- read.table("../genes/ko/ko_pathway.list", sep="\t", header=FALSE, stringsAsFactors=FALSE)
+#ko_pw_split <- data.frame(do.call(rbind, strsplit(ko_pw$V1, split = ":", fixed = TRUE)), do.call(rbind, strsplit(ko_pw$V2, split = ":", fixed = TRUE)))
+#colnames(ko_pw_split) <- c("string", "id", "string2", "pw")
+	
+#diff_names <- merge(x=diff_names, y=ko_pw_split, by="id", all.x=TRUE)
+
+#pw1 <- paste(unique(diff_names$pw), collapse = ',')
+#pw2 <- noquote(pw1)
+#url_get3 <- noquote(paste0("http://togows.dbcls.jp/entry/pathway/",pw2,"/pathways"))
+#names <- getURL(url_get3)
+#pw_names_list <- strsplit(names, "\n")
+#pw_list <- strsplit(pw2, ",")
+
+#pw_names <- data.frame(pw = character(0), pw_name = character(0))	
+#df_len <- lapply(pw_list[1], length)
+#df_len2 <- df_len[[1]]
+#for (i in 1:df_len2) {
+#	pw <- pw_list[[1]][i]
+#	pw_name <- pw_names_list[[1]][i]
+#	pw_names[i, ] <- c(pw, pw_name)
+#}
+
+#dim(diff_names)
+#diff_names <- merge(x=diff_names, y=pw_names, by="pw", all.x=TRUE)
+#dim(diff_names)
+
+#diff_names_pw <- diff_names[c("id","pw","log2FoldChange")]
+#write.table(diff_names_pw, file="deep_viral_diff_enzymes_pws.txt", col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+
+#cs <- subset(diff_names, log2FoldChange < 0)
+#cds <- subset(diff_names, log2FoldChange > 0)
+
+#cs_pw_count <- count(cs, "pw_name")
+#cs_pw_count_order <- cs_pw_count[order(-cs_pw_count$freq),]
+#cs_pw_count_order$pw_name <- gsub("ko\\d+\\s+", "", cs_pw_count_order$pw_name)
+#write.table(cs_pw_count_order, file="deep_viral_55CS_pw_freq.txt", col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+	
+#cds_pw_count <- count(cds, "pw_name")
+#cds_pw_count_order <- cds_pw_count[order(-cds_pw_count$freq),]
+#cds_pw_count_order$pw_name <- gsub("ko\\d+\\s+", "", cds_pw_count_order$pw_name)
+#write.table(cds_pw_count_order, file="deep_viral_27CDS_pw_freq.txt", col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
+```
+
+Get reference metabolic network data for KEGG from mmnet package in R. Then send the network to Cytoscape (version 3.2.1) and analyze the network to obtain topological features. If you want to skip sending the network to cytoscape, the topological features of each node are in the intermediate_results directory. The code to send it to cytoscape is commented out currently and uses the file in the intermediate_results to keep it reproducible.
+
+```{r}
+library(mmnet)
+library(gplots)
+library(RJSONIO)
+library(RCy3)
+
+data(RefDbcache)
+refnet <- RefDbcache$network
+source('cytoscape_util.R')
+cygraph <- toCytoscape(refnet)
+#send2cy(cygraph, 'default%20black', 'circular')
+```
+
+If you want to actually send the network for analysis in Cytoscape uncode the last line above and run it, then follow along below, otherwise skip to the next code block and use the previously generate output in the intermediate_results directory...
+
+In cytoscape right click on the refNet network name on the left and click "Create View"
+Apply preferred layout
+
+Select the largest connected portion of the network (Tools --> network analyzer --> subnetwork creation --> extract connected components, select first component --> extract)
+
+This should generate a network with 3616 nodes.
+
+Analyzed subset network as directed (Tools --> network analyzer --> network analysis --> Analyze network --> treat the network as directed --> ok )
+
+File -- Export --> Table --> refNet(1) default node
+
+Save as to the current directory:
+refnet_attributes.csv
+
+The file 'refnet_attributes.csv' can also be found in the intermediate_results directory. This file will be used below since I cannot figure out how to reproduce this from the command line currently.
+
+Using previously defined guidelines (see manuscript) we removed viral KOs that would not fall under the definiton of being an AMG. Then, we used betweeness centrality to split the metabolic network into three equally sized tiers - core, intermediate, and periphery - and tested if AMGs from the 55CS and 27CDS deep viral metagenomes are enriched or depleted in any of the tiers. Then repeat this analysis using the differentially abunant KOs from the microbial metagenomes (diets 55CS and 27CDS only).
+
+```{r}
+ref_topo <- read.csv("intermediate_results/refnet_attributes.csv", header=TRUE)
+diff_names <- read.table("intermediate_results/deep_viral_diff_enzymes_pws.txt", header=TRUE, sep="\t")
+
+cs <- subset(diff_names, log2FoldChange < 0)
+cds <- subset(diff_names, log2FoldChange > 0)
+
+cds_diff_metab <- merge(cds, ref_topo, by="id")
+cds_diff_metab <- cds_diff_metab[,c("id","pw","BetweennessCentrality")]
+	
+remove_ko <- subset(cds_diff_metab, cds_diff_metab$pw %in% c("ko03440", "ko03430", "ko00970", "ko00230", "ko00240"), drop = TRUE)
+remove_ko_bs <- subset(cds_diff_metab, cds_diff_metab$pw %in% c("ko01230"), drop = TRUE)
+	
+#remove those from the bs removal list that are in carbon metabolism (ko01200) or nitrogen metabolsim (ko00910)
+remove_ko_bs_ids <- subset(cds_diff_metab, cds_diff_metab$id %in% remove_ko_bs$id, drop = TRUE)
+remove_ko_bs_no_cm_nm <- subset(remove_ko_bs_ids, !remove_ko_bs_ids$pw %in% c("ko00910","ko01200"), drop = TRUE)
+	
+remove_all_ko <- rbind(remove_ko,remove_ko_bs_no_cm_nm)
+remove_all_ko_list <- as.character(unique(remove_all_ko$id))
+	
+cds_diff_amg <- subset(cds_diff_metab, !cds_diff_metab$id %in% remove_all_ko_list, drop = TRUE)
+	
+ref_topo_sort <- ref_topo[with(ref_topo, order(-BetweennessCentrality)), ]
+ref_core <- ref_topo_sort[1:1206,]
+ref_interm <- ref_topo_sort[1207:2411,]
+ref_periph <- ref_topo_sort[2412:3616,]
+	
+cds_amg_core <- merge(cds_diff_amg, ref_core, by=c("id","BetweennessCentrality"))
+cds_amg_interm <- merge(cds_diff_amg, ref_interm, by=c("id","BetweennessCentrality"))
+cds_amg_periph <- merge(cds_diff_amg, ref_periph, by=c("id","BetweennessCentrality"))
+	
+length(unique(cds_amg_core$id))
+#78
+length(unique(cds_amg_interm$id))
+#59
+length(unique(cds_amg_periph$id))
+#56
+	
+
+phyper(78,1206,2410,193, lower.tail=FALSE)
+phyper(59,1205,2411,193, lower.tail=TRUE)
+phyper(56,1205,2411,193, lower.tail=TRUE)
+
+
+cs_diff_metab <- merge(cs, ref_topo, by="id")
+cs_diff_metab <- cs_diff_metab[,c("id","pw","BetweennessCentrality")]
+	
+remove_ko <- subset(cs_diff_metab, cs_diff_metab$pw %in% c("ko03440", "ko03430", "ko00970", "ko00230", "ko00240"), drop = TRUE)
+remove_ko_bs <- subset(cs_diff_metab, cs_diff_metab$pw %in% c("ko01230"), drop = TRUE)
+	
+#remove those from the bs removal list that are in carbon metabolism (ko01200) or nitrogen metabolsim (ko00910)
+remove_ko_bs_ids <- subset(cs_diff_metab, cs_diff_metab$id %in% remove_ko_bs$id, drop = TRUE)
+remove_ko_bs_no_cm_nm <- subset(remove_ko_bs_ids, !remove_ko_bs_ids$pw %in% c("ko00910","ko01200"), drop = TRUE)
+	
+remove_all_ko <- rbind(remove_ko,remove_ko_bs_no_cm_nm)
+remove_all_ko_list <- as.character(unique(remove_all_ko$id))
+	
+cs_diff_amg <- subset(cs_diff_metab, !cs_diff_metab$id %in% remove_all_ko_list, drop = TRUE)
+#48
+	
+cs_amg_core <- merge(cs_diff_amg, ref_core, by=c("id","BetweennessCentrality"))
+cs_amg_interm <- merge(cs_diff_amg, ref_interm, by=c("id","BetweennessCentrality"))
+cs_amg_periph <- merge(cs_diff_amg, ref_periph, by=c("id","BetweennessCentrality"))
+	
+length(unique(cs_amg_core$id))
+#22
+length(unique(cs_amg_interm$id))
+#16
+length(unique(cs_amg_periph$id))
+#10
+	
+	
+phyper(22,1206,2410,48, lower.tail=FALSE)
+phyper(16,1205,2411,48, lower.tail=TRUE)
+phyper(10,1205,2411,48, lower.tail=TRUE)
+
+
+	
+deseq <- read.table("microbial_deseq2.txt", sep="\t", header=TRUE)
+colnames(deseq)[1] = "id"
+diff <- subset(deseq, padj < 0.05)
+
+cs_diff <- subset(diff, log2FoldChange < 0)
+cds_diff <- subset(diff, log2FoldChange > 0)
+
+cds_diff_metab <- merge(cds_diff, ref_topo, by="id")
+cds_diff_metab <- cds_diff_metab[,c("id","BetweennessCentrality")]
+#38
+
+cds_diff_core <- merge(cds_diff_metab, ref_core, by=c("id","BetweennessCentrality"))
+cds_diff_interm <- merge(cds_diff_metab, ref_interm, by=c("id","BetweennessCentrality"))
+cds_diff_periph <- merge(cds_diff_metab, ref_periph, by=c("id","BetweennessCentrality"))
+	
+length(unique(cds_diff_core$id))
+#14
+length(unique(cds_diff_interm$id))
+#11
+length(unique(cds_diff_periph$id))
+#13
+	
+phyper(14,1206,2410,38, lower.tail=FALSE)
+phyper(11,1205,2411,38, lower.tail=TRUE)
+phyper(13,1205,2411,38, lower.tail=TRUE)
+
+
+cs_diff_metab <- merge(cs_diff, ref_topo, by="id")
+cs_diff_metab <- cs_diff_metab[,c("id","BetweennessCentrality")]
+#9
+
+cs_diff_core <- merge(cs_diff_metab, ref_core, by=c("id","BetweennessCentrality"))
+cs_diff_interm <- merge(cs_diff_metab, ref_interm, by=c("id","BetweennessCentrality"))
+cs_diff_periph <- merge(cs_diff_metab, ref_periph, by=c("id","BetweennessCentrality"))
+	
+length(unique(cs_diff_core$id))
+#3
+length(unique(cs_diff_interm$id))
+#4
+length(unique(cs_diff_periph$id))
+#2
+	
+phyper(3,1206,2410,9, lower.tail=FALSE)
+phyper(4,1205,2411,9, lower.tail=TRUE)
+phyper(2,1205,2411,9, lower.tail=TRUE)
+```

@@ -11,46 +11,47 @@ Not using a loop beacuse outputting names that match mapping files and code used
 
 ```{r, engine='bash', results='hide'}
 mkdir microbial_qc
+chmod 775 Trimmomatic-0.33/*
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B1.fastq microbial_qc/B1_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B1.fastq microbial_qc/B1_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B2.fastq microbial_qc/B2_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B2.fastq microbial_qc/B2_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B3.fastq microbial_qc/B3_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B3.fastq microbial_qc/B3_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B4.fastq microbial_qc/B4_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B4.fastq microbial_qc/B4_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B5.fastq microbial_qc/B5_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B5.fastq microbial_qc/B5_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B6.fastq microbial_qc/B6_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B6.fastq microbial_qc/B6_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B7.fastq microbial_qc/B7_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B7.fastq microbial_qc/B7_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B8.fastq microbial_qc/B8_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B8.fastq microbial_qc/B8_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B9.fastq microbial_qc/B9_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B9.fastq microbial_qc/B9_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B10.fastq microbial_qc/B10_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B10.fastq microbial_qc/B10_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B11.fastq microbial_qc/B11_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B11.fastq microbial_qc/B11_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
   
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B12.fastq microbial_qc/B12_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B12.fastq microbial_qc/B12_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B13.fastq microbial_qc/B13_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B13.fastq microbial_qc/B13_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B14.fastq microbial_qc/B14_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B14.fastq microbial_qc/B14_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B15.fastq microbial_qc/B15_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B15.fastq microbial_qc/B15_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B16.fastq microbial_qc/B16_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B16.fastq microbial_qc/B16_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B17.fastq microbial_qc/B17_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B17.fastq microbial_qc/B17_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B18.fastq microbial_qc/B18_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B18.fastq microbial_qc/B18_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
 java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B19.fastq microbial_qc/B19_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
     
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B20.fastq microbial_qc/B20_trimm.fastq ILLUMINACLIP:total_adapt_remove.cat.txt:2:20:10 MINLEN:85
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_microbial/B20.fastq microbial_qc/B20_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/total_adapt_remove.cat.txt:2:20:10 MINLEN:85
 ```
 
 Now remove all artificial duplicates.

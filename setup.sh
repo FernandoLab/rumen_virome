@@ -37,9 +37,10 @@ wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackc
 bash Anaconda-2.3.0-Linux-x86_64.sh
 anaconda/bin/conda create -n rumenVirome python=2.7 qiime=1.9.1
 source anaconda/bin/activate rumenVirome
+#cp pinned anaconda/conda-meta
 
 # r
-conda install -c https://conda.binstar.org/r rpy2=2.5.6 r-devtools=1.9.1 r-curl=0.9.4
+conda install -c r rpy2=2.5.6 r-devtools=1.9.1 r-curl=0.9.4
 conda install -c r r=3.2.2
 
 # cutadapt
@@ -48,19 +49,21 @@ pip install cutadapt==1.8.1
 # khmer
 pip install khmer==1.4.1
 
+# biopython
+pip install biopython
+
 # mothur
 wget https://github.com/mothur/mothur/releases/download/v1.35.1/Mothur.cen_64.zip
 unzip Mothur.cen_64.zip
 
 # usearch
-wget $1 -O usearch8.0.1623
-chmod 775 usearch8.0.1623
+wget -O anaconda/envs/rumenVirome/bin/usearch8.0.1623 $1
+chmod 775 anaconda/envs/rumenVirome/bin/usearch8.0.1623
 
 # rRNA prediction
 wget http://weizhong-lab.ucsd.edu/meta_rna/rRNA_prediction.tar.bz2
 bzip2 -d rRNA_prediction.tar.bz2
 tar -xvf rRNA_prediction.tar
-chmod 777 -R rRNA_prediction/
 
 # pandoc
 conda install -c https://conda.binstar.org/asmeurer pandoc
@@ -81,13 +84,35 @@ cd ..
 wget http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.5/bowtie2-2.2.5-linux-x86_64.zip/download -O bowtie-2.2.5.source.zip
 unzip bowtie-2.2.5.source.zip
 
-#sra toolkit
+# sra toolkit
 wget ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-centos_linux64.tar.gz
 tar -xzf sratoolkit.current-centos_linux64.tar.gz
+
+# cytoscape utility 
+wget https://raw.githubusercontent.com/idekerlab/cy-rest-R/develop/utility/cytoscape_util.R
 
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
+
+conda install bioconductor-genomicranges=1.20.8
+wget https://bioc.ism.ac.jp/packages/3.1/bioc/src/contrib/DESeq2_1.8.2.tar.gz
+R CMD INSTALL DESeq2_1.8.2.tar.gz
+
+# unpack intermediate results
+for f in intermediate_results/*.zip
+do
+	unzip $f -d intermediate_results/
+done
+
+rm intermediate_results/*.zip
+
+for f in intermediate_results/*.biom
+do
+	filename=$(basename "$f")
+	filename="${filename%.biom}"
+	biom convert --table-type="OTU table" --to-tsv -i $f -o intermediate_results/$filename.txt
+done
 
 # clean up
 mv total_adapt_remove.cat.txt Trimmomatic-0.33/

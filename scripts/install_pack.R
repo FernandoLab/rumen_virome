@@ -1,9 +1,15 @@
 source("http://bioconductor.org/biocLite.R")
-biocLite("Heatplus")
-biocLite("DESeq2")
-biocLite("phyloseq")
-biocLite("KEGGREST")
-biocLite("mmnet")
+ipak <- function(pkg){
+new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+if (length(new.pkg)) 
+    biocLite(new.pkg)
+sapply(pkg, require, character.only = TRUE)
+}
+
+packages <- c("S4Vectors", "IRanges", "GenomicRanges", "BiocGenerics", "Biobase", 
+"BiocParallel", "genefilter", "geneplotter", "vsn", "phyloseq", "Heatplus", "mmnet", "RCy3")
+
+ipak(packages)
 
 ipak <- function(pkg){
 new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -12,9 +18,10 @@ if (length(new.pkg))
 sapply(pkg, require, character.only = TRUE)
 }
 
-packages <- c("ggplot2", "vegan", "reshape2", "RColorBrewer", "rmarkdown", 
+packages <- c("ggplot2", "vegan", "dplyr", "reshape2", "RColorBrewer", "rmarkdown", 
 "knitr", "grid", "reshape", "data.table", "biom", "gplots", "gridExtra", "mvtnorm",
-"pls", "vsn", "car", "QuantPsyc", "reshape2", "R.utils", "pheatmap")
+"pls", "QuantPsyc", "reshape2", "R.utils", "pheatmap", "optparse", "Hmisc", "locfit", 
+"Rcpp", "httr", "RJSONIO")
 
 ipak(packages)
 

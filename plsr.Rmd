@@ -5,25 +5,23 @@ output:
     keep_md: true
 ---
 
-# Partial Least Squares Regression - Ion Torrent Viral Metagenomes
+Investigating multivariate linear relationships between rlog tranformed KO annotations in the viral metagenome and dietary components. This is followed up by using univariate linear regressions to confirm the strength and direction of relationships identified by PLSR.
 
-Investigating multivariate linear relationships between rlog tranformed KO annotations in the viral metagenome and dietary components. This is followed up by a univariate multiple linear regressions (MLR) for each KO to confirm the potetnial relationships identified by PLSR.
-
-```{r,}
+```{r}
 library(pls)
 library(phyloseq)
 library(DESeq2)
-library(vsn)
-library(KEGGREST)
-library(car)
-library(parallel)
 library(QuantPsyc)
 library(reshape2)
+library(parallel)
+library(vsn)
 options(stringsAsFactors=FALSE)
 
-table <- read.table("viral_blast2tsv_filter2/VMG.ko_raw_abundances.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")
+table <- read.table("intermediate_results/VMG.ko_raw_abundance.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")
+names(table) <- gsub("_trimm", "", names(table))
 table_matrix <- as.matrix(table)
-map <- read.table("viral_mapping_ko.txt", sep="\t", header=TRUE, row.names=1)
+map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1)
+map <- map[c(7,8,9,10,11,12,13,14,15,1,2,3,4,5,6),]
 OTU = otu_table(table_matrix, taxa_are_rows = TRUE)
 SAMPLEDATA = sample_data(map)
 physeq = phyloseq(OTU, SAMPLEDATA)
@@ -32,7 +30,6 @@ dds = phyloseq_to_deseq2(physeq, ~Diet)
 rld <- rlog(dds, blind = FALSE)
 rlogmat <- assay(rld)
 rlogdf <- as.data.frame(rlogmat)
-write.table(rlogdf, file="viral_blast2tsv_filter2/VMG.ko_rlog.txt", col.names=NA, row.names=TRUE, quote=FALSE, sep="\t")
 rlogmat_t <- t(rlogmat)
 map2 <- as.matrix(map[c("TDN", "Zn", "Protein")])
 pls_df <- data.frame(y=I(rlogmat_t), x=I(map2))
@@ -44,21 +41,21 @@ summaryfile$C1_exp <- summaryfile$V2
 summaryfile$C2_exp <- (summaryfile$V3 - summaryfile$V2)
 summaryfile$C3_exp <- (summaryfile$V4 - summaryfile$V3)
 c1_top <- summaryfile[ which(summaryfile$C1_exp > 30), ]
-dim(c1_top)
+#dim(c1_top)
 c2_top <- summaryfile[ which(summaryfile$C2_exp > 30), ]
-dim(c2_top)
+#dim(c2_top)
 c3_top <- summaryfile[ which(summaryfile$C3_exp > 30), ]
-dim(c3_top)
+#dim(c3_top)
 pls_top <- rbind(c1_top,c2_top,c3_top)
-pls_top_list <- unique(pls_top$V1) #101
+pls_top_list <- unique(pls_top$V1)
+#100
 ```
 
-MLR on KOs that have >= 30% variation explained by any component.
+Univariate regression on KOs that have >= 30% variation explained by any component.
 
 ```{r,}
 rlog_psl <- rlogdf[pls_top_list,]
 rlog_psl_t <- t(rlog_psl)
-
 
 res_tdn <- data.frame(id = character(0), tdn_radj=character(0), tdn_p_val=character(0), tdn_coeff=character(0), tdn_coeff_stand=character(0))
 for (i in 1:ncol(rlog_psl_t)) {
@@ -75,7 +72,6 @@ for (i in 1:ncol(rlog_psl_t)) {
 tdn_sig <- subset(res_tdn, tdn_p_val < 0.05)
 dim(tdn_sig) #71
 
-
 res_zn <- data.frame(id = character(0), zn_radj=character(0), zn_p_val=character(0), zn_coeff=character(0), zn_coeff_stand=character(0))
 for (i in 1:ncol(rlog_psl_t)) {
 	mlr <- lm(rlog_psl_t[,i] ~ Zn, data=map)
@@ -90,7 +86,6 @@ for (i in 1:ncol(rlog_psl_t)) {
 
 zn_sig <- subset(res_zn, zn_p_val < 0.05)
 dim(zn_sig) #14
-
 
 res_protein <- data.frame(id = character(0), protein_radj=character(0), protein_p_val=character(0), protein_coeff=character(0), protein_coeff_stand=character(0))
 for (i in 1:ncol(rlog_psl_t)) {
@@ -107,14 +102,13 @@ for (i in 1:ncol(rlog_psl_t)) {
 protein_sig <- subset(res_protein, protein_p_val < 0.05)
 dim(protein_sig) #4
 
-
 length(intersect(tdn_sig$id, zn_sig$id)) #1
 length(intersect(tdn_sig$id, protein_sig$id)) #2
 length(intersect(protein_sig$id, zn_sig$id)) #0
 
 ```
 
-Heatmap of MLR results.
+Heatmap of linear regression results.
 
 ```{r}
 library(RCurl)
@@ -124,8 +118,7 @@ library(pheatmap)
 res1 <- merge(res_tdn, res_zn, by="id")
 final_pls_table <- merge(res1, res_protein, by="id")
 reg_sign <- subset(final_pls_table, tdn_p_val < 0.05 | zn_p_val < 0.05 | protein_p_val < 0.05)
-
-
+#86
 
 reg_hm <- data.frame(id = character(0), TDN=numeric(0), Zn=numeric(0), Protein=numeric(0))
 options(stringsAsFactors=FALSE)
@@ -163,20 +156,26 @@ is.num <- sapply(reg_hm, is.numeric)
 reg_hm[is.num] <- lapply(reg_hm[is.num], round, 3)
 
 enz_list <- reg_hm$id
-enz_names <- data.frame(ID = character(0), Name = character(0), Def=character(0))	
+
+enz1 <- paste(enz_list, collapse = ',')
+enz2 <- noquote(enz1)
+url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
+names <- getURL(url_get)
+url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
+defs <- getURL(url_get2)
+names_list <- strsplit(names, "\n")
+defs_list <- strsplit(defs, "\n")
+enz_list <- strsplit(enz2, ",")
+
+enz_names <- data.frame(id = character(0), Name = character(0), Def=character(0))	
 options(stringsAsFactors=FALSE)
-for (i in 1:length(enz_list)) {
-	enz <- enz_list[i]
-	enz2 <- noquote(enz)
-	url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
-	names <- getURL(url_get)
-	Sys.sleep(1) 
-	names <- gsub("[\r\n]", "", names)
-	url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
-	defs <- getURL(url_get2)
-	Sys.sleep(1) 
-	defs <- gsub("[\r\n]", "", defs)	
-	enz_names[i, ] <- c(enz, names, defs)
+df_len <- lapply(enz_list[1], length)
+df_len2 <- df_len[[1]]
+for (i in 1:df_len2) {
+	enz <- enz_list[[1]][i]
+	name <- names_list[[1]][i]
+	def <- defs_list[[1]][i]	
+	enz_names[i, ] <- c(enz, name, def)
 }
 
 colnames(enz_names)[1] <- "id"
@@ -190,16 +189,15 @@ reg_hm <- reg_hm[c(-1)]
 reg_hm_mat <- as.matrix(reg_hm)
 
 reg_hm3 <- reg_hm2[c("id", "Def", "TDN", "Zn", "Protein")]
-write.table(reg_hm3, file="plsr_mlr_hm_data.txt", row.names=FALSE, quote=FALSE, sep="\t")
+#write.table(reg_hm3, file="plsr_mlr_hm_data.txt", row.names=FALSE, quote=FALSE, sep="\t")
 
 reg_hm_sort <- reg_hm3[order(reg_hm3$TDN),]
-write.table(reg_hm_sort, file="plsr_mlr_hm_data_sort.txt", row.names=FALSE, quote=FALSE, sep="\t")
-
+#write.table(reg_hm_sort, file="plsr_mlr_hm_data_sort.txt", row.names=FALSE, quote=FALSE, sep="\t")
 
 bk <- c(-1.500, -1.125, -0.750, -0.375, -0.0001, 0.0001, 0.375, 0.750, 1.125, 1.500)  
 col_pal <- c("#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac")
 
-tiff("figures/figure_s3_nolabel.tiff", height=8, width=6, res=600, units = 'in', compression=c("lzw"))
+tiff("figure_s1.tiff", height=8, width=6, res=600, units = 'in', compression=c("lzw"))
 pheatmap(reg_hm_mat, 
 	cluster_row = F,
     cluster_cols = F,

@@ -1,0 +1,88 @@
+pw_name	freq
+NA	115
+ko01230  Biosynthesis of amino acids	9
+ko00051  Fructose and mannose metabolism	8
+ko00520  Amino sugar and nucleotide sugar metabolism	8
+ko00052  Galactose metabolism	7
+ko01200  Carbon metabolism	7
+ko00500  Starch and sucrose metabolism	6
+ko02010  ABC transporters	6
+ko02020  Two-component system	5
+ko00030  Pentose phosphate pathway	4
+ko00240  Pyrimidine metabolism	4
+ko00250  Alanine, aspartate and glutamate metabolism	4
+ko00720  Carbon fixation pathways in prokaryotes	4
+ko00970  Aminoacyl-tRNA biosynthesis	4
+ko00010  Glycolysis / Gluconeogenesis	3
+ko00040  Pentose and glucuronate interconversions	3
+ko00230  Purine metabolism	3
+ko00260  Glycine, serine and threonine metabolism	3
+ko00330  Arginine and proline metabolism	3
+ko00460  Cyanoamino acid metabolism	3
+ko00620  Pyruvate metabolism	3
+ko00910  Nitrogen metabolism	3
+ko00020  Citrate cycle (TCA cycle)	2
+ko00061  Fatty acid biosynthesis	2
+ko00190  Oxidative phosphorylation	2
+ko00270  Cysteine and methionine metabolism	2
+ko00400  Phenylalanine, tyrosine and tryptophan biosynthesis	2
+ko00440  Phosphonate and phosphinate metabolism	2
+ko00511  Other glycan degradation	2
+ko00550  Peptidoglycan biosynthesis	2
+ko00600  Sphingolipid metabolism	2
+ko00630  Glyoxylate and dicarboxylate metabolism	2
+ko00680  Methane metabolism	2
+ko00750  Vitamin B6 metabolism	2
+ko00940  Phenylpropanoid biosynthesis	2
+ko01210  2-Oxocarboxylic acid metabolism	2
+ko01212  Fatty acid metabolism	2
+ko03060  Protein export	2
+ko03070  Bacterial secretion system	2
+ko03410  Base excision repair	2
+ko04141  Protein processing in endoplasmic reticulum	2
+ko04626  Plant-pathogen interaction	2
+ko00253  Tetracycline biosynthesis	1
+ko00290  Valine, leucine and isoleucine biosynthesis	1
+ko00300  Lysine biosynthesis	1
+ko00363  Bisphenol degradation	1
+ko00410  beta-Alanine metabolism	1
+ko00450  Selenocompound metabolism	1
+ko00471  D-Glutamine and D-glutamate metabolism	1
+ko00510  N-Glycan biosynthesis	1
+ko00561  Glycerolipid metabolism	1
+ko00562  Inositol phosphate metabolism	1
+ko00564  Glycerophospholipid metabolism	1
+ko00591  Linoleic acid metabolism	1
+ko00603  Glycosphingolipid biosynthesis - globo series	1
+ko00625  Chloroalkane and chloroalkene degradation	1
+ko00640  Propanoate metabolism	1
+ko00650  Butanoate metabolism	1
+ko00670  One carbon pool by folate	1
+ko00710  Carbon fixation in photosynthetic organisms	1
+ko00760  Nicotinate and nicotinamide metabolism	1
+ko00770  Pantothenate and CoA biosynthesis	1
+ko00780  Biotin metabolism	1
+ko00790  Folate biosynthesis	1
+ko00900  Terpenoid backbone biosynthesis	1
+ko00983  Drug metabolism - other enzymes	1
+ko01054  Nonribosomal peptide structures	1
+ko03010  Ribosome	1
+ko03018  RNA degradation	1
+ko03320  PPAR signaling pathway	1
+ko03420  Nucleotide excision repair	1
+ko04140  Regulation of autophagy	1
+ko04144  Endocytosis	1
+ko04150  mTOR signaling pathway	1
+ko04151  PI3K-Akt signaling pathway	1
+ko04210  Apoptosis	1
+ko04530  Tight junction	1
+ko04612  Antigen processing and presentation	1
+ko04621  NOD-like receptor signaling pathway	1
+ko04914  Progesterone-mediated oocyte maturation	1
+ko04915  Estrogen signaling pathway	1
+ko04917  Prolactin signaling pathway	1
+ko05134  Legionellosis	1
+ko05146  Amoebiasis	1
+ko05150  Staphylococcus aureus infection	1
+ko05200  Pathways in cancer	1
+ko05215  Prostate cancer	1

@@ -5,12 +5,9 @@ output:
     keep_md: true
 ---
 
-# Beta Diversity - Ion Torrent Microbial Metagenomes
-Two methods - median k-mer counts and distribution of ORFs among samples.
-
 ## Median K-mer Count
 
-Use khmer software to compare k-mer profiles of different metagenomes. Load all total metagenomes into counting.
+Use khmer software to compare k-mer profiles of different metagenomes. Load all microbial metagenomes into counting first.
 
 ```{r, engine='bash', results='hide'}
 mkdir microbial_beta_div
@@ -119,7 +116,7 @@ total_animal_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(
   labs(fill = "") +
   theme(legend.key = element_blank())
 
-tiff("figures/figure_s2a_nolabel.tiff", height = 6, width = 12, units='in', res=600)
+tiff("figure_2a.tiff", height = 6, width = 12, units='in', res=600)
 multiplot(total_diet_nmds, total_animal_nmds, cols = 2)
 dev.off()
 ```
@@ -215,7 +212,7 @@ biplot_df2 <- data.frame(text_x = as.numeric(c("-1.04", "-0.9", "0.56")), biplot
 biplot_df3 <- data.frame(text_y = as.numeric(c("0.26", "-0.55", "0.068")), biplot_df2)
 biplot_df3$Label[3] = "Pro"
 
-tiff("figures/total_read_dbRDA.tiff", width = 6, height = 6, units = 'in', res = 300)
+tiff("figure_4a.tiff", width = 6, height = 6, units = 'in', res = 300)
 ggplot(data = site_df2, aes(Dim1, Dim2)) + 
     geom_point(aes(color = diet)) +
   	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
@@ -233,55 +230,42 @@ ggplot(data = site_df2, aes(Dim1, Dim2)) +
 dev.off()
 ```
 
-Get the average pairwise distances between samples.
+Test for differences between intra-steer distances and intra-diet distances in the microbial metagenomes. Intra-diet distances are all distances between samples from the same diet while intra-steer distances are all distances between samples from the same steer. Then use a t-test to show intra-diet distances are not higher than intra-steer distances. The same is not true in the viral communities (see beta_div_viral.Rmd).
 
-```{r, engine='bash'}
-printf "\n27CDS 55CS 55CS 27CDS Control 40MDGS 27CDS 27CDS 55CS 40MDGS Control Control Control 40MDGS 27CDS 55CS 40MDGS 40MDGS Control 55CS" >> microbial_beta_div/config.txt
-printf "\n259 346 3244 222 3257 259 346 3244 222 3257 346 259 3244 222 3257 259 346 3244 222 3257" >> microbial_beta_div/config.txt
-	
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=55CS -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+```{r}
+dm_list <- melt(total_bc_matrix)[melt(upper.tri(total_bc_matrix))$value, ]
+total_map2 <- total_map[c("ID","Animal","Diet")]
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=Corn -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+names(total_map2)[1] <- "Var1"
+dm_list2 <- merge(total_map2, dm_list, by="Var1")
+names(dm_list2)[2] <- "var1_animal"
+names(dm_list2)[3] <- "var1_diet"
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=27CDS -diet2=40MDGS -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+names(total_map2)[1] <- "Var2"
+dm_list2 <- merge(total_map2, dm_list2, by="Var2")
+names(dm_list2)[2] <- "var2_animal"
+names(dm_list2)[3] <- "var2_diet"
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=Corn -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+intra_diet <- dm_list2[dm_list2$var1_diet == dm_list2$var2_diet,]
+intra_animal <- dm_list2[dm_list2$var1_animal == dm_list2$var2_animal,]
+intra_diet$label <- "Intra-Diet"
+intra_animal$label <- "Intra-Animal"
+intra <- rbind(intra_diet, intra_animal)
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=55CS -diet2=40MDGS -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+tiff("figure_3a.tiff", width = 6, height = 6, units = 'in', res = 300)
+ggplot(intra, aes(x = label, y = value)) + 
+    geom_boxplot() + geom_point(position = position_jitter(width = 0.15)) + 
+    labs(x = "", y = "Bray-Curtis Dissimilarity\n") + guides(fill = FALSE) + 
+    theme(axis.text.x = element_text(colour = "black", size=19), axis.title.y = element_text(size = 19), 
+        axis.ticks = element_blank())
+dev.off()
 
-perl scripts/get_pairwise_dist_diet.pl -diet1=Corn -diet2=40MDGS -distance=microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -config=microbial_beta_div/config.txt
+t.test(intra_diet$value, intra_animal$value)
 ```
 
 ## Open Reading Frames
 
 Same approach as above, just using the abundance of ORFs across samples instead of median k-mer counts.
-
-```{r, engine='bash', results='hide'}
-for f in bmg_blast2tsv/*orf_abundance.txt
-do
-	filename=$(basename "$f")
-	filename="${filename%.txt}"
-	biom convert --table-type="OTU table" --to-json -i $f -o bmg_blast2tsv/$filename.biom
-done
-
-merge_otu_tables.py -i bmg_blast2tsv/BMG.10.orf_abundance.biom,bmg_blast2tsv/BMG.11.orf_abundance.biom,bmg_blast2tsv/BMG.12.orf_abundance.biom,bmg_blast2tsv/BMG.13.orf_abundance.biom,bmg_blast2tsv/BMG.14.orf_abundance.biom,bmg_blast2tsv/BMG.15.orf_abundance.biom,bmg_blast2tsv/BMG.16.orf_abundance.biom,bmg_blast2tsv/BMG.17.orf_abundance.biom,bmg_blast2tsv/BMG.18.orf_abundance.biom,bmg_blast2tsv/BMG.19.orf_abundance.biom,bmg_blast2tsv/BMG.1.orf_abundance.biom,bmg_blast2tsv/BMG.20.orf_abundance.biom,bmg_blast2tsv/BMG.2.orf_abundance.biom,bmg_blast2tsv/BMG.3.orf_abundance.biom,bmg_blast2tsv/BMG.4.orf_abundance.biom,bmg_blast2tsv/BMG.5.orf_abundance.biom,bmg_blast2tsv/BMG.6.orf_abundance.biom,bmg_blast2tsv/BMG.7.orf_abundance.biom,bmg_blast2tsv/BMG.8.orf_abundance.biom,bmg_blast2tsv/BMG.9.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance.biom
-	
-biom summarize-table -i bmg_blast2tsv/BMG.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance_summarize.txt
-
-biom convert -i bmg_blast2tsv/BMG.orf_abundance.biom -o bmg_blast2tsv/BMG.orf_abundance.txt --table-type="OTU table" --to-tsv
-
-awk '{print $1,$2/631225,$3/2261004,$4/1591514,$5/972805,$6/2475541,$7/734576,$8/2011286,$9/509528,$10/1240812,$11/995310,$12/931099,$13/888555,$14/1331228,$15/2070496,$16/3165966,$17/666970,$18/2344185,$19/484852,$20/884957,$21/667046}' bmg_blast2tsv/BMG.orf_abundance.txt > bmg_blast2tsv/BMG.orf_abundance.norm.txt
- 	
-printf "ID BMG.10 BMG.11 BMG.12 BMG.13 BMG.14 BMG.15 BMG.16 BMG.17 BMG.18 BMG.19 BMG.1 BMG.20 BMG.2 BMG.3 BMG.4 BMG.5 BMG.6 BMG.7 BMG.8 BMG.9\n" > bmg_blast2tsv/BMG.orf_table.txt
-	
-awk 'NR>2 {print}' bmg_blast2tsv/BMG.orf_abundance.norm.txt >> bmg_blast2tsv/BMG.orf_table.txt
-	
-tr ' ' \\t < bmg_blast2tsv/BMG.orf_table.txt > bmg_blast2tsv/BMG.orf_table.tab.txt
-	
-biom convert -i bmg_blast2tsv/BMG.orf_table.tab.txt -o bmg_blast2tsv/BMG.orf_table.tab.biom --table-type="OTU table" --to-json
-```
-
-Calculate Bray-Curtis dissimilarity and plot NMDS.
 
 ```{r, engine='bash', results='hide'}
 beta_diversity.py -i bmg_blast2tsv/BMG.orf_table.tab.biom -o bmg_blast2tsv/BMG.orf_table_bc -m bray_curtis
@@ -296,9 +280,7 @@ total_bc_dist <- as.dist(total_bc_matrix)
 	
 total_map <- read.table("total_mapping.txt", sep="\t", header=TRUE)
 total_map$Animal <- as.factor(total_map$Animal)
-```
 
-```{r}
 total_nmds <- read.table("bmg_blast2tsv/BMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
 colnames(total_nmds)[1] <- "ID"
 total_nmds_map <- merge(total_nmds, total_map, by = "ID")

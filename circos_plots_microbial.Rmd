@@ -1,19 +1,18 @@
 ---
-title: "Total Metagenome Circos Plots"
+title: "microbial Metagenome Circos Plots"
 output:
   html_document:
     keep_md: true
 ---
 
-# Generate Tables for Circos Plots - Total Metagenome
 The code below calculates how reads are shared between samples and diets to generate tables that can be used to construct the Circos plots from the manuscript with a GUI (website - directions to do so at the bottom of this notebook). Results may differ slighly from what is observed in the manuscript due to differences in subsampling events.
 
 ## Sample-Sample Comparisons
 
 ```{r, engine='bash', results='hide'}
-cd cd_hit_454_output_total/
+cd microbial_qc/
  
-for f in *.fna
+for f in *finalQC.fna
 do
   filename=$(basename "$f")
   filename="${filename%.*}"
@@ -24,9 +23,8 @@ for f in *subsample.fna
 do
     filename=$(basename "$f")
     filename="${filename%.*}"
-    load-into-counting.py -k 20 -N 4 -x 1e9 --report-total-kmers -s tsv "$filename""_subsample_k20.kh" $f
+    load-into-counting.py -k 20 -N 4 -x 1e9 --report-microbial-kmers -s tsv "$filename""_subsample_k20.kh" $f
 done
-
 
 ls *subsample_k20.kh | awk '{ ORS=" "; print; }' > config_sub.txt
 printf "\n" >> config_sub.txt
@@ -42,20 +40,20 @@ printf "\n259 346 3244 222 3257 259 346 3244 222 3257 346 259 3244 222 3257 259 
 cd ..
 ```
 
-Following script calcualtes the median shared k-mer content between each pair of samples. The script only considers reads that are shared with at least one other sample to avoid potential impact of sequencing errors on the interpretation.
+Following script calcualtes the median shared k-mer content between each pair of samples. The script only considers reads that are shared with at least one other sample to avoid potential impact of sequencing errors on the interpretation. Shared is defined as a median k-mer count >1.
 
 ```{r, engine='bash'}
-perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=cd_hit_454_output_total -threshold=1
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=qc_microbial -threshold=1
 
-mv *.comb.keep.txt cd_hit_454_output_total/
+mv *.comb.keep.txt microbial_qc/
 
-python scripts/circos_make_table.py -d cd_hit_454_output_total/ -c cd_hit_454_output_total/config_sub.txt -i T -s subsample.fna.comb.keep.txt > total_circos_list_sub.txt
+python scripts/circos_make_table.py -d microbial_qc/ -c microbial_qc/config_sub.txt -i T -s subsample.fna.comb.keep.txt > microbial_circos_list_sub.txt
 ```
 
 ```{r, cache=FALSE}
 options(stringsAsFactors=FALSE)
 matrix_out <- data.frame(matrix(NA, nrow = 20, ncol = 20))
-pw <- read.table("total_circos_list_sub.txt", sep="\t", header=FALSE)
+pw <- read.table("microbial_circos_list_sub.txt", sep="\t", header=FALSE)
 r_c_names <- unique(pw$V1)
 row.names(matrix_out) <- r_c_names
 colnames(matrix_out) <- r_c_names
@@ -64,31 +62,31 @@ for(i in 1:nrow(pw)) {
 	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
 }
 
-write.table(matrix_out, file="total_circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+write.table(matrix_out, file="microbial_circos_table_sub.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
 ```
 
 ```{r, engine='bash'}
-sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' total_circos_table_sub.txt > total_circos_table2_sub.txt
+sed -E $'s/\tCorn-3257/labels\tCorn-3257/g' microbial_circos_table_sub.txt > microbial_circos_table2_sub.txt
 
-printf "labels\n255,211,0\n0,159,107\n196,2,51\n196,2,51\n0,135,189\n196,2,51\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n255,211,0\n0,135,189\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n255,211,0\n0,159,107\n196,2,51\n255,211,0" > total_circos_row_colors.txt
-paste total_circos_row_colors.txt total_circos_table2_sub.txt > circos_total_all_samples_upload.txt
+printf "labels\n255,211,0\n0,159,107\n196,2,51\n196,2,51\n0,135,189\n196,2,51\n0,135,189\n0,159,107\n0,135,189\n255,211,0\n255,211,0\n0,135,189\n196,2,51\n0,159,107\n0,135,189\n0,159,107\n255,211,0\n0,159,107\n196,2,51\n255,211,0" > microbial_circos_row_colors.txt
+paste microbial_circos_row_colors.txt microbial_circos_table2_sub.txt > circos_microbial_all_samples_upload.txt
 
-printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > total_circos_row_colors_27cds.txt
-paste total_circos_row_colors_27cds.txt total_circos_table2_sub.txt > circos_total_27cds_upload.txt
+printf "labels\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n0,135,189\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211" > microbial_circos_row_colors_27cds.txt
+paste microbial_circos_row_colors_27cds.txt microbial_circos_table2_sub.txt > circos_microbial_27cds_upload.txt
 
-printf "labels\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211" > total_circos_row_colors_55cs.txt
-paste total_circos_row_colors_55cs.txt total_circos_table2_sub.txt > circos_total_55cs_upload.txt
+printf "labels\n211,211,211\n211,211,211\n196,2,51\n196,2,51\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n196,2,51\n211,211,211" > microbial_circos_row_colors_55cs.txt
+paste microbial_circos_row_colors_55cs.txt microbial_circos_table2_sub.txt > circos_microbial_55cs_upload.txt
 
-printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211" > total_circos_row_colors_40mdgs.txt
-paste total_circos_row_colors_40mdgs.txt total_circos_table2_sub.txt > circos_total_40mdgs_upload.txt
+printf "labels\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n0,159,107\n211,211,211\n211,211,211" > microbial_circos_row_colors_40mdgs.txt
+paste microbial_circos_row_colors_40mdgs.txt microbial_circos_table2_sub.txt > circos_microbial_40mdgs_upload.txt
 
-printf "labels\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n255,211,0" > total_circos_row_colors_corn.txt
-paste total_circos_row_colors_corn.txt total_circos_table2_sub.txt > circos_total_corn_upload.txt
+printf "labels\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n255,211,0\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n211,211,211\n255,211,0\n211,211,211\n211,211,211\n255,211,0" > microbial_circos_row_colors_corn.txt
+paste microbial_circos_row_colors_corn.txt microbial_circos_table2_sub.txt > circos_microbial_corn_upload.txt
 ```
 
 ## Diet-Diet Comparisons
 ```{r, engine='bash', results='hide'}
-cd cd_hit_454_output_total/
+cd microbial_qc/
 mkdir sub_sample_comb
 mv *.comb.keep.txt sub_sample_comb
 mv *subsample.fna.comb sub_sample_comb
@@ -122,21 +120,21 @@ cd ..
 ```
 
 ```{r, engine='bash'}
-perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=cd_hit_454_output_total -threshold=1
+perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=qc_microbial -threshold=1
 
-mv *.comb.keep.txt cd_hit_454_output_total/
+mv *.comb.keep.txt qc_microbial/
 
-python scripts/circos_make_table.py -d cd_hit_454_output_total/ -c cd_hit_454_output_total/config_cat_sub.txt -i F -s sub_cat.fna.comb.keep.txt > total_circos_list_sub_cat.txt
+python scripts/circos_make_table.py -d qc_microbial/ -c qc_microbial/config_cat_sub.txt -i F -s sub_cat.fna.comb.keep.txt > microbial_circos_list_sub_cat.txt
 
-mkdir cd_hit_454_output_total/sub_diet_comb
-mv cd_hit_454_output_total/*sub_cat.fna.comb.keep.txt cd_hit_454_output_total/sub_diet_comb
-mv cd_hit_454_output_total/*sub_cat.fna.comb cd_hit_454_output_total/sub_diet_comb
+mkdir qc_microbial/sub_diet_comb
+mv qc_microbial/*sub_cat.fna.comb.keep.txt qc_microbial/sub_diet_comb
+mv qc_microbial/*sub_cat.fna.comb qc_microbial/sub_diet_comb
 ```
 
 ```{r, cache=FALSE}
 options(stringsAsFactors=FALSE)
 matrix_out <- data.frame(matrix(NA, nrow = 4, ncol = 4))
-pw <- read.table("total_circos_list_sub_cat.txt", sep="\t", header=FALSE)
+pw <- read.table("microbial_circos_list_sub_cat.txt", sep="\t", header=FALSE)
 r_c_names <- unique(pw$V1)
 row.names(matrix_out) <- r_c_names
 colnames(matrix_out) <- r_c_names
@@ -145,15 +143,15 @@ for(i in 1:nrow(pw)) {
 	matrix_out[pw$V1[i], pw$V2[i]] = pw$V3[i]
 }
 
-write.table(matrix_out, file="total_circos_table_sub_cat.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
+write.table(matrix_out, file="microbial_circos_table_sub_cat.txt", sep="\t", row.names=TRUE, col.names=NA, quote=FALSE)
 ```
 
 ```{r, engine='bash'}
-sed -E $'s/\t40MDGS/labels\t40MDGS/g' total_circos_table_sub_cat.txt > total_circos_table_sub_cat2.txt
+sed -E $'s/\t40MDGS/labels\t40MDGS/g' microbial_circos_table_sub_cat.txt > microbial_circos_table_sub_cat2.txt
 
-printf "labels\n0,159,107\n196,2,51\n0,135,189\n255,211,0" > total_circos_row_colors_cat.txt
+printf "labels\n0,159,107\n196,2,51\n0,135,189\n255,211,0" > microbial_circos_row_colors_cat.txt
 
-paste total_circos_row_colors_cat.txt total_circos_table_sub_cat2.txt > circos_total_diets_upload.txt
+paste microbial_circos_row_colors_cat.txt microbial_circos_table_sub_cat2.txt > circos_microbial_diets_upload.txt
 ```
 
 ## Circos GUI
@@ -171,12 +169,8 @@ Click save. Switch to the visualize tab.
 
 Six files for upload:
 
-- circos_total_all_samples_upload.txt (Figure __ in manuscript.)
-- circos_total_corn_upload.txt (Figure __ in manuscript.)
-- circos_total_55cs_upload.txt (Figure __ in manuscript.)
-- circos_total_40mdgs_upload.txt (Figure __ in manuscript.)
-- circos_total_27cds_upload.txt (Figure __ in manuscript.)
-- circos_total_diets_upload.txt (Figure __ in manuscript.)
+- circos_microbial_all_samples_upload.txt
+- circos_microbial_diets_upload.txt
 
 Under section 2A, upload each file and check "col with row colors".
 

@@ -19,36 +19,37 @@ Not using a loop beacuse outputting names that match mapping files and code used
 
 ```{r, engine='bash', results='hide'}
 mkdir viral_qc
+chmod 775 Trimmomatic-0.33/*
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V1.fastq viral_qc/V1_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V1.fastq viral_qc/V1_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V2.fastq viral_qc/V2_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V2.fastq viral_qc/V2_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V3.fastq viral_qc/V3_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V3.fastq viral_qc/V3_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V4.fastq viral_qc/V4_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V4.fastq viral_qc/V4_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V5.fastq viral_qc/V5_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:100 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V5.fastq viral_qc/V5_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:100 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V6.fastq viral_qc/V6_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V6.fastq viral_qc/V6_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V7.fastq viral_qc/V7_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V7.fastq viral_qc/V7_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V8.fastq viral_qc/V8_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V8.fastq viral_qc/V8_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V9.fastq viral_qc/V9_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V9.fastq viral_qc/V9_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V10.fastq viral_qc/V10_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V10.fastq viral_qc/V10_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V11.fastq viral_qc/V11_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V11.fastq viral_qc/V11_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
 java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V12.fastq viral_qc/V12_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
 java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V13.fastq viral_qc/V13_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V14.fastq viral_qc/V14_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V14.fastq viral_qc/V14_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 
-java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V15.fastq viral_qc/V15_trimm.fastq ILLUMINACLIP:transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
+java -jar Trimmomatic-0.33/trimmomatic-0.33.jar SE -phred33 raw_viral/V15.fastq viral_qc/V15_trimm.fastq ILLUMINACLIP:Trimmomatic-0.33/transp_adapt_remove.cat.txt:2:20:10 CROP:175 MINLEN:75
 ```
 
 To remove artifical duplicates we use cd-hit-454.  We noticed early on the transposon library preps with the Ion Torrent Museek kits introduces (unfortunately sometimes many) duplicates (associated with viral sample?). While the software was originally designed for 454 sequencing, Ion Torrent shares many of the same error profiles as 454 and cd-hit-454 appears to work fairly well for removing duplicates in our data.
@@ -59,7 +60,7 @@ export OMP_NUM_THREADS=10
 for f in viral_qc/*.fastq
 do
   filename=$(basename "$f")
-  filename="${filename%.*}"
+  filename="${filename%_*}"
   cd-hit-454 -i $f -o viral_qc/"$filename""_cd454.fastq" -M 6100 -T 10
 done
 ```
@@ -67,7 +68,7 @@ done
 Now, we wanted to check for other types of duplicates and some that may have been missed by cd-hit-454. Further, we can use prinseq to remove transposon associated seqeunces that kept showing up in the 3' end.
 
 ```{r, engine='bash', results='hide'}
-for f in viral_qc/*.fastq
+for f in viral_qc/*_cd454.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
@@ -78,7 +79,7 @@ done
 Use prefix length to remove duplicates with exact matches over first 75 basepairs.
 
 ```{r, engine='bash', results='hide'}
-for f in viral_qc/*.fastq
+for f in viral_qc/*_prinseq.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
@@ -89,13 +90,13 @@ done
 Use qiime to remove those identified as prefix duplicates and khmer to get a FASTA version.
 
 ```{r, engine='bash', results='hide'}
-for f in viral_qc/*truncatederep.fasta
+for f in viral_qc/*_truncatederep.fasta
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
-  grep ">" $f | cut -c 2- > "$filename"_keep_ids.txt
-  filter_fasta.py -f "$filename"_prinseq.fastq -s "$filename"_keep_ids.txt -o "$filename"_finalQC.fastq
-  fastq-to-fasta.py "$filename"_finalQC.fastq -o "$filename"_finalQC.fna
+  grep ">" $f | cut -c 2- > viral_qc/"$filename"_keep_ids.txt
+  filter_fasta.py -f viral_qc/"$filename"_prinseq.fastq -s viral_qc/"$filename"_keep_ids.txt -o viral_qc/"$filename"_finalQC.fastq
+  fastq-to-fasta.py viral_qc/"$filename"_finalQC.fastq -o viral_qc/"$filename"_finalQC.fna
 done
 ```
 
@@ -107,14 +108,14 @@ grep -c ">" viral_qc/*finalQC.fna
 
 Look at rRNA contamination rates. For some reason I can only get this to run from within the examples folder.  So, move all the fasta files generated to the examples folder within rRNA predictor.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 mkdir rRNA_prediction/examples/e1/viral_input
 mkdir rRNA_prediction/examples/e1/viral_output
-cp illumina_qc/*.cat.fna rRNA_prediction/examples/e1/viral_input/
-
+cp viral_qc/*.fna rRNA_prediction/examples/e1/viral_input/
+RRNA=`cd rRNA_prediction/rRNA_hmm_fs_wst_v0; pwd`
+export PATH=$PATH:$RRNA
 cd rRNA_prediction/examples/e1
-export PATH=//work/samodha/canderson3/rRNA_prediction/rRNA_hmm_fs_wst_v0:$PATH
-/work/samodha/canderson3/rRNA_prediction/scripts/rRNA_hmm_run_wst_v0.pl  viral_input viral_output
+../../scripts/rRNA_hmm_run_wst_v0.pl  viral_input viral_output
 cd ../../..
 ```
 
@@ -122,6 +123,8 @@ Check the number of rRNA hits for each sample using custom script to parse outpu
 
 ```{r, engine='bash'}
 for f in rRNA_prediction/examples/e1/viral_output/*.coord
-  scripts/./parse_rRNA_output.pl -rrna $f
+do
+  echo $f
+  perl scripts/parse_rRNA_output.pl -rrna $f
 done
 ```

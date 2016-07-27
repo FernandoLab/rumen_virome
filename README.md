@@ -12,16 +12,14 @@ Generally, the markdown files rely on previously generate outputs, so rendering 
 	4. qc_deep_viral.Rmd
 	5. assembly_and_orfs.Rmd
 	6. map_reads.Rmd
-	7. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
-	8. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory downloaded with setup.sh script)
+	7. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
+	8. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
 	9. beta_div_viral.Rmd
 	10. beta_div_microbial.Rmd
 	11. circos_plots_viral.Rmd
 	12. circos_plots_microbial.Rmd
 	13. plsr.Rmd
-	14. filter_viral.Rmd
-	15. enzyme_analysis.Rmd
-	16. taxonomy.Rmd
+	14. enzyme_enrichment.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
 
 Due to licensing issues, USEARCH can not be included in the setup. To obtain a download link, go to the USEARCH download page and select version USEARCH v8.0.1623 for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
 
@@ -43,6 +41,3 @@ Anaconda is downloaded and prompts you during installataion of the packages. The
 
 To render one of the RMarkdown files:
 R CMD BATCH --no-restore --no-save '--args file1.Rmd' render.R
-
-Rendered results can be found in this repository with file extension .md or .html.
-

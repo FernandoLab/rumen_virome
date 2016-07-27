@@ -5,25 +5,36 @@ output:
     keep_md: true
 ---
 
-Different QC steps (minor, mostly in how we trim off adaptors and dealing with ambiguous bases/homopolymers that were dealt with by the torrent server previously) were used for the illumina viral metagenome data. Once again, there apperas to be duplication issues associated with the transposon preps presumambly, so we must be careful in dealing with them to ensure their removal. There were a few rounds of sequencing multiplexed with other samples, and hence trimming a few different files and then combining the reads.
+Different QC steps (minor, mostly in how we trim off adaptors and dealing with ambiguous bases/homopolymers that were dealt with by the torrent server previously) were used for the illumina viral metagenome data. Once again, there apperas to be duplication issues associated with the transposon preps presumambly, so we must be careful in dealing with them to ensure their removal. There were a few rounds of sequencing multiplexed with other samples, and hence trimming a few different files and then combining the reads. However, presumambly due to a mistake by me when uploading to the SRA, all runs got concatenated together into one FASTQ file. I'm trying to get this corrected, but for now I just figured out the order of the runs in the FASTQ file and wrote a script to split them apart. Splitting the samples into their sequencing runs was done right away because the second step of QC requires the free USEARCH 32-bit version and it has a memory limit (files too large if not split by run.)
 
-Not using a loop beacuse outputting names that match mapping files and code used in the analysis. These names are not congruent with the SRA file names. Also some files require different quality filtering due to run specific quality patterns.
+
+```{r, engine='bash', results='hide'}
+python scripts/split_sra_runs.py
+```
 
 ```{r, engine='bash', results='hide'}
 mkdir deep_viral_qc
 
-cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run1_R1_trim.fastq raw_deep_viral/deep_viral_p2_A3257_27cds_run1_S1_L001_R1_001.fastq.gz
+for f in raw_deep_viral/*_R1.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  cutadapt -n 2 -u -25 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/"$filename""_R1_trim.fastq" $f
+done
 
-cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/V4_run1_R2_trim.fastq raw_deep_viral/deep_viral_p2_A3257_27cds_run1_S1_L001_R2_001.fastq.gz
+for f in raw_deep_viral/*_R2.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  cutadapt -n 2 -u -100 -b TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTGACGCTGCCGACGA -b GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCTCCGAGCCCACGAGAC -b AGATGTGTATAAGAGACAG -b CTGTCTCTTATACACATCT -o deep_viral_qc/"$filename""_R2_trim.fastq" $f
+done
 
 ```
 
-Remove seqeunces that have an estimated error rate >1%:
+Remove seqeunces that have an estimated error rate >1%.
 
 ```{r, engine='bash', results='hide'}
-mkdir deep_viral_qc
-
-for f in deep_viral_qc/*_trim.fastq
+for f in deep_viral_qc/*.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
@@ -31,7 +42,7 @@ do
 done
 ```
 
-merge read1 and read2 together, many of reverse reads lost due to quality falling off early in V3 chemistry, not worth getting pairs back together.
+Merge read1 and read2 together from the same run, many of reverse reads lost due to quality falling off early in V3 chemistry, not worth getting pairs back together.
 
 ```{r, engine='bash', results='hide'}
 for f in deep_viral_qc/*_R1_error.fastq
@@ -49,33 +60,32 @@ for f in deep_viral_qc/*_R1_R2_error.fastq
 do
   filename=$(basename "$f")
 	filename="${filename%_*}"
-	prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good deep_viral_qc/"$filename""_R1_R2_truncatederep"
-	grep ">" deep_viral_qc/"$filename""_R1_R2_truncatederep.fasta" | cut -c 2- > deep_viral_qc/"$filename""_R1_R2_keep_ids.txt"
-	filter_fasta.py -f $f -s deep_viral_qc/"$filename""_R1_R2_keep_ids.txt" -o deep_viral_qc/"$filename""_R1_R2_finalQC.fastq"
+	prinseq-lite.pl -trim_to_len 80 -derep 1 -fastq $f -out_format 2 -out_good deep_viral_qc/"$filename""_truncatederep"
+	grep ">" deep_viral_qc/"$filename""_truncatederep.fasta" | cut -c 2- > deep_viral_qc/"$filename""_keep_ids.txt"
+	filter_fasta.py -f $f -s deep_viral_qc/"$filename""_keep_ids.txt" -o deep_viral_qc/"$filename""_finalQC.fastq"
 done
 ```
 
-Combine reads from all runs together for each sample.
+Combine reads from all runs together.
 
-```{r, engine='bash'}
-function pref
-{
-  for filename in deep_viral_qc/*R1_R2_finalQC.fastq
-  do
-    echo "${filename%_run1_*}"
-  done | sort -u
-}
+```{r, engine='bash', results='hide'}
+cat deep_viral_qc/V4_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V4_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V4_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V4_illumina_finalQC.fastq
 
-pref | while read pref
-do
-   $pref_*_finalQC.fastq > cat $pref.illumina.cat.fastq
-done
+cat deep_viral_qc/V9_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V9_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V9_illumina_run3_R1_R2_finalQC.fastq > deep_viral_qc/V9_illumina_finalQC.fastq
+
+cat deep_viral_qc/V10_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V10_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V10_illumina_run3_R1_R2_finalQC.fastq deep_viral_qc/V10_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V10_illumina_finalQC.fastq
+
+cat deep_viral_qc/V11_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V11_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V11_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V11_illumina_finalQC.fastq
+
+cat deep_viral_qc/V12_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V12_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V12_illumina_run3_R1_R2_finalQC.fastq deep_viral_qc/V12_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V12_illumina_finalQC.fastq
+
+cat deep_viral_qc/V13_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run3_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V13_illumina_finalQC.fastq
 ```
 
 Get a FASTA version.
 
 ```{r, engine='bash', results='hide'}
-for f in deep_viral_qc/*.cat.fastq
+for f in deep_viral_qc/*illumina_finalQC.fastq
 do
   filename=$(basename "$f")
   filename="${filename%.*}"
@@ -86,19 +96,20 @@ done
 Resulting read numbers.
 
 ```{r, engine='bash'}
-grep -c ">" deep_viral_qc/*.cat.fna
+grep -c ">" deep_viral_qc/*illumina_finalQC.fna
 ```
 
 
 Look at viral contamination. Same procedure, just focusing on reads from the MiSeq data.
 
-```{r, engine='bash'}
+```{r, engine='bash', results='hide'}
 mkdir rRNA_prediction/examples/e1/deep_viral_input
-mkdir rRNA_prediction/examples/e1/deep_viral_output  
-cp *.illumina.cat.fna rRNA_prediction/examples/e1/deep_viral_input/
+mkdir rRNA_prediction/examples/e1/deep_viral_output
+cp deep_viral_qc/*illumina_finalQC.fna rRNA_prediction/examples/e1/deep_viral_input/
+RRNA=`cd rRNA_prediction/rRNA_hmm_fs_wst_v0; pwd`
+export PATH=$PATH:$RRNA
 cd rRNA_prediction/examples/e1
-export PATH=//work/samodha/canderson3/rRNA_prediction/rRNA_hmm_fs_wst_v0:$PATH
-/work/samodha/canderson3/rRNA_prediction/scripts/rRNA_hmm_run_wst_v0.pl deep_viral_input deep_viral_output
+../../scripts/rRNA_hmm_run_wst_v0.pl deep_viral_input deep_viral_output
 cd ../../..
 ```
 
@@ -106,6 +117,8 @@ Check the results.
 
 ```{r, engine='bash'}
 for f in rRNA_prediction/examples/e1/deep_viral_output/*.coord
-  scripts/./parse_rRNA_output.pl -rrna $f
+do
+  echo $f
+  perl scripts/parse_rRNA_output.pl -rrna $f
 done
 ```
