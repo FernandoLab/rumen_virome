@@ -33,7 +33,7 @@ prinseq-lite.pl -fasta vmg.orfs_nt.fasta -min_len 300 -out_format 1 -out_good vm
 filter_fasta.py -f vmg.orfs_aa.fasta -a vmg.orfs_nt.filter.fasta -o vmg.orfs_aa.filter.fasta
 ```
 
-## Microbial Metagenome - Ion Torrent Data
+## Microbial Metagenome
 
 Assembly the microbial metagenome data using Spades.
 

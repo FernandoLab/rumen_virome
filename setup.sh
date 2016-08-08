@@ -37,7 +37,6 @@ wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackc
 bash Anaconda-2.3.0-Linux-x86_64.sh
 anaconda/bin/conda create -n rumenVirome python=2.7 qiime=1.9.1
 source anaconda/bin/activate rumenVirome
-#cp pinned anaconda/conda-meta
 
 # r
 conda install -c r rpy2=2.5.6 r-devtools=1.9.1 r-curl=0.9.4
@@ -94,8 +93,8 @@ wget https://raw.githubusercontent.com/idekerlab/cy-rest-R/develop/utility/cytos
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
-
 conda install bioconductor-genomicranges=1.20.8
+conda install -c asmeurer r-rcpparmadillo=0.5.600.2.0
 wget https://bioc.ism.ac.jp/packages/3.1/bioc/src/contrib/DESeq2_1.8.2.tar.gz
 R CMD INSTALL DESeq2_1.8.2.tar.gz
 
