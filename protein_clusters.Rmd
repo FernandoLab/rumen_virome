@@ -1,0 +1,69 @@
+---
+title: "Protein Clusters"
+output:
+  html_document:
+    keep_md: true
+---
+
+Self cluster the ORFs in the microbial and viral/deep viral datasets to generate protein clusters. Protein clusters can be used to access diversity within and between samples within a dataset.
+
+```{r, engine='bash'}
+cd-hit -i vmg.ion_illumina.orfs_aa.filter.fasta -o vmg.ion_illumina.orfs_aa.filter.pcs.fasta -g 1 -n 4 -M 30000 -d 0 -T 10 -c 0.6 -aS 0.8
+
+cd-hit -i bmg.orfs_aa.filter.fasta -o bmg.orfs_aa.filter.pcs.fasta -g 1 -n 4 -M 30000 -d 0 -T 10 -c 0.6 -aS 0.8
+
+# fix header line issues
+sed -e "s/ //g" < vmg.ion_illumina.orfs_aa.filter.pcs.fasta.clstr > vmg.ion_illumina.orfs_aa.filter.pcs.fasta.filter.clstr
+
+sed -e "s/ //g" < bmg.orfs_aa.filter.pcs.fasta.clstr > bmg.orfs_aa.filter.pcs.fasta.filter.clstr 
+
+# calcualtes abundance of PCs based on ORF abundance
+# if singleton, then must be present in at least three samples or else removed
+python get_pc_abundance.py --orf_ab_table=vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.txt  --pc_cluster=vmg.ion_illumina.orfs_aa.filter.pcs.fasta.filter.clstr  --thresh 3
+mv pc_cluster_abundance.txt viral_ion_illumina_pc_cluster_raw_abundance.txt
+
+python get_pc_abundance.py --orf_ab_table=vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.txt --pc_cluster=vmg.ion_illumina.orfs_aa.filter.pcs.fasta.filter.clstr --thresh 1
+mv pc_cluster_abundance.txt viral_ion_illumina_pc_cluster_raw_abundance_singletons.txt
+
+python get_pc_abundance.py --orf_ab_table=bmg_orfs_bowtie/BMG.orf_raw_abundance.txt --pc_cluster=bmg.orfs_aa.filter.pcs.fasta.filter.clstr --thresh 3
+mv pc_cluster_abundance.txt microbial_pc_cluster_raw_abundance.txt
+
+python get_pc_abundance.py --orf_ab_table=bmg_orfs_bowtie/BMG.orf_raw_abundance.txt --pc_cluster=bmg.orfs_aa.filter.pcs.fasta.filter.clstr --thresh 1
+mv pc_cluster_abundance.txt microbial_pc_cluster_raw_abundance_singletons.txt
+
+#get earth virome
+wget http://portal.nersc.gov/dna/microbial/prokpubs/EarthVirome_DP/mVGs_sequences_v2.fna
+
+#uncompress phast db
+unzip virus.db.zip
+
+#uncompress POV db
+tar -zxvf POV_all_clusters.lg.tar.gz
+
+# cluster all viral orfs (ion + illumina) with POV/phast/earth_virome
+# first predict ORFs from earth virome contigs then cat with other dbs
+prodigal -i mVGs_sequences_v2.fna -d mVGs_sequences_v2_nt.fasta -a mVGs_sequences_v2_aa.fasta  -p meta 
+
+cat POV_all_clusters.fa mVGs_sequences_v2_aa.fasta virus.db > pc_compare.fasta
+# 7281927
+
+awk '!/^>/ { next } { getline seq } length(seq) >= 60 { print $0 "\n" seq }' pc_compare.fasta > pc_compare.filter.fasta
+# 7058048
+
+
+cd-hit-v4.6.1-2012-08-27/cd-hit-2d -i pc_compare.filter.fasta -i2 vmg.ion_illumina.orfs_aa.filter.fasta -o vmg.ion_illumina.orfs_aa.pc_compare_novel.fasta -c 0.6 -aS 0.8 -g 1 -n 4 -d 0 -M 30000
+
+grep -c ">" vmg.ion_illumina.orfs_aa.filter.fasta
+#755820
+
+grep -c "viral_NODE_" vmg.ion_illumina.orfs_aa.pc_compare_novel.fasta.clstr
+#26270
+#3.475695271361% of ORFs
+
+```	
+
+Calculate the core and exclusive core PCs for viral and microbial datasets.
+
+```{r, engine='bash'}
+python calc_core_pc.py 
+```

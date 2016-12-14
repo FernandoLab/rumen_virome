@@ -1,0 +1,178 @@
+---
+title: "Virsorter"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r, engine='bash'}
+prinseq-lite.pl -fasta vmg.illumina.contigs.fasta -min_len 1500 -out_format 1 -out_good vmg.illumina.contigs.1500
+
+#ran virsorter using iplant_wrapper script on github. Accessed 9/8/16.
+
+#get cat1 and cat2 virsorter features and use to filter for ORFs of interest
+python extract_virsorter_features.py --virsorter_csv=VIRSorter_global-phage-signal_1.5kb_viromes.csv --contig_fasta=vmg.illumina.contigs.1500.fasta --orf_fasta=vmg.illumina.orfs_aa.filter.fasta 
+
+mv virsorter_orf.fasta vmg.illumina.orfs_aa.filter.virsorter.fasta
+mv virsorter_contig.fasta vmg.illumina.contigs.filter.virsorter.fasta
+
+#wget http://phast.wishartlab.com/phage_finder/DB/prophage_virus.db
+#sept 12 2016
+
+#awk '/^>/{id=$0;getline;arr[id]=$0}END{for(id in arr)printf("%s\n%s\n",id,arr[id])}' prophage_virus.db > prophage_virus_derep.db
+
+cat /work/samodha/canderson3/keggV69.genes.pep.txt prophage_virus_derep.db > kegg_phast.fasta
+
+#use ublast instead. Using substription version so database fits into memory. Cant reproduce as a result.
+
+usearch7.0.10 -makeudb_ublast kegg_phast.fasta -output kegg_phast.udb
+
+usearch7.0.10 -ublast vmg.illumina.orfs_aa.filter.virsorter.fasta -db kegg_phast.udb -evalue 0.0001 -blast6out vmg.illumina.orfs_aa.filter.virsorter.kegg_phast_ublast.txt -strand both -top_hits_only -threads 10
+
+
+#makeblastdb -in kegg_phast.fasta -dbtype prot -parse_seqids
+#blastp -db kegg_phast.fasta -query vmg.illumina.orfs_aa.filter.virsorter.fasta -out vmg.illumina.orfs_aa.filter.virsorter.blastp_kegg.txt -evalue 0.00001 -outfmt "6 std qcovs qcovhsp" -max_target_seqs 1 -num_threads 10
+```
+
+Add python script to filter for AMGs.
+
+```{r, engine=bash}
+
+
+
+```
+
+Test if ORFs AMGs were identified on have differential abundance between 55CS and 27CDS. Try DESEQ2 first.
+
+```{r}
+library(phyloseq)
+library(DESeq2)
+options(stringsAsFactors=FALSE)
+
+table <- read.table("vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.txt", header=TRUE, comment.char="", sep='\t', row.names=1, skip=1)
+table <- subset(table, select=c(V4_illumina,V9_illumina,V10_illumina,V11_illumina,V12_illumina,V13_illumina))
+colnames(table) <- gsub('_illumina','', colnames(table))
+table_sub <- table[grepl("deepviral", rownames(table)), ]
+table_sub <- table_sub[which(rowSums(table_sub) > 0),]
+table_matrix <- as.matrix(table_sub)
+dim(table_matrix) #525552
+
+map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1, comment.char="")
+selectedRows <- (row.names(map) %in% colnames(table_sub))
+map_sub <- map[selectedRows,]
+map_sub <- map_sub[match(colnames(table_sub), row.names(map_sub)),]
+
+OTU = otu_table(table_matrix, taxa_are_rows = TRUE)
+SAMPLEDATA = sample_data(map_sub)
+physeq = phyloseq(OTU, SAMPLEDATA)
+dds_orf = phyloseq_to_deseq2(physeq, ~Diet)
+dds_orf = estimateSizeFactors(dds_orf)
+
+
+amg <- read.table("amg_knum_raw_ab.txt", header=TRUE, comment.char="", sep='\t', row.names=1)
+amg_matrix <- as.matrix(amg)
+OTU = otu_table(amg_matrix, taxa_are_rows = TRUE)
+SAMPLEDATA = sample_data(map_sub)
+physeq = phyloseq(OTU, SAMPLEDATA)
+dds_amg = phyloseq_to_deseq2(physeq, ~Diet)
+dds_amg$sizeFactor <- dds_orf$sizeFactor
+dds_amg <- DESeq(dds_amg, test="Wald", fitType="parametric")
+res <- results(dds_amg, cooksCutoff = FALSE)
+alpha <- 0.05
+sigtab <- res[which(res$padj < alpha), ]
+dim(sigtab) #0
+
+res_df <- as.data.frame(res)
+test <- res_df[order(res_df$pvalue),] 
+```
+
+Now with metagenomeSeq.
+
+```{r}
+library(metagenomeSeq)
+options(stringsAsFactors=FALSE)
+
+table <- read.table("vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.txt", header=TRUE, comment.char="", sep='\t', row.names=1, skip=1)
+table <- subset(table, select=c(V4_illumina,V9_illumina,V10_illumina,V11_illumina,V12_illumina,V13_illumina))
+colnames(table) <- gsub('_illumina','', colnames(table))
+table_sub <- table[grepl("deepviral", rownames(table)), ]
+table_sub <- table_sub[which(rowSums(table_sub) > 0),]
+table_matrix <- as.matrix(table_sub)
+dim(table_matrix) #525552
+
+map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1, comment.char="")
+selectedRows <- (row.names(map) %in% colnames(table_sub))
+map_sub <- map[selectedRows,]
+map_sub <- map_sub[match(colnames(table_sub), row.names(map_sub)),]
+
+phenotypeData <- AnnotatedDataFrame(map_sub)
+orf_obj <- newMRexperiment(table_matrix,phenoData=phenotypeData)
+
+p = cumNormStatFast(orf_obj)
+orf_obj = cumNorm(orf_obj, p = p)
+norm <- normFactors(orf_obj)
+
+
+amg <- read.table("amg_knum_raw_ab.txt", header=TRUE, comment.char="", sep='\t', row.names=1)
+amg_matrix <- as.matrix(amg)
+amg_obj <- newMRexperiment(amg_matrix,phenoData=phenotypeData, normFactors = norm)
+
+mod <- model.matrix(~1 + Diet, data = map_sub)
+amg_res <- fitFeatureModel(amg_obj, mod)
+```
+
+plot AMG heatmap.
+
+```{r}
+library(metagenomeSeq)
+library(edgeR)
+library(gridExtra)
+library(ggplot2)
+library(ggthemes)
+library(gplots)
+library(grid)
+library(vegan)
+options(stringsAsFactors=FALSE)
+
+amg <- read.table("amg_knum_raw_ab.txt", header=TRUE, comment.char="", sep='\t', row.names=1)
+amg_matrix <- as.matrix(amg)
+
+map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1, comment.char="")
+selectedRows <- (row.names(map) %in% colnames(amg))
+map_sub <- map[selectedRows,]
+map_sub <- map_sub[match(colnames(amg), row.names(map_sub)),]
+
+d <- DGEList(counts=amg_matrix, lib.size=map_sub$reads)
+#log_cpm <- cpm(d,log=TRUE, normalized.lib.sizes=TRUE)
+cpm <- cpm(d,log=FALSE, normalized.lib.sizes=TRUE)
+
+phenotypeData <- AnnotatedDataFrame(map_sub)
+amg_obj <- newMRexperiment(cpm,phenoData=phenotypeData,libSize=map_sub$reads)
+
+map_sub$few_cols <- c("#F15A60", "#5A9BD4", "#F15A60", "#5A9BD4", "#5A9BD4", "#F15A60")
+map_sub$few_cols <- as.character(map_sub$few_cols)
+
+#make plot, test, with legend wanted then paste it to the heatmap
+map$TDN <- as.numeric(as.character(map$TDN))
+map$TDN <- gsub(78.5030, NA, map$TDN)
+map$TDN <- gsub(81.4325, NA, map$TDN)
+
+
+test <- ggplot(map, aes(TDN, reads, color=Diet, group=Diet)) + 
+  geom_point(size=2, shape=15) +
+  scale_color_few(palette="medium", breaks=c("27CDS", "55CS")) +
+  theme(legend.text=element_text(size=10), legend.key = element_blank(), legend.title = element_blank(), legend.key.height = unit(0.35, "cm"), legend.key.width = unit(0.01, "cm"), legend.background = element_rect(fill=alpha('white', 0.0)))
+
+g <- ggplot_gtable(ggplot_build(test))$grobs
+g[[8]]$vp$x <- unit(-0.0725, 'npc')
+g[[8]]$vp$y <- unit(0.800, 'npc')
+
+heatmapCols <- colorRampPalette(c("white", "yellow2", "orange", "red"), space = "rgb")(50)
+log_label = c(as.expression("\n"~"Log"[2]~"Counts"~"Per"~"Million"))
+
+tiff("amg_hm.tiff", res=600, compression = "lzw", width=6, height=6, units="in") 
+plotMRheatmap(obj = amg_obj, norm=FALSE, log=TRUE, n = 75, trace = "none", col = heatmapCols, ColSideColors = map_sub$few_cols, labRow=NA, srtCol=0, key = FALSE, labCol=NA, margins=c(1,1), distfun = function(x) vegdist(x, method = "bray"), hclustfun = function(x) hclust(x, method = "ward.D2"))
+grid::pushViewport(plotViewport())
+grid::grid.draw(g[[8]])
+dev.off()
+```

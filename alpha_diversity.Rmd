@@ -1,0 +1,278 @@
+---
+title: "Alpha Diversity"
+output:
+  html_document:
+    keep_md: true
+---
+
+Calculate and plot accumulation curves.
+
+```{r, engine='bash'}
+python calc_rarefaction.py --pc_table=viral_ion_illumina_pc_cluster_raw_abundance.txt --iterations=1000
+mv pc_rarefaction.txt viral_pc_rarefaction.txt 
+
+python calc_rarefaction.py --pc_table=viral_ion_illumina_pc_cluster_raw_abundance_singletons.txt --iterations=1000
+mv pc_rarefaction.txt viral_pc_rarefaction_singletons.txt 
+
+python calc_rarefaction.py --pc_table=microbial_pc_cluster_raw_abundance.txt --iterations=1000
+mv pc_rarefaction.txt microbial_pc_rarefaction.txt 
+
+python calc_rarefaction.py --pc_table=microbial_pc_cluster_raw_abundance_singletons.txt --iterations=1000
+mv pc_rarefaction.txt microbial_pc_rarefaction_singletons.txt 
+```	
+
+
+```{r}
+library(ggplot2)
+#add to install setup, in CRAN
+library(sitools)
+#conda install -c kalefranz imagemagick=6.9.1
+
+rarefaction <- read.table('viral_pc_rarefaction.txt', header=FALSE, sep="\t")
+colnames(rarefaction) <- c('iteration', 'samples', 'pcs')
+tiff("viral_rarefaction.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(rarefaction, aes(x=samples, y=pcs)) +
+  geom_point(alpha = 0.0075, size=0.2, shape=16) +
+  theme_bw() +
+  ggtitle("")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  labs(x = "Number of Samples", y = "Protein Clusters") +
+  scale_y_continuous(labels=f2si, limits = c(0, 325000))
+dev.off()
+
+rarefaction <- read.table('microbial_pc_rarefaction.txt', header=FALSE, sep="\t")
+colnames(rarefaction) <- c('iteration', 'samples', 'pcs')
+tiff("microbial_rarefaction.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(rarefaction, aes(x=samples, y=pcs)) +
+  geom_point(alpha = 0.0075, size=0.2, shape=16) +
+  theme_bw() +
+  ggtitle("")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  labs(x = "Number of Samples", y = "Protein Clusters") +
+  scale_y_continuous(labels=f2si, limits = c(0, 325000))
+dev.off()
+
+rarefaction <- read.table('viral_pc_rarefaction_singletons.txt', header=FALSE, sep="\t")
+colnames(rarefaction) <- c('iteration', 'samples', 'pcs')
+tiff("viral_rarefaction_singletons.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(rarefaction, aes(x=samples, y=pcs), axis.ticks=element_line(size=0.3)) +
+  geom_point(alpha = 0.0075, size=0.2, shape=16) +
+  theme_bw() +
+  ggtitle("")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  labs(x = "Number of Samples", y = "Protein Clusters") +
+  scale_y_continuous(labels=f2si, breaks = c(200000,400000,600000), limits = c(0, 600000))
+dev.off()
+
+rarefaction <- read.table('microbial_pc_rarefaction_singletons.txt', header=FALSE, sep="\t")
+colnames(rarefaction) <- c('iteration', 'samples', 'pcs')
+tiff("microbial_rarefaction_singletons.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(rarefaction, aes(x=samples, y=pcs)) +
+  geom_point(alpha = 0.0075, size=0.2, shape=16) +
+  theme_bw() +
+  ggtitle("")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  labs(x = "Number of Samples", y = "Protein Clusters") +
+  scale_y_continuous(labels=f2si, breaks = c(200000,400000,600000))
+dev.off()
+
+```
+
+```{r, engine='bash'}
+#convert microbial_rarefaction_singletons.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_rarefaction_singletons_label.tiff 
+
+#convert viral_rarefaction_singletons.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_rarefaction_singletons_label.tiff 
+
+convert microbial_rarefaction.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_rarefaction_label.tiff 
+
+convert viral_rarefaction.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_rarefaction_label.tiff 
+
+montage microbial_rarefaction_label.tiff viral_rarefaction_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 rarefaction.tiff
+
+convert rarefaction.tiff rarefaction.eps
+```
+
+```{r, engine='bash'}
+#even
+biom convert --table-type "OTU table" -i viral_ion_illumina_pc_cluster_raw_abundance.txt -o viral_ion_illumina_pc_cluster_raw_abundance.biom --to-json
+multiple_rarefactions_even_depth.py -i viral_ion_illumina_pc_cluster_raw_abundance.biom -n 100 -d 192998 -o viral_mult_even
+alpha_diversity.py -i viral_mult_even/ -o viral_alpha_even -m shannon
+collate_alpha.py -i viral_alpha_even -o viral_alpha_even_collate
+
+#not_even
+multiple_rarefactions.py -i viral_ion_illumina_pc_cluster_raw_abundance.biom -o viral_alpha_rare -m 10000 -s 10000 -n 10  -x 200000
+alpha_diversity.py -i viral_alpha_rare/ -o viral_alpha_rare_shannon -m shannon
+collate_alpha.py -i viral_alpha_rare_shannon/ -o viral_alpha_rare_shannon_collate
+mv viral_alpha_rare_shannon_collate/shannon.txt viral_alpha_rare_shannon_collate/shannon2.txt 
+cut -f 1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18 viral_alpha_rare_shannon_collate/shannon2.txt > viral_alpha_rare_shannon_collate/shannon.txt
+rm viral_alpha_rare_shannon_collate/shannon2.txt
+make_rarefaction_plots.py -i viral_alpha_rare_shannon_collate/ -m viral_mapping.txt -e stderr --generate_per_sample_plots -w -o viral_alpha_rare_collate_plot
+#manually copy html table into file viral_alpha_rare_collate_plot.txt
+
+#even
+biom convert --table-type "OTU table" -i microbial_pc_cluster_raw_abundance.txt -o microbial_pc_cluster_raw_abundance.biom --to-json
+multiple_rarefactions_even_depth.py -i microbial_pc_cluster_raw_abundance.biom -n 100 -d 195078 -o microbial_mult_even
+alpha_diversity.py -i microbial_mult_even/ -o microbial_alpha_even -m shannon
+collate_alpha.py -i microbial_alpha_even -o microbial_alpha_even_collate
+
+#not_even
+multiple_rarefactions.py -i microbial_pc_cluster_raw_abundance.biom -o microbial_alpha_rare -m 10000 -s 10000 -n 10 -x 200000
+alpha_diversity.py -i microbial_alpha_rare/ -o microbial_alpha_rare_shannon -m shannon
+collate_alpha.py -i microbial_alpha_rare_shannon/ -o microbial_alpha_rare_shannon_collate
+make_rarefaction_plots.py -i microbial_alpha_rare_shannon_collate/ -m microbial_mapping.txt -e stderr --generate_per_sample_plots -w -o microbial_alpha_rare_collate_plot
+#manually copy html table into file microbial_alpha_rare_collate_plot.txt
+```
+
+Plot rarefaction curves and alpha diversity metrics at an even depth.
+
+```{r}
+library(ggplot2)
+library(matrixStats)
+library(plyr)
+library(ggthemes)
+library(sitools)
+
+#viral even
+viral_even <- read.table('viral_alpha_even_collate/shannon.txt', header=TRUE, sep='\t')
+viral_even <- subset(viral_even, select=-c(V4_illumina, V9_illumina, V10_illumina, V11_illumina, V12_illumina, V13_illumina, X, sequences.per.sample, iteration))
+viral_even_matrix <- as.matrix(viral_even)
+viral_even_means <- data.frame(DivMeans = colMeans(viral_even_matrix), DivSD = colSds(viral_even_matrix))
+viral_mapping <- read.table('viral_mapping.txt', header=TRUE, sep='\t', row.names = 1, comment.char='')
+viral_mapping_even <- merge(viral_mapping, viral_even_means, by="row.names") 
+viral_mapping_even$Animal <- as.factor(viral_mapping_even$Animal)
+
+fit <- aov(DivMeans ~ Diet + Animal, data=viral_mapping_even)
+summary(fit)
+
+#            Df Sum Sq Mean Sq F value Pr(>F)  
+#Diet         3 12.096   4.032   5.595 0.0358 *
+#Animal       4  1.111   0.278   0.385 0.8124  
+#Residuals    6  4.324   0.721
+
+
+viral_mapping_even_cds <- subset(viral_mapping_even, Diet == '27CDS')
+viral_mapping_even_mdgs <- subset(viral_mapping_even, Diet == '40MDGS')
+viral_mapping_even_cs <- subset(viral_mapping_even, Diet == '55CS')
+viral_mapping_even_corn <- subset(viral_mapping_even, Diet == 'Corn')
+
+t.test(viral_mapping_even_cds$DivMeans, viral_mapping_even_cs$DivMeans)	
+t.test(viral_mapping_even_cds$DivMeans, viral_mapping_even_corn$DivMeans)	
+t.test(viral_mapping_even_cds$DivMeans, viral_mapping_even_mdgs$DivMeans)	
+t.test(viral_mapping_even_cs$DivMeans, viral_mapping_even_mdgs$DivMeans)	
+t.test(viral_mapping_even_cs$DivMeans, viral_mapping_even_corn$DivMeans)	
+t.test(viral_mapping_even_mdgs$DivMeans, viral_mapping_even_corn$DivMeans)	
+
+shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))
+tiff("viral_alpha_even.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(viral_mapping_even, aes(x = Diet, y = DivMeans)) + 
+  geom_point(size = 0.4, shape=16) + 
+  labs(x = "", y = shannons) +
+  theme_bw() +
+  ggtitle("") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.2, lwd=0.1) +
+  annotate("text",x=1,y=(max(viral_mapping_even_cds$DivMeans) + 0.55), label="", size=2.25, fontface =2)+ 
+  annotate("text",x=2,y=(max(viral_mapping_even_mdgs$DivMeans) + 0.55), label="*", size=2.25, fontface =2)+ 
+  annotate("text",x=3,y=(max(viral_mapping_even_cs$DivMeans) + 0.55), label="", size=2.25, fontface =2)+ 
+  annotate("text",x=4,y=(max(viral_mapping_even_corn$DivMeans) + 0.55), label="*", size=2.25, fontface =2)+ 
+  scale_y_continuous(limits=c(9,16))
+dev.off()
+
+
+#microbial even
+microbial_even <- read.table('microbial_alpha_even_collate/shannon.txt', header=TRUE, sep='\t')
+microbial_even <- subset(microbial_even, select=-c(X, sequences.per.sample, iteration))
+microbial_even_matrix <- as.matrix(microbial_even)
+microbial_even_means <- data.frame(DivMeans = colMeans(microbial_even_matrix), DivSD = colSds(microbial_even_matrix))
+microbial_mapping <- read.table('microbial_mapping.txt', header=TRUE, sep='\t', row.names = 1, comment.char='')
+microbial_mapping_even <- merge(microbial_mapping, microbial_even_means, by="row.names") 
+microbial_mapping_even$Animal <- as.factor(microbial_mapping_even$Animal)
+
+fit <- aov(DivMeans ~ Diet + Animal, data=microbial_mapping_even)
+summary(fit)
+
+#            Df Sum Sq Mean Sq F value Pr(>F)
+#Diet         3 0.2533 0.08444   0.715  0.562
+#Animal       4 0.7235 0.18088   1.532  0.255
+#Residuals   12 1.4167 0.11806   
+
+microbial_mapping_even_cds <- subset(microbial_mapping_even, Diet == '27CDS')
+microbial_mapping_even_mdgs <- subset(microbial_mapping_even, Diet == '40MDGS')
+microbial_mapping_even_cs <- subset(microbial_mapping_even, Diet == '55CS')
+microbial_mapping_even_corn <- subset(microbial_mapping_even, Diet == 'Corn')
+
+t.test(microbial_mapping_even_cds$DivMeans, microbial_mapping_even_cs$DivMeans)	
+t.test(microbial_mapping_even_cds$DivMeans, microbial_mapping_even_corn$DivMeans)	
+t.test(microbial_mapping_even_cds$DivMeans, microbial_mapping_even_mdgs$DivMeans)	
+t.test(microbial_mapping_even_cs$DivMeans, microbial_mapping_even_mdgs$DivMeans)	
+t.test(microbial_mapping_even_cs$DivMeans, microbial_mapping_even_corn$DivMeans)	
+t.test(microbial_mapping_even_mdgs$DivMeans, microbial_mapping_even_corn$DivMeans)	
+
+shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))
+tiff("microbial_alpha_even.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(microbial_mapping_even, aes(x = Diet, y = DivMeans)) + 
+  geom_point(size = 0.4, shape=16) + 
+  labs(x = "", y = shannons) +
+  theme_bw() +
+  ggtitle("") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3)) +
+  stat_summary(fun.y = median, fun.ymin = median, fun.ymax = median, geom = "crossbar", width = 0.2, lwd=0.1) +
+  annotate("text",x=1,y=(max(microbial_mapping_even_cds$DivMeans) + 0.55), label="", size=2.25, fontface =2)+ 
+  annotate("text",x=2,y=(max(microbial_mapping_even_mdgs$DivMeans) + 0.55), label="", size=2.25, fontface =2)+ 
+  annotate("text",x=3,y=(max(microbial_mapping_even_cs$DivMeans) + 0.55), label="", size=2.25, fontface =2)+ 
+  annotate("text",x=4,y=(max(microbial_mapping_even_corn$DivMeans) + 0.55), label="", size=2.25, fontface =2) +
+  scale_y_continuous(limits=c(9,16))
+dev.off() 
+
+#viral rarefaction
+viral_rare <- read.table('viral_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
+
+pd <- position_dodge(width = 300)
+shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))
+tiff("viral_shannon_rare.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(viral_rare, aes(x = Seqs.Sample, y = shannon.Ave., colour = Diet, group = Diet, ymin = shannon.Ave. - shannon.Err., ymax = shannon.Ave. + shannon.Err.)) + 
+  geom_line(position = pd, size=0.15) + 
+  geom_linerange(position = pd, size = 0.15) +
+  geom_point(position = pd, size = 0.2) +
+  scale_color_few(palette="medium") +
+  labs(x = "Sequences per Sample", y = shannons) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0, color="black"), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3), legend.text=element_text(size=3.5), legend.key = element_blank(), legend.title = element_blank(), legend.key.size = unit(0.15, "cm"), legend.position = c(0.057, 0.91), legend.background = element_rect(fill=alpha('white', 0.0))) +
+  guides(colour = guide_legend(override.aes = list(size=0.2,linetype=0))) +
+  scale_y_continuous(limits=c(9,16)) +
+  scale_x_continuous(labels=f2si)
+dev.off()
+
+
+#microbial rarefaction
+microbial_rare <- read.table('microbial_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
+
+pd <- position_dodge(width = 300)
+shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))
+tiff("microbial_shannon_rare.tiff", res=600, compression = "lzw", width=3.3, height=1.35, units="in") 
+ggplot(microbial_rare, aes(x = Seqs.Sample, y = shannon.Ave., colour = Diet, group = Diet, ymin = shannon.Ave. - shannon.Err., ymax = shannon.Ave. + shannon.Err.)) + 
+  geom_line(position = pd, size=0.15) + 
+  geom_linerange(position = pd, size = 0.15) +
+  geom_point(position = pd, size = 0.2) +
+  scale_color_few(palette="medium") +
+  labs(x = "Sequences per Sample", y = shannons) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0, color="black"), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3), legend.text=element_text(size=3.5), legend.key = element_blank(), legend.title = element_blank(), legend.key.size = unit(0.15, "cm"), legend.position = c(0.057, 0.91), legend.background = element_rect(fill=alpha('white', 0.0))) +
+  guides(colour = guide_legend(override.aes = list(size=0.2,linetype=0))) +
+  scale_y_continuous(limits=c(9,16)) +
+  scale_x_continuous(labels=f2si)
+dev.off()
+```
+
+```{r, engine='bash'}
+convert microbial_shannon_rare.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_shannon_rare_label.tiff 
+
+convert viral_shannon_rare.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_shannon_rare_label.tiff 
+
+convert microbial_alpha_even.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "C" microbial_alpha_even_label.tiff 
+
+convert viral_alpha_even.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "D" viral_alpha_even_label.tiff 
+
+montage microbial_shannon_rare_label.tiff viral_shannon_rare_label.tiff microbial_alpha_even_label.tiff viral_alpha_even_label.tiff -tile 2x2 -geometry +0+0 -gravity Center -density 600 alpha.tiff
+
+convert alpha.tiff alpha.eps
+convert alpha.tiff alpha.pdf
+```
