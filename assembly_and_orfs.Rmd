@@ -28,14 +28,16 @@ prodigal -i vmg.contigs.filter.fasta -d vmg.orfs_nt.fasta -a vmg.orfs_aa.fasta -
 Filter the ORFs based on length of nt, then use those sequences as a guide to remove the short seqeunces from aa file.
 
 ```{r, engine='bash', results='hide'}
-prinseq-lite.pl -fasta vmg.orfs_nt.fasta -min_len 300 -out_format 1 -out_good vmg.orfs_nt.filter
+sed ':a;N;/^>/M!s/\n//;ta;P;D' vmg.orfs_aa.fasta > vmg.orfs_aa.fix.fasta
 
-filter_fasta.py -f vmg.orfs_aa.fasta -a vmg.orfs_nt.filter.fasta -o vmg.orfs_aa.filter.fasta
+awk '!/^>/ { next } { getline seq } length(seq) >= 60 { print $0 "\n" seq }' vmg.orfs_aa.fix.fasta > vmg.orfs_aa.filter.fasta
+
+filter_fasta.py -f vmg.orfs_nt.fasta -a vmg.orfs_aa.filter.fasta -o vmg.orfs_nt.filter.fasta
 ```
 
 ## Microbial Metagenome
 
-Assembly the microbial metagenome data using Spades.
+Assemble the microbial metagenome data using Spades.
 
 ```{r, engine='bash', results='hide'}
 cat microbial_qc/*_finalQC.fastq > BMG.cat.fastq
@@ -56,9 +58,11 @@ prodigal -i bmg.contigs.filter.fasta -d bmg.orfs_nt.fasta -a bmg.orfs_aa.fasta -
 Filter the ORFs based on length of nt, then use those sequences as a guide to remove the short seqeunces from aa file.
 
 ```{r, engine='bash', results='hide'}
-prinseq-lite.pl -fasta bmg.orfs_nt.fasta -min_len 300 -out_format 1 -out_good bmg.orfs_nt.filter
+sed ':a;N;/^>/M!s/\n//;ta;P;D' bmg.orfs_aa.fasta > bmg.orfs_aa.fix.fasta
 
-filter_fasta.py -f bmg.orfs_aa.fasta -a bmg.orfs_nt.filter.fasta -o bmg.orfs_aa.filter.fasta
+awk '!/^>/ { next } { getline seq } length(seq) >= 60 { print $0 "\n" seq }' bmg.orfs_aa.fix.fasta > bmg.orfs_aa.filter.fasta
+
+filter_fasta.py -f bmg.orfs_nt.fasta -a bmg.orfs_aa.filter.fasta -o bmg.orfs_nt.filter.fasta
 ```
 
 ## Deep Viral Metagenome
@@ -84,7 +88,10 @@ prodigal -i vmg.illumina.contigs.filter.fasta -d vmg.illumina.orfs_nt.fasta -a v
 Filter the ORFs based on length of nt, then use those sequences as a guide to remove the short seqeunces from aa file.
 
 ```{r, engine='bash', results='hide'}
-prinseq-lite.pl -fasta vmg.illumina.orfs_nt.fasta -min_len 300 -out_format 1 -out_good vmg.illumina.orfs_nt.filter
+sed ':a;N;/^>/M!s/\n//;ta;P;D' vmg.illumina.orfs_aa.fasta > vmg.illumina.orfs_aa.fix.fasta
 
-filter_fasta.py -f vmg.illumina.orfs_aa.fasta -a vmg.illumina.orfs_nt.filter.fasta -o vmg.illumina.orfs_aa.filter.fasta
+awk '!/^>/ { next } { getline seq } length(seq) >= 60 { print $0 "\n" seq }' vmg.illumina.orfs_aa.fix.fasta > vmg.illumina.orfs_aa.filter.fasta
+
+filter_fasta.py -f vmg.illumina.orfs_nt.fasta -a vmg.illumina.orfs_aa.filter.fasta -o vmg.illumina.orfs_nt.filter.fasta
 ```
+

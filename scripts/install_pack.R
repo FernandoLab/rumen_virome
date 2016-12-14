@@ -21,7 +21,7 @@ sapply(pkg, require, character.only = TRUE)
 packages <- c("ggplot2", "vegan", "dplyr", "reshape2", "RColorBrewer", "rmarkdown", 
 "knitr", "grid", "reshape", "data.table", "biom", "gplots", "gridExtra", "mvtnorm",
 "pls", "QuantPsyc", "reshape2", "R.utils", "pheatmap", "optparse", "Hmisc", "locfit", 
-"Rcpp", "httr", "RJSONIO", "RcppArmadillo")
+"Rcpp", "httr", "RJSONIO", "RcppArmadillo", "ggthemes")
 
 ipak(packages)
 

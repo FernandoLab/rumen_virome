@@ -5,34 +5,30 @@ output:
     keep_md: true
 ---
 
-Investigating multivariate linear relationships between rlog tranformed KO annotations in the viral metagenome and dietary components. This is followed up by using univariate linear regressions to confirm the strength and direction of relationships identified by PLSR.
+Investigating multivariate linear relationships between log tranformed viral microbial_div clusters (with greater than 1000 reads) and dietary components. This is followed up by using univariate linear regressions to confirm the strength and direction of relationships identified by PLSR.
 
 ```{r}
 library(pls)
-library(phyloseq)
-library(DESeq2)
 library(QuantPsyc)
 library(reshape2)
-library(parallel)
+library(edgeR)
 options(stringsAsFactors=FALSE)
 
-table <- read.table("intermediate_results/VMG.ko_raw_abundance.txt", header=TRUE, comment.char="", skip=1, row.names=1, sep="\t")
-names(table) <- gsub("_trimm", "", names(table))
+table <- read.table("viral_beta_div/viral_pc_cluster_raw_abundance.txt", header=TRUE, comment.char="", sep='\t', row.names=1)
+table <- subset(table, rowSums(table) > 750)
 table_matrix <- as.matrix(table)
-map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1)
-map <- map[c(7,8,9,10,11,12,13,14,15,1,2,3,4,5,6),]
-OTU = otu_table(table_matrix, taxa_are_rows = TRUE)
-SAMPLEDATA = sample_data(map)
-physeq = phyloseq(OTU, SAMPLEDATA)
-dds = phyloseq_to_deseq2(physeq, ~Diet)
 
-rld <- rlog(dds, blind = FALSE)
-rlogmat <- assay(rld)
-rlogdf <- as.data.frame(rlogmat)
-rlogmat_t <- t(rlogmat)
-map2 <- as.matrix(map[c("TDN", "Zn", "Protein")])
-pls_df <- data.frame(y=I(rlogmat_t), x=I(map2))
-pls.options(parallel = 4)
+map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, row.names=1, comment.char="")
+map <- map[match(colnames(table), row.names(map)),]
+map2 <- as.matrix(map[c("TDN", "Zn", "microbial_div")])
+
+
+d <- DGEList(counts=table_matrix, lib.size=map$reads)
+logdf <- as.data.frame(cpm(d,log=TRUE))
+logdf_t <- t(logdf)
+
+pls_df <- data.frame(y=I(logdf_t), x=I(map2))
+#pls.options(parallel = 4)
 pls_result <- plsr(y ~ x, data = pls_df, validation = "LOO", scale=TRUE)
 capture.output(summary(pls_result, what="training"), file="plsr_result.txt")
 summaryfile <- read.table("plsr_result.txt", skip=7)
@@ -40,86 +36,84 @@ summaryfile$C1_exp <- summaryfile$V2
 summaryfile$C2_exp <- (summaryfile$V3 - summaryfile$V2)
 summaryfile$C3_exp <- (summaryfile$V4 - summaryfile$V3)
 c1_top <- summaryfile[ which(summaryfile$C1_exp > 30), ]
-#dim(c1_top)
 c2_top <- summaryfile[ which(summaryfile$C2_exp > 30), ]
-#dim(c2_top)
 c3_top <- summaryfile[ which(summaryfile$C3_exp > 30), ]
-#dim(c3_top)
 pls_top <- rbind(c1_top,c2_top,c3_top)
 pls_top_list <- unique(pls_top$V1)
-#100
+length(pls_top_list) #375
 ```
 
 Univariate regression on KOs that have >= 30% variation explained by any component.
 
 ```{r,}
-rlog_psl <- rlogdf[pls_top_list,]
-rlog_psl_t <- t(rlog_psl)
+log_psl <- logdf[pls_top_list,]
+log_psl_t <- t(log_psl)
 
 res_tdn <- data.frame(id = character(0), tdn_radj=character(0), tdn_p_val=character(0), tdn_coeff=character(0), tdn_coeff_stand=character(0))
-for (i in 1:ncol(rlog_psl_t)) {
-	mlr <- lm(rlog_psl_t[,i] ~ TDN, data=map)
+for (i in 1:ncol(log_psl_t)) {
+	mlr <- lm(log_psl_t[,i] ~ TDN, data=map)
 	summ <- summary(mlr)
 	tdn_p_val <- summ$coefficients[8]
 	tdn_radj <-  summ$adj.r.squared
-	name <- colnames(rlog_psl_t)[i]
+	name <- colnames(log_psl_t)[i]
 	tdn_coeff <- mlr$coefficients[2]
 	tdn_coeff_stand <- lm.beta(mlr)[1]
 	res_tdn[i, ] <- c(name, tdn_radj, tdn_p_val, tdn_coeff, tdn_coeff_stand)
 }
-
+res_tdn$tdn_p_val <- as.numeric(res_tdn$tdn_p_val)
 tdn_sig <- subset(res_tdn, tdn_p_val < 0.05)
-dim(tdn_sig) #71
+dim(tdn_sig) #145
 
 res_zn <- data.frame(id = character(0), zn_radj=character(0), zn_p_val=character(0), zn_coeff=character(0), zn_coeff_stand=character(0))
-for (i in 1:ncol(rlog_psl_t)) {
-	mlr <- lm(rlog_psl_t[,i] ~ Zn, data=map)
+for (i in 1:ncol(log_psl_t)) {
+	mlr <- lm(log_psl_t[,i] ~ Zn, data=map)
 	summ <- summary(mlr)
 	zn_p_val <- summ$coefficients[8]
 	zn_radj <-  summ$adj.r.squared
-	name <- colnames(rlog_psl_t)[i]
+	name <- colnames(log_psl_t)[i]
 	zn_coeff <- mlr$coefficients[2]
 	zn_coeff_stand <- lm.beta(mlr)[1]
 	res_zn[i, ] <- c(name, zn_radj, zn_p_val, zn_coeff, zn_coeff_stand)
 }
-
+res_zn$zn_p_val <- as.numeric(res_zn$zn_p_val)
 zn_sig <- subset(res_zn, zn_p_val < 0.05)
-dim(zn_sig) #14
+dim(zn_sig) #15
 
-res_protein <- data.frame(id = character(0), protein_radj=character(0), protein_p_val=character(0), protein_coeff=character(0), protein_coeff_stand=character(0))
-for (i in 1:ncol(rlog_psl_t)) {
-	mlr <- lm(rlog_psl_t[,i] ~ Protein, data=map)
+res_microbial_div <- data.frame(id = character(0), microbial_div_radj=character(0), microbial_div_p_val=character(0), microbial_div_coeff=character(0), microbial_div_coeff_stand=character(0))
+for (i in 1:ncol(log_psl_t)) {
+	mlr <- lm(log_psl_t[,i] ~ microbial_div, data=map)
 	summ <- summary(mlr)
-	protein_p_val <- summ$coefficients[8]
-	protein_radj <-  summ$adj.r.squared
-	name <- colnames(rlog_psl_t)[i]
-	protein_coeff <- mlr$coefficients[2]
-	protein_coeff_stand <- lm.beta(mlr)[1]
-	res_protein[i, ] <- c(name, protein_radj, protein_p_val, protein_coeff, protein_coeff_stand)
+	microbial_div_p_val <- summ$coefficients[8]
+	microbial_div_radj <-  summ$adj.r.squared
+	name <- colnames(log_psl_t)[i]
+	microbial_div_coeff <- mlr$coefficients[2]
+	microbial_div_coeff_stand <- lm.beta(mlr)[1]
+	res_microbial_div[i, ] <- c(name, microbial_div_radj, microbial_div_p_val, microbial_div_coeff, microbial_div_coeff_stand)
 }
+res_microbial_div$microbial_div_p_val <- as.numeric(res_microbial_div$microbial_div_p_val)
+microbial_div_sig <- subset(res_microbial_div, microbial_div_p_val < 0.05)
+dim(microbial_div_sig) #84
 
-protein_sig <- subset(res_protein, protein_p_val < 0.05)
-dim(protein_sig) #4
+length(intersect(tdn_sig$id, zn_sig$id))  #3
+length(intersect(tdn_sig$id, microbial_div_sig$id)) #0 
+length(intersect(microbial_div_sig$id, zn_sig$id)) #0
 
-length(intersect(tdn_sig$id, zn_sig$id)) #1
-length(intersect(tdn_sig$id, protein_sig$id)) #2
-length(intersect(protein_sig$id, zn_sig$id)) #0
-
+res_sig <- unique(c(tdn_sig$id, zn_sig$id, microbial_div_sig$id))
+length(res_sig) #241
 ```
 
 Heatmap of linear regression results.
 
 ```{r}
-library(RCurl)
-library(R.utils)
-library(pheatmap)
+library(ggplot2)
+library(tidyr)
 
 res1 <- merge(res_tdn, res_zn, by="id")
-final_pls_table <- merge(res1, res_protein, by="id")
-reg_sign <- subset(final_pls_table, tdn_p_val < 0.05 | zn_p_val < 0.05 | protein_p_val < 0.05)
-#86
+final_pls_table <- merge(res1, res_microbial_div, by="id")
+reg_sign <- subset(final_pls_table, tdn_p_val < 0.05 | zn_p_val < 0.05 | microbial_div_p_val < 0.05)
+#241
 
-reg_hm <- data.frame(id = character(0), TDN=numeric(0), Zn=numeric(0), Protein=numeric(0))
+reg_hm <- data.frame(id = character(0), TDN=numeric(0), Zn=numeric(0), microbial_div=numeric(0))
 options(stringsAsFactors=FALSE)
 for (i in 1:nrow(reg_sign)) {
 	id <- reg_sign[i, "id"]
@@ -138,74 +132,43 @@ for (i in 1:nrow(reg_sign)) {
 		zn <- 0
 	}
 	
-	protein_p <- reg_sign[i,"protein_p_val"]
-	if (protein_p < 0.05) {
-		protein <- reg_sign[i,"protein_coeff_stand"]
+	microbial_div_p <- reg_sign[i,"microbial_div_p_val"]
+	if (microbial_div_p < 0.05) {
+		microbial_div <- reg_sign[i,"microbial_div_coeff_stand"]
 	} else {
-		protein <- 0
+		microbial_div <- 0
 	}
 	
-	reg_hm[i, ] <- c(id, tdn, zn, protein)
+	reg_hm[i, ] <- c(id, tdn, zn, microbial_div)
 }
 
 reg_hm$TDN <- as.numeric(reg_hm$TDN)
 reg_hm$Zn <- as.numeric(reg_hm$Zn)
-reg_hm$Protein <- as.numeric(reg_hm$Protein)
+reg_hm$microbial_div <- as.numeric(reg_hm$microbial_div)
 is.num <- sapply(reg_hm, is.numeric)
 reg_hm[is.num] <- lapply(reg_hm[is.num], round, 3)
 
-enz_list <- reg_hm$id
 
-enz1 <- paste(enz_list, collapse = ',')
-enz2 <- noquote(enz1)
-url_get <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/name"))
-names <- getURL(url_get)
-url_get2 <- noquote(paste0("http://togows.dbcls.jp/entry/orthology/",enz2,"/definition"))
-defs <- getURL(url_get2)
-names_list <- strsplit(names, "\n")
-defs_list <- strsplit(defs, "\n")
-enz_list <- strsplit(enz2, ",")
 
-enz_names <- data.frame(id = character(0), Name = character(0), Def=character(0))	
-options(stringsAsFactors=FALSE)
-df_len <- lapply(enz_list[1], length)
-df_len2 <- df_len[[1]]
-for (i in 1:df_len2) {
-	enz <- enz_list[[1]][i]
-	name <- names_list[[1]][i]
-	def <- defs_list[[1]][i]	
-	enz_names[i, ] <- c(enz, name, def)
-}
+reg_hm_long <- gather(reg_hm, variable, reg, TDN:microbial_div, factor_key=FALSE)
+reg_hm_long$variable <- as.factor(reg_hm_long$variable)
 
-colnames(enz_names)[1] <- "id"
+logdf$sum <- rowSums(logdf)
+logdf$id <- rownames(logdf)
+logdf2 <- subset(logdf, select = c(id, sum))
 
-enz_names2 <- enz_names
-enz_names2$Def2 <- gsub(" \\[EC(.)+", "", enz_names2$Def)
-enz_names2$Def3 <- capitalize(enz_names2$Def2)
-reg_hm2 <- merge(reg_hm, enz_names2, by="id")
-rownames(reg_hm) <- reg_hm$id
-reg_hm <- reg_hm[c(-1)]
-reg_hm_mat <- as.matrix(reg_hm)
+reg_hm_long_sum <- merge(x = reg_hm_long, y = logdf2, by = "id", all.x = TRUE)
+reg_hm_long_order <- reg_hm_long_sum[with(reg_hm_long_sum, order(-sum)), ]
 
-reg_hm3 <- reg_hm2[c("id", "Def", "TDN", "Zn", "Protein")]
-#write.table(reg_hm3, file="plsr_mlr_hm_data.txt", row.names=FALSE, quote=FALSE, sep="\t")
-
-reg_hm_sort <- reg_hm3[order(reg_hm3$TDN),]
-#write.table(reg_hm_sort, file="plsr_mlr_hm_data_sort.txt", row.names=FALSE, quote=FALSE, sep="\t")
-
-bk <- c(-1.500, -1.125, -0.750, -0.375, -0.0001, 0.0001, 0.375, 0.750, 1.125, 1.500)  
-col_pal <- c("#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac")
-
-tiff("figure_s1.tiff", height=8, width=6, res=600, units = 'in', compression=c("lzw"))
-pheatmap(reg_hm_mat, 
-	cluster_row = F,
-    cluster_cols = F,
-    color = col_pal,
-    fontsize = 6.5,
-    fontsize_row=6, 
-    fontsize_col = 12,
-    labels_row = reg_hm2$Def3,
-    border_color = "black",
-    breaks=bk)
+colorder <- c( "TDN", "Zn", "microbial_div")
+tiff("plsr_hm.tiff", res=600, compression = "lzw", width=5, height=10, units="in") 
+ggplot(reg_hm_long_order, aes(x = variable, y = id)) + 
+  geom_tile(aes(fill=reg),color='white') + 
+  scale_fill_gradient2(midpoint = 0.0, limits=c(-1.0, 1.0)) +
+  scale_x_discrete(limits=colorder,labels=c("TDN","Zinc",bquote(atop(Microbial,Diversity ~ (italic(paste("H'"))))  ))) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank(), axis.ticks = element_blank(), panel.background=element_blank(),panel.grid.major=element_blank(),
+  panel.grid.minor=element_blank(),plot.background=element_blank(),legend.title=element_blank(),    
+  panel.border = element_blank(), axis.text.x=element_text(face = "bold", size = 16))
 dev.off()
 ```

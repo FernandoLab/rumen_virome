@@ -134,7 +134,6 @@ do
 	biom convert --table-type="OTU table" --to-json -i $f -o viral_illumina_blast2tsv/$filename.biom
 done
 
-merge_otu_tables.py -i viral_illumina_blast2tsv/V4.illumina.cat.fastq.orf_norm_abundance.biom,viral_illumina_blast2tsv/V9.illumina.cat.fastq.orf_norm_abundance.biom,viral_illumina_blast2tsv/V10.illumina.cat.fastq.orf_norm_abundance.biom,viral_illumina_blast2tsv/V11.illumina.cat.fastq.orf_norm_abundance.biom,viral_illumina_blast2tsv/V12.illumina.cat.fastq.orf_norm_abundance.biom,viral_illumina_blast2tsv/V13.illumina.cat.fastq.orf_norm_abundance.biom -o viral_illumina_blast2tsv/VMG.illumina.orf_norm_abundance.biom
 
 biom summarize-table -i viral_illumina_blast2tsv/VMG.illumina.orf_norm_abundance.biom  -o viral_illumina_blast2tsv/VMG.illumina.orf_norm_abundance_summarize.txt
 	

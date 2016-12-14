@@ -87,8 +87,17 @@ unzip bowtie-2.2.5.source.zip
 wget ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-centos_linux64.tar.gz
 tar -xzf sratoolkit.current-centos_linux64.tar.gz
 
-# cytoscape utility 
-wget https://raw.githubusercontent.com/idekerlab/cy-rest-R/develop/utility/cytoscape_util.R
+#samtools
+conda install samtools
+
+#cd-hit
+conda install -c ostrokach cd-hit=4.6.1
+wget https://github.com/weizhongli/cdhit/releases/download/V4.6.1/cd-hit-v4.6.1-2012-08-27.tgz
+tar -xvf cd-hit-v4.6.1-2012-08-27.tgz
+cd cd-hit-v4.6.1-2012-08-27
+make openmp=yes
+cd ..
+chmod 775 -R cd-hit-v4.6.1-2012-08-27
 
 # R packages
 printf "\nInstallling R packages, will take some time...\n"

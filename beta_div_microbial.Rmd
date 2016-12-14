@@ -5,6 +5,254 @@ output:
     keep_md: true
 ---
 
+Two methods - distribution of protein clusters among samples (assembly-based approach) and median k-mer counts of reads (assembly free approach) to look at beta diversity.
+
+## Protein Clusters
+
+Calculate Bray-Curtis dissimilarity and plot NMDS.
+
+```{r, engine='bash', results='hide'}
+python scripts/norm_pc.py 
+
+mv microbial_pc_cluster_raw_abundance.txt microbial_beta_div/microbial_pc_cluster_raw_abundance.txt
+mv microbial_pc_cluster_norm_abundance.txt microbial_beta_div/microbial_pc_cluster_norm_abundance.txt
+
+biom convert --table-type "OTU table" -i microbial_beta_div/microbial_pc_cluster_norm_abundance.txt -o microbial_beta_div/microbial_pc_cluster_norm_abundance.biom --to-json
+
+beta_diversity.py -i microbial_beta_div/microbial_pc_cluster_norm_abundance.biom -o microbial_beta_div/microbial_pc_bc -m bray_curtis
+
+nmds.py -i microbial_beta_div/microbial_pc_bc/bray_curtis_microbial_pc_cluster_norm_abundance.txt -o microbial_beta_div/microbial_pc_bc/microbial_bc_nmds.txt
+```
+
+```{r}
+library(ggplot2)
+library(vegan)
+library(data.table)
+library(ggvegan)
+library(grid)
+library(ggthemes)
+
+microbial_bc <- read.table("microbial_beta_div/microbial_pc_bc/bray_curtis_microbial_pc_cluster_norm_abundance.txt", header=TRUE, row.names=1)
+microbial_bc_matrix <- as.matrix(microbial_bc)
+microbial_bc_dist <- as.dist(microbial_bc_matrix)
+
+microbial_map <- read.table("microbial_mapping.txt", sep="\t", header=TRUE, comment.char = '')
+microbial_map$Animal <- as.factor(microbial_map$Animal)
+colnames(microbial_map)[1] <- "ID"
+
+microbial_nmds <- read.table("microbial_beta_div/microbial_pc_bc/microbial_bc_nmds.txt", nrow = 20, sep = "\t", header=TRUE)
+colnames(microbial_nmds)[1] <- "ID"
+microbial_nmds_map <- merge(microbial_nmds, microbial_map, by = "ID")
+names(microbial_nmds_map)[names(microbial_nmds_map)=="Animal"] <- "Steer"
+
+tiff("microbial_pc_diet_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(microbial_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Diet),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
+
+tiff("microbial_pc_steer_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(microbial_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Steer),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Microbial - PC - Steer") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
+```
+
+```{r, engine='bash'}
+convert microbial_pc_diet_nmds.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +10+0 "A" microbial_pc_diet_nmds_label.tiff 
+
+convert microbial_pc_steer_nmds.tiff -compress lzw -density 600 microbial_pc_steer_nmds_label.tiff 
+
+montage microbial_pc_diet_nmds_label.tiff microbial_pc_steer_nmds_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 microbial_pc_nmds.tiff
+```
+
+PERMANOVA Stats.
+
+```{r}
+row.names(microbial_map) <- microbial_map$ID
+microbial_map <- microbial_map[match(row.names(microbial_bc), row.names(microbial_map)),]
+
+set.seed(42) 
+adonis(microbial_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=microbial_map)
+
+#Number of permutations: 999
+#
+#Terms added sequentially (first to last)
+#
+#          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    
+#Diet       3    1.2074 0.40245  1.9954 0.25903  0.001 ***
+#Animal     4    1.0335 0.25837  1.2810 0.22172  0.109    
+#Residuals 12    2.4203 0.20169         0.51925           
+#Total     19    4.6611                 1.00000           
+#Test assumptions. Not significant.
+
+anova(betadisper(microbial_bc_dist,microbial_map$Diet))
+
+anova(betadisper(microbial_bc_dist,microbial_map$Animal))
+
+set.seed(42)
+permutest(betadisper(microbial_bc_dist,microbial_map$Diet))
+
+set.seed(42)
+permutest(betadisper(microbial_bc_dist,microbial_map$Animal))
+```
+
+adonis and dbRDA analysis to investigate the influence of environmental factors
+
+```{r}
+map2 <- microbial_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo", "viral_div")]
+cor(map2)
+
+microbial_map_sub <- subset(microbial_map, viral_div != "NA")
+
+microbial_tab <- fread("microbial_beta_div/microbial_pc_cluster_norm_abundance.txt", header=TRUE, sep="\t")
+microbial_df <- as.data.frame(microbial_tab)
+row.names(microbial_df) <- microbial_df$OTUID
+microbial_df <- subset(microbial_df, select=-c(OTUID))
+microbial_df_t <- t(microbial_df)
+
+selectedRows <- (row.names(microbial_df_t) %in% row.names(microbial_map_sub))
+microbial_df_t_sub <- microbial_df_t[selectedRows,]
+microbial_df_t_sub <- microbial_df_t_sub[rowSums(microbial_df_t_sub)>0, ]
+
+microbial_map_sub <- microbial_map_sub[match(row.names(microbial_df_t_sub), row.names(microbial_map_sub)),]
+
+microbial_cap <- capscale(microbial_df_t_sub ~ TDN + Zn + Protein + pH + VFA + viral_div, data=microbial_map_sub, dist="bray")
+vif.cca(microbial_cap)
+#      TDN        Zn   Protein        pH       VFA viral_div 
+# 9.472825  6.880138  3.330825  3.797561  2.067238  4.994427
+
+ordistep(microbial_cap, direction="backward")
+#removes viral_div
+
+#run with all samples since viral_div not selected as a feature
+microbial_map <- microbial_map[match(row.names(microbial_df_t), row.names(microbial_map)),]
+
+microbial_cap <- capscale(microbial_df_t ~ TDN + Zn + Protein, data=microbial_map, dist="bray")
+vif.cca(microbial_cap)
+ #    TDN       Zn  Protein 
+#3.097465 1.484369 2.429636 
+
+ordistep(microbial_cap, direction="backward")
+
+set.seed(42)
+anova.cca(microbial_cap, seed=42)
+
+#Model: capscale(formula = microbial_df_t ~ TDN + Zn + Protein, data = microbial_map, distance = "bray")
+#         Df SumOfSqs      F Pr(>F)   
+#Model     3   1.2074 1.8644  0.003 **
+#Residual 16   3.4538    
+
+set.seed(42)
+anova.cca(microbial_cap, by="margin", seed=42)
+#Model: capscale(formula = microbial_df_t ~ TDN + Zn + Protein, data = microbial_map, distance = "bray")
+#         Df SumOfSqs      F Pr(>F)   
+#TDN       1   0.5131 2.3771  0.007 **
+#Zn        1   0.4052 1.8769  0.042 * 
+#Protein   1   0.3089 1.4311  0.113   
+#Residual 16   3.4538        
+
+RsquareAdj(microbial_cap)
+#$r.squared
+#[1] 0.2590278
+#$adj.r.squared
+#[1] 0.1200955
+
+#get r2 for terms
+set.seed(42)
+adonis(microbial_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=microbial_map)
+#          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
+#TDN        1    0.5414 0.54142  2.5082 0.11616  0.003 **
+#Zn         1    0.3570 0.35702  1.6539 0.07660  0.064 . 
+#Protein    1    0.3089 0.30892  1.4311 0.06628  0.113   
+#Residuals 16    3.4538 0.21586         0.74097          
+#Total     19    4.6611                 1.00000   
+
+test <- fortify(microbial_cap)
+site_df <- subset(test, test$Score == "sites")
+site_df$Diet <- microbial_map$Diet
+biplot_df <- subset(test, test$Score == "biplot")
+biplot_df2 <- data.frame(text_x = as.numeric(c("-1.075", "-0.48", "0.64")), biplot_df)
+biplot_df3 <- data.frame(text_y = as.numeric(c("0.215", "0.92", "-0.26")), biplot_df2)
+biplot_df3$Label[2] = "Zinc"
+biplot_df3$Label[3] = "Protein"
+
+tiff("microbial_dbRDA.tiff", width = 3.3, height = 3.3, units = 'in', res=600, compression = "lzw")
+ggplot(data = site_df, aes(Dim1, Dim2)) + 
+    #ggtitle("") +
+    geom_point(aes(color = Diet), size=0.7, shape=16) +
+  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.075, "cm")),colour="black", size=0.35) + 
+  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=2)+
+  	labs(x="CAP1 (48.58% of Constrained Variation)", y="CAP2 (33.95% of Constrained Variation)")+
+	  theme_bw() +
+    scale_color_few(palette="medium") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=3.5, color="black"), axis.title=element_text(size=5), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"),legend.text=element_text(size=5), legend.title = element_blank(), legend.key.size = unit(0.15, "cm"), legend.key.height = unit(0.2, "cm"), legend.key = element_blank(), legend.position = c(0.075, 0.945), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="vertical", axis.ticks.length = unit(0.05, "cm"), plot.title = element_text(size = 0.01)) +
+  	coord_fixed() +
+  	xlim(-2.0, 2.0) +
+  	ylim(-2.0, 2.0)
+dev.off()
+```
+
+```{r, engine='bash'}
+convert microbial_dbRDA.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_dbRDA_label.tiff 
+```
+
+Test for differences between intra-steer distances and intra-diet distances in the microbial metagenomes. Intra-diet distances are all distances between samples from the same diet while intra-steer distances are all distances between samples from the same steer. Then use a t-test to show intra-diet distances are not higher than intra-steer distances. The same is not true in the viral communities (see beta_div_viral.Rmd).
+
+```{r}
+dm_list_microbial <- melt(microbial_bc_matrix)[melt(upper.tri(microbial_bc_matrix))$value, ]
+microbial_map2 <- microbial_map[c("ID","Animal","Diet")]
+
+names(microbial_map2)[1] <- "Var1"
+dm_list2_microbial <- merge(microbial_map2, dm_list_microbial, by="Var1")
+names(dm_list2_microbial)[2] <- "var1_animal"
+names(dm_list2_microbial)[3] <- "var1_diet"
+
+names(microbial_map2)[1] <- "Var2"
+dm_list2_microbial <- merge(microbial_map2, dm_list2_microbial, by="Var2")
+names(dm_list2_microbial)[2] <- "var2_animal"
+names(dm_list2_microbial)[3] <- "var2_diet"
+
+intra_diet_microbial <- dm_list2_microbial[dm_list2_microbial$var1_diet == dm_list2_microbial$var2_diet,]
+intra_animal_microbial <- dm_list2_microbial[dm_list2_microbial$var1_animal == dm_list2_microbial$var2_animal,]
+intra_diet_microbial$label <- "Intra-\nDiet"
+intra_animal_microbial$label <- "Intra-\nSteer"
+intra_microbial <- rbind(intra_diet_microbial, intra_animal_microbial)
+
+colorder <- c( "Intra-\nDiet", "Intra-\nSteer")
+tiff("microbial_intra_diet.tiff", width = 1.35, height = 3.3, units = 'in', res = 600, compression = "lzw")
+ggplot(intra_microbial, aes(x = label, y = value)) + 
+    geom_boxplot(outlier.size=0.15, outlier.color="black", lwd=0.2) + 
+    geom_point(position = position_jitter(width = 0.15), size=0.5, shape=16) + 
+    labs(x = "", y = "Bray-Curtis Dissimilarity\n") + guides(fill = FALSE) + 
+    theme_bw() +
+    theme(axis.title.x=element_blank(), axis.text.x = element_text(colour = "black", size=6, margin = margin(b = 0.005)), axis.title.y = element_text(size = 6, margin = margin(l = 0.005)),  axis.text.y = element_text(size = 4), axis.ticks.x = element_blank(), axis.ticks.length = unit(0.05, "cm"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black")) +
+  scale_y_continuous(limits=c(0.30,1.01), breaks=c(0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)) +
+  scale_x_discrete(limits=colorder) + 
+  annotate("text",x=1,y=(max(intra_microbial$value) + 0.025), label="", size=2.25, fontface =2.25)+ 
+  annotate("text",x=2,y=(max(intra_microbial$value) + 0.025), label="", size=2.25, fontface =2.25)
+dev.off()
+
+t.test(intra_diet_microbial$value, intra_animal_microbial$value)
+#t = -1.8129, df = 67.693, p-value = 0.07428
+```
+
+```{r, engine='bash'}
+convert microbial_intra_diet.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_intra_diet_label.tiff 
+```
+
 ## Median K-mer Count
 
 Use khmer software to compare k-mer profiles of different metagenomes. Load all microbial metagenomes into counting first.
@@ -19,14 +267,13 @@ do
 done
 ```
 
-The script below is from ____ (	https://github.com/qingpeng/igs-diversity/blob/master/scripts/get_comb_multi_old_median_kmer.py
-) and I have provided the version of the script used in this analysis. Finds the median k-mer abundance across samples.
+The script below calculates the median k-mer abundance across samples is from https://github.com/qingpeng/igs-diversity/blob/master/scripts/get_comb_multi_old_median_kmer.py and I have provided the version of the script used in this analysis.
 
 ```{r, engine='bash', results='hide'}
 cd microbial_beta_div/
 ls *k20.kh | awk '{ ORS=" "; print; }' > config.txt
 printf "\n" >> config.txt
-ls *finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
+ls ../microbial_qc/*finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
 printf "\n" >> config.txt
 printf "200000000" >> config.txt
 	
@@ -35,357 +282,134 @@ python ../scripts/get_comb_multi_old_median_kmer.py config.txt
 cd ..
 ```
 
-Remove reads that are not shared with at least one other sample. This helps to alleviate differences diven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
+Remove reads that are not shared with at least one other sample. This helps to alleviate differences driven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
 
 ```{r, engine='bash', results='hide'}
+mv microbial_qc/*.comb microbial_beta_div/
+
 perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=microbial_beta_div -threshold=1
 
 mv *.comb.keep.txt microbial_beta_div
 	
 cat microbial_beta_div/*.comb.keep.txt > microbial_beta_div/BMG.cat.comb.keep.txt
  	
-awk '{print $1,$2/631225,$3/2261004,$4/1591514,$5/972805,$6/2475541,$7/734576,$8/2011286,$9/509528,$10/1240812,$11/995310,$12/931099,$13/888555,$14/1331228,$15/2070496,$16/3165966,$17/666970,$18/2344185,$19/484852,$20/884957,$21/667046}' microbial_beta_div/BMG.cat.comb.keep.txt > microbial_beta_div/BMG.cat.comb.keep.norm.txt
+awk '{print $1,$2/631225,$3/2261004,$4/1591514,$5/972805,$6/2475541,$7/734576,$8/2011286,$9/509528,$10/1240812,$11/995551,$12/931099,$13/888555,$14/1331228,$15/2070496,$16/3165966,$17/666970,$18/2344185,$19/484852,$20/884957,$21/667046}' microbial_beta_div/BMG.cat.comb.keep.txt > microbial_beta_div/BMG.cat.comb.keep.norm.txt
  	
-printf "ID BMG.10 BMG.11 BMG.12 BMG.13 BMG.14 BMG.15 BMG.16 BMG.17 BMG.18 BMG.19 BMG.1 BMG.20 BMG.2 BMG.3 BMG.4 BMG.5 BMG.6 BMG.7 BMG.8 BMG.9\n" > microbial_beta_div/BMG.read_table.txt
+printf "ID B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B1 B20 B2 B3 B4 B5 B6 B7 B8 B9\n" > microbial_beta_div/BMG.read_table.txt
 	
 cat microbial_beta_div/BMG.cat.comb.keep.norm.txt >> microbial_beta_div/BMG.read_table.txt
 	
 tr ' ' \\t < microbial_beta_div/BMG.read_table.txt > microbial_beta_div/BMG.read_table.tab.txt
 	
-biom convert -i microbial_beta_div/BMG.read_table.tab.txt -o microbial_beta_div/BMG.read_table.tab.biom --table-type="OTU table" --to-json
+#biom convert -i microbial_beta_div/BMG.read_table.tab.txt -o microbial_beta_div/BMG.read_table.tab.biom --table-type="OTU table" --to-json
 ```
 
 Calcualte the Bray-Curtis dissimilarity between samples based on the normalized median k-mer abundance and use the dissimilarities to construct an NMDS plot.
 
-```{r, engine='bash', results='hide'}
-beta_diversity.py -i microbial_beta_div/BMG.read_table.tab.biom -o microbial_beta_div/BMG.read_table_bc -m bray_curtis
+```{r}
+library(vegan)
+library(data.table)
 
-nmds.py -i microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt -o microbial_beta_div/BMG.read_table_bc_nmds.txt
+microbial_tab <- fread("microbial_beta_div/BMG.read_table.tab.txt")
+microbial_df <- as.data.frame(microbial_tab)
+row.names(microbial_df) <- microbial_df$ID
+microbial_df <- subset(microbial_df, select=-c(ID))
+microbial_df_t <- t(microbial_df)
+
+bc <- vegdist(microbial_df_t)
+bc_matrix <- as.matrix(bc)
+
+write.table(bc_matrix, file="microbial_beta_div/bray_curtis_BMG.read_table.tab.txt", row.names=TRUE, quote=FALSE, sep="\t", col.names=NA)
+```
+
+
+```{r, engine='bash', results='hide'}
+#beta_diversity.py -i microbial_beta_div/BMG.read_table.tab.biom -o microbial_beta_div/BMG.read_table_bc -m bray_curtis
+
+nmds.py -i microbial_beta_div/bray_curtis_BMG.read_table.tab.txt -o microbial_beta_div/BMG.read_table_bc_nmds.txt
 ```
 
 ```{r}
 library(ggplot2)
 library(vegan)
-total_bc <- read.table("microbial_beta_div/BMG.read_table_bc/bray_curtis_BMG.read_table.tab.txt", header=TRUE, row.names=1)
-total_bc_matrix <- as.matrix(total_bc)
-total_bc_dist <- as.dist(total_bc_matrix)
-	
-total_map <- read.table("total_mapping.txt", sep="\t", header=TRUE)
-total_map$Animal <- as.factor(total_map$Animal)
-```
-
-```{r}
-multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
-  library(grid)
-  plots <- c(list(...), plotlist)
-  numPlots = length(plots)
-  if (is.null(layout)) {
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)), ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-    
-	if (numPlots == 1) {
-	  print(plots[[1]])
-  } else {
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    for (i in 1:numPlots) {
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row, layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
-shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
-
-total_nmds <- read.table("microbial_beta_div/BMG.read_table_bc_nmds.txt", nrow = 20, sep = "\t", header=TRUE)
-colnames(total_nmds)[1] <- "ID"
-total_nmds_map <- merge(total_nmds, total_map, by = "ID")
-names(total_nmds_map)[5] <- "Steer"
-
-	
-total_diet_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) + 
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "") +
-  theme(legend.key = element_blank())
-    
-total_animal_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Steer), size=2.5) + 
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "") +
-  theme(legend.key = element_blank())
-
-tiff("figure_2a.tiff", height = 6, width = 12, units='in', res=600)
-multiplot(total_diet_nmds, total_animal_nmds, cols = 2)
-dev.off()
-```
-
-Use PERMANOVA tests to investigate statisticial differences based on diet and animal the sample was collected from. Additionally, PERMANOVA can be used on continous data - so broke down the diets into their main components and tested which component had a signifincant impact on total microbial community structure.
-
-```{r}
-adonis(total_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=total_map)
-
-#Test for assumptions.
-
-anova(betadisper(total_bc_dist,total_map$Diet))
-
-anova(betadisper(total_bc_dist,total_map$Animal))
-
-permutest(betadisper(total_bc_dist,total_map$Diet))
-
-permutest(betadisper(total_bc_dist,total_map$Animal))
-```
-
-Also used dbRDA, adonis, and subsequent ordination plots to investigate influence of environmental factors (i.e. dietary components) on viral communities.
-
-```{r}
 library(data.table)
 library(ggvegan)
 library(grid)
+library(ggthemes)
 
-map2 <- total_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "K", "Mg", "Mn", "S", "Na", "Mo")]
-cor(map2)
+microbial_bc <- read.table("microbial_beta_div/bray_curtis_BMG.read_table.tab.txt", header=TRUE, row.names=1)
+microbial_bc_matrix <- as.matrix(microbial_bc)
+microbial_bc_dist <- as.dist(microbial_bc_matrix)
 
-total_tab <- fread("microbial_beta_div/BMG.read_table.tab.txt", header=TRUE, sep="\t")
-total_df <- as.data.frame(total_tab)
-row.names(total_df) <- total_df$ID
-total_df <- subset(total_df, select=-c(ID))
-total_df_t <- t(total_df)
+microbial_map <- read.table("microbial_mapping.txt", sep="\t", header=TRUE, comment.char = '')
+microbial_map$Animal <- as.factor(microbial_map$Animal)
+colnames(microbial_map)[1] <- "ID"
 
-total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-#save(total_cap, file="total_cap_read.RData")
-#load("total_cap_read.RData")
+microbial_nmds <- read.table("microbial_beta_div/BMG.read_table_bc_nmds.txt", nrow = 20, sep = "\t", header=TRUE)
+colnames(microbial_nmds)[1] <- "ID"
+microbial_nmds_map <- merge(microbial_nmds, microbial_map, by = "ID")
+names(microbial_nmds_map)[names(microbial_nmds_map)=="Animal"] <- "Steer"
 
-total_cap <- capscale(total_df_t ~ TDN + Protein + Zn, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
+tiff("microbial_read_diet_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(microbial_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Diet),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Microbial - Reads - Diet") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
 
-total_cap <- capscale(total_df_t ~ Protein + Zn + TDN, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Protein + TDN + Zn, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Zn + TDN + Protein, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Zn + Protein + TDN, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-adonis(total_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=total_map)
-
-total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
-test <- fortify(total_cap)
-site_df <- subset(test, test$Score == "sites")
-site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","40MDGS", "27CDS", "27CDS", "55CS", "40MDGS","Corn","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
-biplot_df <- subset(test, test$Score == "biplot")
-biplot_df2 <- data.frame(text_x = as.numeric(c("-1.04", "-0.9", "0.56")), biplot_df)
-biplot_df3 <- data.frame(text_y = as.numeric(c("0.26", "-0.55", "0.068")), biplot_df2)
-biplot_df3$Label[3] = "Pro"
-
-tiff("figure_4a.tiff", width = 6, height = 6, units = 'in', res = 300)
-ggplot(data = site_df2, aes(Dim1, Dim2)) + 
-    geom_point(aes(color = diet)) +
-  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
-  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=3)+
-  	labs(x="CAP1 (55.60% of Constrained Variation)", y="CAP2 (32.85% of Constrained Variation)")+
-	  theme_bw() +
-	  theme(legend.title=element_blank(),
-		legend.background = element_rect(fill = "white"),
-		panel.grid.major = element_line(colour = "grey40"),
-		panel.grid.minor = element_blank(),
-		legend.key = element_blank()) +
-  	coord_fixed() +
-  	xlim(-2.0, 2.0) +
-    ylim(-2.1, 2.1)
+tiff("microbial_read_steer_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(microbial_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Steer),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Microbial - Reads - Steer") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
 dev.off()
 ```
 
-Test for differences between intra-steer distances and intra-diet distances in the microbial metagenomes. Intra-diet distances are all distances between samples from the same diet while intra-steer distances are all distances between samples from the same steer. Then use a t-test to show intra-diet distances are not higher than intra-steer distances. The same is not true in the viral communities (see beta_div_viral.Rmd).
+```{r, engine='bash'}
+convert microbial_read_diet_nmds.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +10+0 "A" microbial_read_diet_nmds_label.tiff 
 
-```{r}
-dm_list <- melt(total_bc_matrix)[melt(upper.tri(total_bc_matrix))$value, ]
-total_map2 <- total_map[c("ID","Animal","Diet")]
+convert microbial_read_steer_nmds.tiff -compress lzw -density 600 microbial_read_steer_nmds_label.tiff 
 
-names(total_map2)[1] <- "Var1"
-dm_list2 <- merge(total_map2, dm_list, by="Var1")
-names(dm_list2)[2] <- "var1_animal"
-names(dm_list2)[3] <- "var1_diet"
-
-names(total_map2)[1] <- "Var2"
-dm_list2 <- merge(total_map2, dm_list2, by="Var2")
-names(dm_list2)[2] <- "var2_animal"
-names(dm_list2)[3] <- "var2_diet"
-
-intra_diet <- dm_list2[dm_list2$var1_diet == dm_list2$var2_diet,]
-intra_animal <- dm_list2[dm_list2$var1_animal == dm_list2$var2_animal,]
-intra_diet$label <- "Intra-Diet"
-intra_animal$label <- "Intra-Animal"
-intra <- rbind(intra_diet, intra_animal)
-
-tiff("figure_3a.tiff", width = 6, height = 6, units = 'in', res = 300)
-ggplot(intra, aes(x = label, y = value)) + 
-    geom_boxplot() + geom_point(position = position_jitter(width = 0.15)) + 
-    labs(x = "", y = "Bray-Curtis Dissimilarity\n") + guides(fill = FALSE) + 
-    theme(axis.text.x = element_text(colour = "black", size=19), axis.title.y = element_text(size = 19), 
-        axis.ticks = element_blank())
-dev.off()
-
-t.test(intra_diet$value, intra_animal$value)
-```
-
-## Open Reading Frames
-
-Same approach as above, just using the abundance of ORFs across samples instead of median k-mer counts.
-
-```{r, engine='bash', results='hide'}
-beta_diversity.py -i bmg_blast2tsv/BMG.orf_table.tab.biom -o bmg_blast2tsv/BMG.orf_table_bc -m bray_curtis
-	
-nmds.py -i bmg_blast2tsv/BMG.orf_table_bc/bray_curtis_BMG.orf_table.tab.txt -o bmg_blast2tsv/BMG.orf_table_bc_nmds.txt
-```
-
-```{r}
-total_bc <- read.table("bmg_blast2tsv/BMG.orf_table_bc/bray_curtis_BMG.orf_table.tab.txt", header=TRUE, row.names=1)
-total_bc_matrix <- as.matrix(total_bc)
-total_bc_dist <- as.dist(total_bc_matrix)
-	
-total_map <- read.table("total_mapping.txt", sep="\t", header=TRUE)
-total_map$Animal <- as.factor(total_map$Animal)
-
-total_nmds <- read.table("bmg_blast2tsv/BMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
-colnames(total_nmds)[1] <- "ID"
-total_nmds_map <- merge(total_nmds, total_map, by = "ID")
-	
-total_diet_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "")
-    
-total_animal_nmds <- ggplot(total_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Animal), size=2.5) +
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "")
-    
-#tiff("figures/total_orf_nmds.tiff", height = 6, width = 12, units='in', res=300)
-#multiplot(total_diet_nmds, total_animal_nmds, cols = 2)
-#dev.off()
+montage microbial_read_diet_nmds_label.tiff microbial_read_steer_nmds_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 microbial_read_nmds.tiff
 ```
 
 PERMANOVA Stats.
 
 ```{r}
-adonis(total_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=total_map)
+row.names(microbial_map) <- microbial_map$ID
+microbial_map <- microbial_map[match(row.names(microbial_bc), row.names(microbial_map)),]
 
-#Test assumptions.
+set.seed(42) 
+adonis(microbial_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=microbial_map)
 
-anova(betadisper(total_bc_dist,total_map$Diet))
+#Number of permutations: 999
+#
+#Terms added sequentially (first to last)
+#
+#          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
+#Diet       3    1.2120 0.40401  1.9398 0.25964  0.010 **
+#Animal     4    0.9568 0.23920  1.1484 0.20496  0.274   
+#Residuals 12    2.4994 0.20828         0.53540          
+#Total     19    4.6682                 1.00000      
 
-anova(betadisper(total_bc_dist,total_map$Animal))
+#Test assumptions. Not significant.
+anova(betadisper(microbial_bc_dist,microbial_map$Diet))
 
-permutest(betadisper(total_bc_dist,total_map$Diet))
+anova(betadisper(microbial_bc_dist,microbial_map$Animal))
 
-permutest(betadisper(total_bc_dist,total_map$Animal))
+set.seed(42)
+permutest(betadisper(microbial_bc_dist,microbial_map$Diet))
+
+set.seed(42)
+permutest(betadisper(microbial_bc_dist,microbial_map$Animal))
 ```
-
-dbRDA analysis and ordination plot
-
-```{r}
-map2 <- total_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "K", "Mg", "Mn", "S", "Na", "Mo")]
-cor(map2)
-
-total_tab <- fread("bmg_blast2tsv/BMG.orf_table.tab.txt", header=TRUE, sep="\t")
-total_df <- as.data.frame(total_tab)
-row.names(total_df) <- total_df$ID
-total_df <- subset(total_df, select=-c(ID))
-total_df_t <- t(total_df)
-
-total_cap <- capscale(total_df_t ~ TDN + Zn + K + Protein + pH + VFA, data=total_map, dist="bray")
-ordistep(total_cap, direction="backward")
-
-total_cap <- capscale(total_df_t ~ TDN + Zn + Protein, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ TDN + Protein + Zn, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Protein + Zn + TDN, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Protein + TDN + Zn, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Zn + TDN + Protein, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-total_cap <- capscale(total_df_t ~ Zn + Protein + TDN, data = total_map, distance = "bray")
-anova.cca(total_cap)
-anova.cca(total_cap, by="terms")
-anova.cca(total_cap, by="axis")
-RsquareAdj(total_cap)
-
-#save(total_cap, file="total_cap_orf.RData")
-#load("total_cap_orf.RData")
-
-
-adonis(total_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=total_map)
-
-adonis(total_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=total_map)
-
-
-```
-
-
-
-

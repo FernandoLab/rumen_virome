@@ -82,6 +82,18 @@ cat deep_viral_qc/V12_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V12_illumi
 cat deep_viral_qc/V13_illumina_run1_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run2_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run3_R1_R2_finalQC.fastq deep_viral_qc/V13_illumina_run4_R1_R2_finalQC.fastq > deep_viral_qc/V13_illumina_finalQC.fastq
 ```
 
+Resulting read numbers.
+
+```{r, engine='bash'}
+for f in deep_viral_qc/*illumina_finalQC.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%.*}"
+  echo $f
+  prinseq-lite.pl -stats_info -fastq $f
+done
+```
+
 Get a FASTA version.
 
 ```{r, engine='bash', results='hide'}
@@ -89,23 +101,16 @@ for f in deep_viral_qc/*illumina_finalQC.fastq
 do
   filename=$(basename "$f")
   filename="${filename%.*}"
-  fastq-to-fasta.py $f -o deep_viral_qc/"$filename"".fna"
+  prinseq-lite.pl -fastq $f -out_format 1 -out_good deep_viral_qc/"$filename"
 done
 ```
 
-Resulting read numbers.
-
-```{r, engine='bash'}
-grep -c ">" deep_viral_qc/*illumina_finalQC.fna
-```
-
-
-Look at viral contamination. Same procedure, just focusing on reads from the MiSeq data.
+Look at deep viral metagenome contamination. Same procedure as viral metagenome, just focusing on reads from the MiSeq data.
 
 ```{r, engine='bash', results='hide'}
 mkdir rRNA_prediction/examples/e1/deep_viral_input
 mkdir rRNA_prediction/examples/e1/deep_viral_output
-cp deep_viral_qc/*illumina_finalQC.fna rRNA_prediction/examples/e1/deep_viral_input/
+cp deep_viral_qc/*illumina_finalQC.fasta rRNA_prediction/examples/e1/deep_viral_input/
 RRNA=`cd rRNA_prediction/rRNA_hmm_fs_wst_v0; pwd`
 export PATH=$PATH:$RRNA
 cd rRNA_prediction/examples/e1

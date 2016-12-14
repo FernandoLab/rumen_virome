@@ -5,51 +5,102 @@ output:
     keep_md: true
 ---
 
-Make bowtie databases for all datasets.
+Make bowtie databases for all datasets. Going to combine all viral ORFs from viral and deep viral metagenomes for the purpose of looking at protein clusters.
 
 ```{r, engine='bash'}
-mkdir vmg_orfs_bowtie
-bowtie2-build vmg.orfs_nt.filter.fasta vmg_orfs_bowtie/vmg_orfs_bowtie_db
+sed -e "s/>/>viral_/g" < vmg.orfs_nt.filter.fasta > vmg.orfs_nt.filter.sub.fasta
+sed -e "s/>/>deepviral_/g" < vmg.illumina.orfs_nt.filter.fasta > vmg.illumina.orfs_nt.filter.sub.fasta
+
+sed -e "s/>/>viral_/g" < vmg.orfs_aa.filter.fasta > vmg.orfs_aa.filter.sub.fasta
+sed -e "s/>/>deepviral_/g" < vmg.illumina.orfs_aa.filter.fasta > vmg.illumina.orfs_aa.filter.sub.fasta
+
+cat vmg.orfs_nt.filter.sub.fasta vmg.illumina.orfs_nt.filter.sub.fasta > vmg.ion_illumina.orfs_nt.filter.fasta
+cat vmg.orfs_aa.filter.sub.fasta vmg.illumina.orfs_aa.filter.sub.fasta > vmg.ion_illumina.orfs_aa.filter.fasta
+
+mkdir vmg_ion_illumina_orfs_bowtie
+bowtie2-build vmg.ion_illumina.orfs_nt.filter.fasta vmg_ion_illumina_orfs_bowtie/vmg_ion_illumina_orfs_bowtie_db
 
 mkdir bmg_orfs_bowtie
 bowtie2-build bmg.orfs_nt.filter.fasta bmg_orfs_bowtie/bmg_orfs_bowtie_db
-
-mkdir vmg_illumina_orfs_bowtie
-bowtie2-build vmg.illumina.orfs_nt.filter.fasta vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db
 ```	
 
-Align viral metagenome reads to nt ORFs.
+Align viral metagenome reads to nt ORFs from viral and deep viral metagenomes.
 
 ```{r, engine='bash'}
 for f in viral_qc/*finalQC.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
-  bowtie2 -U $f --end-to-end --sensitive -x vmg_orfs_bowtie/vmg_orfs_bowtie_db -S vmg_orfs_bowtie/$filename.psl --un vmg_orfs_bowtie/$filename.unaligned.txt --al vmg_orfs_bowtie/$filename.aligned.txt
-done
-
-```
-
-Align microbial metagenome reads to nt ORFs.
-
-```{r, engine='bash'}	
-for f in microbial_qc/*finalQC.fastq
-do
-  filename=$(basename "$f")
-  filename="${filename%_*}"
-  bowtie2 -U $f --end-to-end --sensitive -x bmg_orfs_bowtie/bmg_orfs_bowtie_db -S bmg_orfs_bowtie/$filename.psl --un bmg_orfs_bowtie/$filename.unaligned.txt --al bmg_orfs_bowtie/$filename.aligned.txt 
+  bowtie2 -U $f --end-to-end --sensitive -p 10 -x vmg_ion_illumina_orfs_bowtie/vmg_ion_illumina_orfs_bowtie_db -S vmg_ion_illumina_orfs_bowtie/$filename.sam --un vmg_ion_illumina_orfs_bowtie/$filename.unaligned.txt --al vmg_ion_illumina_orfs_bowtie/$filename.aligned.txt
 done
 ```
-	
-Align deep viral metagenome reads to nt ORFs.
+
+Align deep viral metagenome reads to nt ORFs from viral and deep viral metagenomes.
 
 ```{r, engine='bash'}
 for f in deep_viral_qc/*illumina_finalQC.fastq
 do
   filename=$(basename "$f")
   filename="${filename%_*}"
-  bowtie2 -U $f --end-to-end --sensitive -x vmg_illumina_orfs_bowtie/vmg_illumina_orfs_bowtie_db -S vmg_illumina_orfs_bowtie/$filename.psl --un vmg_illumina_orfs_bowtie/$filename.unaligned.txt --al vmg_illumina_orfs_bowtie/$filename.aligned.txt 
+  bowtie2 -U $f --end-to-end --sensitive -p 10 -x vmg_ion_illumina_orfs_bowtie/vmg_ion_illumina_orfs_bowtie_db -S vmg_ion_illumina_orfs_bowtie/$filename.sam --un vmg_ion_illumina_orfs_bowtie/$filename.unaligned.txt --al vmg_ion_illumina_orfs_bowtie/$filename.aligned.txt
 done
 ```
 
+Align microbial metagenome reads to nt ORFs from the microbial metagenome.
 
+```{r, engine='bash'}	
+for f in microbial_qc/*finalQC.fastq
+do
+  filename=$(basename "$f")
+  filename="${filename%_*}"
+  bowtie2 -U $f --end-to-end --sensitive -p 10 -x bmg_orfs_bowtie/bmg_orfs_bowtie_db -S bmg_orfs_bowtie/$filename.sam --un bmg_orfs_bowtie/$filename.unaligned.txt --al bmg_orfs_bowtie/$filename.aligned.txt 
+done
+```
+
+Use the resulting SAM files to calculate ORF abundances in viral/deep viral and microbial metagenome datasets. This infromation will be used to calcualte protein cluster abundances later on.
+
+```{r, engine='bash'}
+for f in vmg_ion_illumina_orfs_bowtie/*.sam
+do
+  filename=$(echo $f | cut -d. -f1)
+  samtools view -bS $f > $filename.bam
+  samtools sort $filename.bam -o $filename.sorted.bam
+  samtools index $filename.sorted.bam
+  filename2=$(echo $filename | cut -d/ -f2)
+  echo 'OTU'$'\t'$filename2 > $filename.orf_raw_abundance.txt
+  samtools idxstats $filename.sorted.bam | cut -f 1,3 | awk ' $2 > 0 ' >> $filename.orf_raw_abundance.txt
+done
+
+for f in vmg_ion_illumina_orfs_bowtie/*orf_raw_abundance.txt
+do
+  filename=$(basename "$f")
+	filename="${filename%.txt}"
+	biom convert --table-type="OTU table" --to-json -i $f -o vmg_ion_illumina_orfs_bowtie/$filename.biom
+done
+
+merge_otu_tables.py -i vmg_ion_illumina_orfs_bowtie/V1.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V2.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V3.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V4.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V5.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V6.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V7.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V8.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V9.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V10.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V11.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V12.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V13.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V14.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V15.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V4_illumina.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V9_illumina.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V10_illumina.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V11_illumina.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V12_illumina.orf_raw_abundance.biom,vmg_ion_illumina_orfs_bowtie/V13_illumina.orf_raw_abundance.biom -o vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.biom
+
+biom convert --table-type="OTU table" --to-tsv -i vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.biom -o vmg_ion_illumina_orfs_bowtie/VMG_ion_illumina.orf_raw_abundance.txt
+
+for f in bmg_orfs_bowtie/*.sam
+do
+  filename=$(echo $f | cut -d. -f1)
+  samtools view -bS $f > $filename.bam
+  samtools sort $filename.bam -o $filename.sorted.bam
+  samtools index $filename.sorted.bam
+  filename2=$(echo $filename | cut -d/ -f2)
+  echo 'OTU'$'\t'$filename2 > $filename.orf_raw_abundance.txt
+  samtools idxstats $filename.sorted.bam | cut -f 1,3 | awk ' $2 > 0 ' >> $filename.orf_raw_abundance.txt
+done
+
+for f in bmg_orfs_bowtie/*orf_raw_abundance.txt
+do
+  filename=$(basename "$f")
+	filename="${filename%.txt}"
+	biom convert --table-type="OTU table" --to-json -i $f -o bmg_orfs_bowtie/$filename.biom
+done
+
+merge_otu_tables.py -i bmg_orfs_bowtie/B1.orf_raw_abundance.biom,bmg_orfs_bowtie/B2.orf_raw_abundance.biom,bmg_orfs_bowtie/B3.orf_raw_abundance.biom,bmg_orfs_bowtie/B4.orf_raw_abundance.biom,bmg_orfs_bowtie/B5.orf_raw_abundance.biom,bmg_orfs_bowtie/B6.orf_raw_abundance.biom,bmg_orfs_bowtie/B7.orf_raw_abundance.biom,bmg_orfs_bowtie/B8.orf_raw_abundance.biom,bmg_orfs_bowtie/B9.orf_raw_abundance.biom,bmg_orfs_bowtie/B10.orf_raw_abundance.biom,bmg_orfs_bowtie/B11.orf_raw_abundance.biom,bmg_orfs_bowtie/B12.orf_raw_abundance.biom,bmg_orfs_bowtie/B13.orf_raw_abundance.biom,bmg_orfs_bowtie/B14.orf_raw_abundance.biom,bmg_orfs_bowtie/B15.orf_raw_abundance.biom,bmg_orfs_bowtie/B16.orf_raw_abundance.biom,bmg_orfs_bowtie/B17.orf_raw_abundance.biom,bmg_orfs_bowtie/B18.orf_raw_abundance.biom,bmg_orfs_bowtie/B19.orf_raw_abundance.biom,bmg_orfs_bowtie/B20.orf_raw_abundance.biom -o bmg_orfs_bowtie/BMG.orf_raw_abundance.biom
+
+biom convert --table-type="OTU table" --to-tsv -i bmg_orfs_bowtie/BMG.orf_raw_abundance.biom -o bmg_orfs_bowtie/BMG.orf_raw_abundance.txt
+```

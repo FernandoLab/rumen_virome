@@ -5,7 +5,261 @@ output:
     keep_md: true
 ---
 
-Two methods - median k-mer counts and distribution of ORFs among samples.
+Two methods - distribution of protein clusters among samples (assembly-based approach) and median k-mer counts of reads (assembly free approach) to look at beta diversity.
+
+## Protein Clusters
+
+Calculate Bray-Curtis dissimilarity and plot NMDS.
+
+```{r, engine='bash', results='hide'}
+python scripts/norm_pc.py 
+
+mv viral_pc_cluster_raw_abundance.txt viral_beta_div/viral_pc_cluster_raw_abundance.txt
+mv viral_pc_cluster_norm_abundance.txt viral_beta_div/viral_pc_cluster_norm_abundance.txt
+
+biom convert --table-type "OTU table" -i viral_beta_div/viral_pc_cluster_norm_abundance.txt -o viral_beta_div/viral_pc_cluster_norm_abundance.biom --to-json
+
+beta_diversity.py -i viral_beta_div/viral_pc_cluster_norm_abundance.biom -o viral_beta_div/viral_pc_bc -m bray_curtis
+
+nmds.py -i viral_beta_div/viral_pc_bc/bray_curtis_viral_pc_cluster_norm_abundance.txt -o viral_beta_div/viral_pc_bc/viral_bc_nmds.txt
+```
+
+```{r}
+library(ggplot2)
+library(vegan)
+library(data.table)
+library(ggvegan)
+library(grid)
+library(ggthemes)
+
+viral_bc <- read.table("viral_beta_div/viral_pc_bc/bray_curtis_viral_pc_cluster_norm_abundance.txt", header=TRUE, row.names=1)
+viral_bc_matrix <- as.matrix(viral_bc)
+viral_bc_dist <- as.dist(viral_bc_matrix)
+
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, comment.char = '')
+viral_map$Animal <- as.factor(viral_map$Animal)
+colnames(viral_map)[1] <- "ID"
+
+viral_nmds <- read.table("viral_beta_div/viral_pc_bc/viral_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
+colnames(viral_nmds)[1] <- "ID"
+viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
+names(viral_nmds_map)[names(viral_nmds_map)=="Animal"] <- "Steer"
+
+tiff("viral_pc_diet_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(viral_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Diet),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Viral - PC - Diet") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
+
+tiff("viral_pc_steer_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(viral_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Steer),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Viral - PC - Steer") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-1.75,1.75), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
+```
+
+```{r, engine='bash'}
+convert viral_pc_diet_nmds.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +10+0 "B" viral_pc_diet_nmds_label.tiff 
+
+convert viral_pc_steer_nmds.tiff -compress lzw -density 600 viral_pc_steer_nmds_label.tiff 
+
+montage viral_pc_diet_nmds_label.tiff viral_pc_steer_nmds_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 viral_pc_nmds.tiff
+
+montage microbial_pc_nmds.tiff viral_pc_nmds.tiff -tile 1x -geometry +0+0 -gravity Center -density 600 pc_nmds.tiff
+
+convert pc_nmds.tiff pc_nmds.eps
+convert pc_nmds.tiff pc_nmds.pdf
+```
+
+PERMANOVA Stats.
+
+```{r}
+row.names(viral_map) <- viral_map$ID
+viral_map <- viral_map[match(row.names(viral_bc), row.names(viral_map)),]
+
+set.seed(42) 
+adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
+
+#Number of permutations: 999
+#
+#Terms added sequentially (first to last)
+#
+#          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    
+#Diet       3    1.5640 0.52133  1.5196 0.28260  0.001 ***
+#Animal     4    1.5687 0.39217  1.1431 0.28345  0.138    
+#Residuals  7    2.4015 0.34308         0.43394           
+#Total     14    5.5342                 1.00000    
+
+#Test assumptions. Not significant.
+
+anova(betadisper(viral_bc_dist,viral_map$Diet))
+
+anova(betadisper(viral_bc_dist,viral_map$Animal))
+
+set.seed(42)
+permutest(betadisper(viral_bc_dist,viral_map$Diet))
+
+set.seed(42)
+permutest(betadisper(viral_bc_dist,viral_map$Animal))
+```
+
+adonis and dbRDA analysis to investigate the influence of environmental factors.
+
+```{r}
+map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo", "microbial_div")]
+cor(map2)
+
+viral_tab <- fread("viral_beta_div/viral_pc_cluster_norm_abundance.txt", header=TRUE, sep="\t")
+viral_df <- as.data.frame(viral_tab)
+row.names(viral_df) <- viral_df$OTUID
+viral_df <- subset(viral_df, select=-c(OTUID))
+viral_df_t <- t(viral_df)
+
+viral_map <- viral_map[match(row.names(viral_df_t), row.names(viral_map)),]
+
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein + pH + VFA + microbial_div, data=viral_map, dist="bray")
+vif.cca(viral_cap)
+#          TDN            Zn       Protein            pH           VFA 
+#     3.901052      1.541555      3.373044      4.344874      1.843562 
+#microbial_div 
+#     1.409417 
+
+ordistep(viral_cap, direction="backward")
+
+viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein + microbial_div, data=viral_map, dist="bray")
+set.seed(42)
+anova.cca(viral_cap, seed=42)
+
+#Model: capscale(formula = viral_df_t ~ TDN + Zn + Protein + microbial_div, data = viral_map, distance = "bray")
+#         Df SumOfSqs      F Pr(>F)    
+#Model     4   2.0620 1.4846  0.001 ***
+#Residual 10   3.4723       
+
+set.seed(42)
+anova.cca(viral_cap, by="margin", seed=42)
+
+#Model: capscale(formula = viral_df_t ~ TDN + Zn + Protein + microbial_div, data = viral_map, distance = "bray")
+#              Df SumOfSqs      F Pr(>F)    
+#TDN            1   0.7649 2.2029  0.001 ***
+#Zn             1   0.5883 1.6942  0.015 *  
+#Protein        1   0.4435 1.2773  0.099 .  
+#microbial_div  1   0.4980 1.4341  0.024 *  
+#Residual      10   3.4723  
+
+RsquareAdj(viral_cap)
+#$r.squared
+#[1] 0.3725818
+#$adj.r.squared
+#[1] 0.1216145
+
+#get r2 for terms
+set.seed(42)
+adonis(viral_bc_dist ~ TDN + Zn + Protein + microbial_div,  permutations=999, data=viral_map)
+#              Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
+#TDN            1    0.6042 0.60419  1.7401 0.10917  0.005 **
+#Zn             1    0.4817 0.48166  1.3872 0.08703  0.064 . 
+#Protein        1    0.4781 0.47814  1.3770 0.08640  0.056 . 
+#microbial_div  1    0.4980 0.49796  1.4341 0.08998  0.024 * 
+#Residuals     10    3.4723 0.34723         0.62742          
+#Total         14    5.5342                 1.00000 
+
+
+test <- fortify(viral_cap)
+site_df <- subset(test, test$Score == "sites")
+site_df$Diet <- viral_map$Diet
+biplot_df <- subset(test, test$Score == "biplot")
+biplot_df2 <- data.frame(text_x = as.numeric(c("-0.80", "0.26", "0.485", "-0.22")), biplot_df)
+biplot_df3 <- data.frame(text_y = as.numeric(c("-0.415", "-0.325", "0.23", "1.00")), biplot_df2)
+biplot_df3$Label[2] = "Zinc"
+biplot_df3$Label[3] = "Protein"
+biplot_df3$Label[4] = "Microbial\nDiversity"
+#biplot_df3$Label[4] = paste(expression(atop(Microbial,Diversity ~ (italic(paste("H'"))))))
+
+tiff("viral_dbRDA.tiff", width = 3.3, height = 3.3, units = 'in', res=600, compression = "lzw")
+ggplot(data = site_df, aes(Dim1, Dim2)) + 
+    #ggtitle("") +
+    geom_point(aes(color = Diet), size=0.7, shape=16) +
+  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.075, "cm")),colour="black", size=0.35) + 
+  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=2)+
+  	labs(x="CAP1 (42.70% of Constrained Variation)", y="CAP2 (23.14% of Constrained Variation)")+
+	  theme_bw() +
+    scale_color_few(palette="medium") +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=3.5, color="black"), axis.title=element_text(size=5), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"),legend.text=element_text(size=5), legend.title = element_blank(), legend.key.size = unit(0.15, "cm"), legend.key.height = unit(0.2, "cm"), legend.key = element_blank(), legend.position = c(0.075, 0.945), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="vertical", axis.ticks.length = unit(0.05, "cm"), plot.title = element_text(size = 0.01)) +
+  	coord_fixed() +
+  	xlim(-2.0, 2.0) +
+  	ylim(-2.0, 2.0)
+dev.off()
+```
+
+```{r, engine='bash'}
+convert viral_dbRDA.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_dbRDA_label.tiff 
+
+montage microbial_dbRDA_label.tiff viral_dbRDA_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 dbRDA.tiff
+
+convert dbRDA.tiff dbRDA.eps
+convert dbRDA.tiff dbRDA.pdf
+```
+
+Test for differences between intra-steer distances and intra-diet distances in the viral metagenomes. Intra-diet distances are all distances between samples from the same diet while intra-steer distances are all distances between samples from the same steer. Then use a t-test to show intra-diet distances are higher than intra-steer distances. The same is not true in the microbial communities (see beta_div_microbial.Rmd).
+
+```{r}
+dm_list <- melt(viral_bc_matrix)[melt(upper.tri(viral_bc_matrix))$value, ]
+viral_map2 <- viral_map[c("ID","Animal","Diet")]
+
+names(viral_map2)[1] <- "Var1"
+dm_list2 <- merge(viral_map2, dm_list, by="Var1")
+names(dm_list2)[2] <- "var1_animal"
+names(dm_list2)[3] <- "var1_diet"
+
+names(viral_map2)[1] <- "Var2"
+dm_list2 <- merge(viral_map2, dm_list2, by="Var2")
+names(dm_list2)[2] <- "var2_animal"
+names(dm_list2)[3] <- "var2_diet"
+
+intra_diet <- dm_list2[dm_list2$var1_diet == dm_list2$var2_diet,]
+intra_animal <- dm_list2[dm_list2$var1_animal == dm_list2$var2_animal,]
+intra_diet$label <- "Intra-\nDiet"
+intra_animal$label <- "Intra-\nSteer"
+intra <- rbind(intra_diet, intra_animal)
+
+colorder <- c("Intra-\nDiet", "Intra-\nSteer")
+tiff("viral_intra_diet.tiff", width = 1.35, height = 3.3, units = 'in', res = 600, compression = "lzw")
+ggplot(intra, aes(x = label, y = value)) + 
+    geom_boxplot(outlier.size=0.15, outlier.color="black", lwd=0.2) + 
+    geom_point(position = position_jitter(width = 0.15), size=0.4, shape=16) + 
+    labs(x = "", y = "Bray-Curtis Dissimilarity\n") + guides(fill = FALSE) + 
+    theme_bw() +
+    theme(axis.title.x=element_blank(), axis.text.x = element_text(colour = "black", size=6, margin = margin(b = 0.005)), axis.title.y = element_text(size = 6, margin = margin(l = 0.005)),  axis.text.y = element_text(size = 4), axis.ticks.x = element_blank(), axis.ticks.length = unit(0.05, "cm"), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black")) +
+  scale_y_continuous(limits=c(0.30,1.01), breaks=c(0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)) +
+  scale_x_discrete(limits=colorder) + 
+  annotate("text",x=1,y=(max(intra$value) + 0.025), label="", size=2.0, fontface =2.25)+ 
+  annotate("text",x=2,y=(max(intra$value) + 0.025), label="*", size=2.0, fontface =2.25)
+dev.off()
+
+t.test(intra_diet$value, intra_animal$value)
+#t = -2.3584, df = 33.313, p-value = 0.02437
+```
+
+```{r, engine='bash'}
+convert viral_intra_diet.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_intra_diet_label.tiff 
+
+montage microbial_intra_diet_label.tiff viral_intra_diet_label.tiff -tile x1 -geometry +20+0 -gravity Center -density 600 intra_diet.tiff
+
+convert intra_diet.tiff intra_diet.eps
+convert intra_diet.tiff intra_diet.pdf
+```
 
 ## Median K-mer Count
 
@@ -27,9 +281,9 @@ The script below is from https://github.com/qingpeng/igs-diversity/blob/master/s
 cd viral_beta_div/
 ls *k20.kh | awk '{ ORS=" "; print; }' > config.txt
 printf "\n" >> config.txt
-ls *finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
+ls ../viral_qc/*finalQC.fastq | awk '{ ORS=" "; print; }' >> config.txt
 printf "\n" >> config.txt
-printf "55000000" >> config.txt
+printf "64000000" >> config.txt
 	
 python ../scripts/get_comb_multi_old_median_kmer.py config.txt
 
@@ -39,15 +293,17 @@ cd ..
 Remove reads that are not shared with at least one other sample. This helps to alleviate differences diven by sequencing errors. Sequencing errors generate new/false k-mers. The median k-mer counts are then normalized based on library size and the resulting normalized files are converted to biom format.
 
 ```{r, engine='bash', results='hide'}
+mv viral_qc/*.comb viral_beta_div/
+
 perl scripts/khmer_multi_threshold.pl -khmer_multi_dir=viral_beta_div -threshold=1
 
 mv *.comb.keep.txt viral_beta_div
 
 cat viral_beta_div/*.comb.keep.txt > viral_beta_div/VMG.cat.comb.keep.txt
 
-awk '{print $1,$2/629489,$3/2712098,$4/470915,$5/920397,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' viral_beta_div/VMG.cat.comb.keep.txt > viral_beta_div/VMG.cat.comb.keep.norm.txt
+awk '{print $1,$2/629489,$3/2712098,$4/470725,$5/919665,$6/593047,$7/328660,$8/593530,$9/100696,$10/1350530,$11/1881525,$12/2138335,$13/276069,$14/499466,$15/526337,$16/703720}' viral_beta_div/VMG.cat.comb.keep.txt > viral_beta_div/VMG.cat.comb.keep.norm.txt
 
-printf "ID VMG.10 VMG.11 VMG.12 VMG.13 VMG.14 VMG.15 VMG.1 VMG.2 VMG.3 VMG.4 VMG.5 VMG.6 VMG.7 VMG.8 VMG.9\n" > viral_beta_div/VMG.read_table.txt
+printf "ID V10 V11 V12 V13 V14 V15 V1 V2 V3 V4 V5 V6 V7 V8 V9\n" > viral_beta_div/VMG.read_table.txt
 
 cat viral_beta_div/VMG.cat.comb.keep.norm.txt >> viral_beta_div/VMG.read_table.txt
 
@@ -67,64 +323,75 @@ nmds.py -i viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt -
 ```{r}
 library(ggplot2)
 library(vegan)
+library(ggthemes)
+
 viral_bc <- read.table("viral_beta_div/VMG.read_table_bc/bray_curtis_VMG.read_table.tab.txt", header=TRUE, row.names=1)
 viral_bc_matrix <- as.matrix(viral_bc)
 viral_bc_dist <- as.dist(viral_bc_matrix)
 	
-viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
+viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE, comment.char="")
 viral_map$Animal <- as.factor(viral_map$Animal)
-```
-
-```{r}
-multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
-  library(grid)
-  plots <- c(list(...), plotlist)
-  numPlots = length(plots)
-  if (is.null(layout)) {
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)), ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-    
-	if (numPlots == 1) {
-	  print(plots[[1]])
-  } else {
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    for (i in 1:numPlots) {
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row, layout.pos.col = matchidx$col))
-    }
-  }
-}
+colnames(viral_map)[1] <- "ID"
 
 viral_nmds <- read.table("viral_beta_div/VMG.read_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
 colnames(viral_nmds)[1] <- "ID"
 viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
-names(viral_nmds_map)[5] <- "Steer"
+names(viral_nmds_map)[names(viral_nmds_map)=="Animal"] <- "Steer"
 
-shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
-shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
-
-viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
+tiff("viral_read_diet_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(viral_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Diet),size=0.3, shape=16) +
   xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "") +
-  theme(legend.key = element_blank())
-    
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Steer), size=2.5) +
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "") +
-  theme(legend.key = element_blank())
-    
-tiff("figure_2b.tiff", height = 6, width = 12, units='in', res=600)
-multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
+  #ggtitle("Viral - Reads - Diet") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-2.00,2.00), breaks = c(-1.5,-0.75,0,0.75,1.5))
 dev.off()
+
+tiff("viral_read_steer_nmds.tiff", res=600, compression = "lzw", width=1.6, height=1.4, units="in") 
+ggplot(viral_nmds_map, aes(x=NMDS1, y=NMDS2)) + 
+  geom_point(aes(color=Steer),size=0.3, shape=16) +
+  xlab("NMDS1") + ylab("NMDS2") + 
+  #ggtitle("Viral - Reads - Steer") +
+  theme_bw() +
+  scale_color_few(palette="medium") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=2.0, color="black"), axis.title=element_text(size=4), panel.border = element_rect(size = 0.4, linetype = "solid", colour = "black"), plot.title = element_text(size = 4, margin=margin(0,0,5,0)), axis.ticks=element_line(size=0.075, color="black"), legend.text=element_text(size=2.5), legend.title = element_blank(), legend.key.height = unit(0.08, "cm"), legend.key.width = unit(0.00, "cm"), legend.key = element_blank(), legend.position = c(0.5, 1.02), legend.background = element_rect(fill=alpha('white', 0.0)), legend.direction="horizontal", axis.ticks.length = unit(0.035, "cm"), axis.text.y = element_text(margin = margin(r = 0.125)), axis.text.x = element_text(margin = margin(t = 0.3)), plot.margin=unit(c(0.25,0.1,0.1,0.1),"cm"), axis.title.y=element_text(margin=margin(0,2,0,0)), axis.title.x=element_text(margin=margin(3,0,0,0))) +
+  scale_y_continuous(limits=c(-1.25,1.25), breaks = c(-1.0,-0.5,0,0.5,1.0)) +
+  scale_x_continuous(limits=c(-2.00,2.00), breaks = c(-1.5,-0.75,0,0.75,1.5))
+dev.off()
+```
+
+```{r, engine='bash'}
+convert viral_read_diet_nmds.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +10+0 "B" viral_read_diet_nmds_label.tiff 
+
+convert viral_read_steer_nmds.tiff -compress lzw -density 600 viral_read_steer_nmds_label.tiff 
+
+montage viral_read_diet_nmds_label.tiff viral_read_steer_nmds_label.tiff -tile x1 -geometry +0+0 -gravity Center -density 600 viral_read_nmds.tiff
+
+montage microbial_read_nmds.tiff viral_read_nmds.tiff -tile 1x -geometry +0+0 -gravity Center -density 600 read_nmds.tiff
+
+convert read_nmds.tiff read_nmds.eps
 ```
 
 Use PERMANOVA tests to investigate statisticial differences based on diet and animal the sample was collected from. Additionally, PERMANOVA can be used on continous data - so broke down the diets into their main components and tested which component had a signifincant impact on viral community structure.
 
 ```{r}
+row.names(viral_map) <- viral_map$ID
+viral_map <- viral_map[match(row.names(viral_bc), row.names(viral_map)),]
+
+set.seed(42)
 adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
+
+#          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
+#Diet       3    1.7261 0.57536  1.7220 0.31416  0.004 **
+#Animal     4    1.4294 0.35734  1.0695 0.26015  0.332   
+#Residuals  7    2.3388 0.33412         0.42568          
+#Total     14    5.4942                 1.00000  
+
+
+#Test assumptions. Not significant.
 
 anova(betadisper(viral_bc_dist,viral_map$Diet))
 
@@ -134,265 +401,3 @@ permutest(betadisper(viral_bc_dist,viral_map$Diet))
 
 permutest(betadisper(viral_bc_dist,viral_map$Animal))
 ```
-
-Also used dbRDA, adonis, and subsequent ordination plots to investigate influence of environmental factors (i.e. dietary components) on viral communities.
-
-```{r}
-library(data.table)
-library(ggvegan)
-library(grid)
-
-map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo")]
-cor(map2)
-
-viral_tab <- fread("viral_beta_div/VMG.read_table.tab.txt", header=TRUE, sep="\t")
-viral_df <- as.data.frame(viral_tab)
-row.names(viral_df) <- viral_df$ID
-viral_df <- subset(viral_df, select=-c(ID))
-viral_df_t <- t(viral_df)
-
-viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-#save(viral_cap, file="viral_cap_read.RData")
-#load("viral_cap_read.RData")
-
-
-viral_cap <- capscale(viral_df_t ~ TDN + Protein + Zn, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Protein + Zn + TDN, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Protein + TDN + Zn, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Zn + TDN + Protein, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Zn + Protein + TDN, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-adonis(viral_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=viral_map)
-
-viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
-test <- fortify(viral_cap)
-site_df <- subset(test, test$Score == "sites")
-site_df2 <- data.frame(diet= c("27CDS","55CS","55CS","27CDS","Corn","40MDGS","Corn","Corn","40MDGS","27CDS","55CS","40MDGS","40MDGS","Corn","55CS"), site_df)
-biplot_df <- subset(test, test$Score == "biplot")
-biplot_df2 <- data.frame(text_x = as.numeric(c("0.82", "-0.30", "-0.25")), biplot_df)
-biplot_df3 <- data.frame(text_y = as.numeric(c("0.33", "-0.95", "-0.30")), biplot_df2)
-biplot_df3$Label[3] = "Pro"
-
-tiff("figure_4b.tiff", width = 6, height = 6, units = 'in', res = 300)
-ggplot(data = site_df2, aes(Dim1, Dim2)) + 
-    geom_point(aes(color = diet)) +
-  	geom_segment(data=biplot_df3,aes(x=0,xend=Dim1,y=0,yend=Dim2), arrow = arrow(type="closed",length = unit(0.2, "cm")),colour="black") + 
-  	geom_text(data=biplot_df3,aes(x=text_x,y=text_y,label=Label),size=3)+
-  	labs(x="CAP1 (64.02% of Constrained Variation)", y="CAP2 (18.34% of Constrained Variation)")+
-	  theme_bw() +
-	  theme(legend.title=element_blank(),
-		legend.background = element_rect(fill = "white"),
-		panel.grid.major = element_line(colour = "grey40"),
-		panel.grid.minor = element_blank(),
-		legend.key = element_blank()) +
-  	coord_fixed() +
-  	xlim(-2.0, 2.0) +
-  	ylim(-2.1, 2.1)
-dev.off()
-```
-
-Test for differences between intra-steer distances and intra-diet distances in the viral metagenomes. Intra-diet distances are all distances between samples from the same diet while intra-steer distances are all distances between samples from the same steer. Then use a t-test to show intra-diet distances are higher than intra-steer distances. The same is not true in the microbial communities (see beta_div_microbial.Rmd).
-
-```{r}
-dm_list <- melt(viral_bc_matrix)[melt(upper.tri(viral_bc_matrix))$value, ]
-viral_map2 <- viral_map[c("ID","Animal","Diet")]
-
-names(viral_map2)[1] <- "Var1"
-dm_list2 <- merge(viral_map2, dm_list, by="Var1")
-names(dm_list2)[2] <- "var1_animal"
-names(dm_list2)[3] <- "var1_diet"
-
-names(viral_map2)[1] <- "Var2"
-dm_list2 <- merge(viral_map2, dm_list2, by="Var2")
-names(dm_list2)[2] <- "var2_animal"
-names(dm_list2)[3] <- "var2_diet"
-
-intra_diet <- dm_list2[dm_list2$var1_diet == dm_list2$var2_diet,]
-intra_animal <- dm_list2[dm_list2$var1_animal == dm_list2$var2_animal,]
-intra_diet$label <- "Viral\nIntra-Diet"
-intra_animal$label <- "Viral\nIntra-Steer"
-intra <- rbind(intra_diet, intra_animal)
-
-tiff("figure_3b.tiff", width = 6, height = 6, units = 'in', res = 300)
-ggplot(intra, aes(x = label, y = value)) + 
-    geom_boxplot() + geom_point(position = position_jitter(width = 0.15)) + 
-    labs(x = "", y = "Bray-Curtis Dissimilarity\n") + guides(fill = FALSE) + 
-    theme(axis.text.x = element_text(colour = "black", size=12), axis.title.y = element_text(size = 19),
-        axis.ticks = element_blank())
-dev.off()
-
-t.test(intra_diet$value, intra_animal$value)
-```
-
-
-## Open Reading Frames
-
-Same approach as above, just using the abundance of ORFs across samples instead of median k-mer counts.
-
-Calculate Bray-Curtis dissimilarity and plot NMDS.
-
-```{r, engine='bash', results='hide'}
-beta_diversity.py -i viral_blast2tsv/VMG.orf_table.tab.biom -o viral_blast2tsv/VMG.orf_table_bc -m bray_curtis
-
-nmds.py -i viral_blast2tsv/VMG.orf_table_bc/bray_curtis_VMG.orf_table.tab.txt -o viral_blast2tsv/VMG.orf_table_bc_nmds.txt
-```
-
-```{r}
-viral_bc <- read.table("viral_blast2tsv/VMG.orf_table_bc/bray_curtis_VMG.orf_table.tab.txt", header=TRUE, row.names=1)
-viral_bc_matrix <- as.matrix(viral_bc)
-viral_bc_dist <- as.dist(viral_bc_matrix)
-
-viral_map <- read.table("viral_mapping.txt", sep="\t", header=TRUE)
-viral_map$Animal <- as.factor(viral_map$Animal)
-
-viral_nmds <- read.table("viral_blast2tsv/VMG.orf_table_bc_nmds.txt", nrow = 15, sep = "\t", header=TRUE)
-colnames(viral_nmds)[1] <- "ID"
-viral_nmds_map <- merge(viral_nmds, viral_map, by = "ID")
-names(viral_nmds_map)[5] <- "Steer"
-
-shape_diet <- c("Corn" = 15, "27CDS" = 16, "55CS" = 17, "40MDGS" = 18)
-shape_animal <- c("346" = 15, "259" = 16, "3244" = 17, "222" = 18, "3257" = 8)
-
-viral_diet_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Diet), size=2.5) +
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_diet) + 
-  labs(fill = "") +
-  ggtitle("Viral - ORFs - Diet") +
-  theme(legend.title=element_blank(), legend.key = element_blank())
-    
-viral_animal_nmds <- ggplot(viral_nmds_map, aes(NMDS1, NMDS2)) + geom_point(aes(color = Steer), size=2.5) +
-  xlab("NMDS1") + ylab("NMDS2") + 
-  guides(size = FALSE) + scale_shape_manual(name = "", values = shape_animal) + 
-  labs(fill = "") +
-  ggtitle("Viral - ORFs - Steer") +
-  theme(legend.title=element_blank(), legend.key = element_blank())
-    
-#tiff("figures/figure_s2a_orfs_nolabel.tiff", height = 6, width = 12, units='in', res=600)
-#multiplot(viral_diet_nmds, viral_animal_nmds, cols = 2)
-#dev.off()
-```
-
-PERMANOVA Stats.
-
-```{r}
-adonis(viral_bc_dist ~ Diet + Animal, permutations=999, random=Animal, data=viral_map)
-
-#Test assumptions.
-
-anova(betadisper(viral_bc_dist,viral_map$Diet))
-
-anova(betadisper(viral_bc_dist,viral_map$Animal))
-
-permutest(betadisper(viral_bc_dist,viral_map$Diet))
-
-permutest(betadisper(viral_bc_dist,viral_map$Animal))
-```
-
-adonis and dbRDA analysis to investigate the influence of environmental factors
-
-```{r}
-map2 <- viral_map[c("pH", "Protein", "NDF", "K", "Zn", "VFA", "TDN", "ADF", "RFV", "Ca", "Cu", "Fe", "P", "Mg", "Mn", "S", "Na", "Mo")]
-cor(map2)
-
-viral_tab <- fread("viral_blast2tsv/VMG.orf_table.tab.txt", header=TRUE, sep="\t")
-viral_df <- as.data.frame(viral_tab)
-row.names(viral_df) <- viral_df$ID
-viral_df <- subset(viral_df, select=-c(ID))
-viral_df_t <- t(viral_df)
-
-viral_cap <- capscale(viral_df_t ~ TDN + Zn + K + Protein + pH + VFA, data=viral_map, dist="bray")
-
-ordistep(viral_cap, direction="backward")
-
-viral_cap <- capscale(viral_df_t ~ TDN + Zn + Protein, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ TDN + Protein + Zn, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Protein + Zn + TDN, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Protein + TDN + Zn, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Zn + TDN + Protein, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-viral_cap <- capscale(viral_df_t ~ Zn + Protein + TDN, data = viral_map, distance = "bray")
-anova.cca(viral_cap)
-anova.cca(viral_cap, by="terms")
-anova.cca(viral_cap, by="axis")
-RsquareAdj(viral_cap)
-
-#save(viral_cap, file="viral_cap_orf.RData")
-#load("viral_cap_orf.RData")
-
-adonis(viral_bc_dist ~ TDN + Zn + Protein ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ TDN + Protein + Zn ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Protein + Zn + TDN ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Protein + TDN + Zn ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Zn + TDN + Protein ,  permutations=999, data=viral_map)
-
-adonis(viral_bc_dist ~ Zn + Protein + TDN ,  permutations=999, data=viral_map)
-```
-
-
-
