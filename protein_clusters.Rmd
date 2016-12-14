@@ -31,13 +31,13 @@ mv pc_cluster_abundance.txt microbial_pc_cluster_raw_abundance.txt
 python get_pc_abundance.py --orf_ab_table=bmg_orfs_bowtie/BMG.orf_raw_abundance.txt --pc_cluster=bmg.orfs_aa.filter.pcs.fasta.filter.clstr --thresh 1
 mv pc_cluster_abundance.txt microbial_pc_cluster_raw_abundance_singletons.txt
 
-#get earth virome
+#get earth virome scaffolds
 wget http://portal.nersc.gov/dna/microbial/prokpubs/EarthVirome_DP/mVGs_sequences_v2.fna
 
 #uncompress phast db
 unzip virus.db.zip
 
-#uncompress POV db
+#uncompress POV protein clusters
 tar -zxvf POV_all_clusters.lg.tar.gz
 
 # cluster all viral orfs (ion + illumina) with POV/phast/earth_virome
@@ -56,6 +56,7 @@ cd-hit-v4.6.1-2012-08-27/cd-hit-2d -i pc_compare.filter.fasta -i2 vmg.ion_illumi
 grep -c ">" vmg.ion_illumina.orfs_aa.filter.fasta
 #755820
 
+# determine how many ORFs from viral metagenome clustered
 grep -c "viral_NODE_" vmg.ion_illumina.orfs_aa.pc_compare_novel.fasta.clstr
 #26270
 #3.475695271361% of ORFs
@@ -65,5 +66,5 @@ grep -c "viral_NODE_" vmg.ion_illumina.orfs_aa.pc_compare_novel.fasta.clstr
 Calculate the core and exclusive core PCs for viral and microbial datasets.
 
 ```{r, engine='bash'}
-python calc_core_pc.py 
+python scripts/calc_core_pc.py 
 ```

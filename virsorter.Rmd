@@ -5,13 +5,15 @@ output:
     keep_md: true
 ---
 
+After identifying that dietary TDN content is the main ecological driver of rumen viral communities, we wanted to investigate the potential influence of extreme TDN diets on viral auxiliary metabolism gene (AMG) content. So, we looked for AMGs in the deep viral metagenomes collected from 55CS and 27CDS diets. First, we wanted to ensure the AMG signal was not the result of a contamination. To do so, we used VirSorter to "decontaminate" viral contigs and then searched the viral contigs against the KEGG database.
+
 ```{r, engine='bash'}
 prinseq-lite.pl -fasta vmg.illumina.contigs.fasta -min_len 1500 -out_format 1 -out_good vmg.illumina.contigs.1500
 
 #ran virsorter using iplant_wrapper script on github. Accessed 9/8/16.
 
 #get cat1 and cat2 virsorter features and use to filter for ORFs of interest
-python extract_virsorter_features.py --virsorter_csv=VIRSorter_global-phage-signal_1.5kb_viromes.csv --contig_fasta=vmg.illumina.contigs.1500.fasta --orf_fasta=vmg.illumina.orfs_aa.filter.fasta 
+python scripts/extract_virsorter_features.py --virsorter_csv=intermediate_results/VIRSorter_global-phage-signal_1.5kb_viromes.csv --contig_fasta=vmg.illumina.contigs.1500.fasta --orf_fasta=vmg.illumina.orfs_aa.filter.fasta 
 
 mv virsorter_orf.fasta vmg.illumina.orfs_aa.filter.virsorter.fasta
 mv virsorter_contig.fasta vmg.illumina.contigs.filter.virsorter.fasta
@@ -21,28 +23,25 @@ mv virsorter_contig.fasta vmg.illumina.contigs.filter.virsorter.fasta
 
 #awk '/^>/{id=$0;getline;arr[id]=$0}END{for(id in arr)printf("%s\n%s\n",id,arr[id])}' prophage_virus.db > prophage_virus_derep.db
 
+unzip prophage_virus_derep.db.zip
 cat /work/samodha/canderson3/keggV69.genes.pep.txt prophage_virus_derep.db > kegg_phast.fasta
 
-#use ublast instead. Using substription version so database fits into memory. Cant reproduce as a result.
+# Use ublast to search against the KEGG db. Version of ublast needed is a substription version so that the database fits into memory. Cant reproduce as a result. Output is available though in intermediate_results directory.
 
-usearch7.0.10 -makeudb_ublast kegg_phast.fasta -output kegg_phast.udb
+#usearch7.0.10 -makeudb_ublast kegg_phast.fasta -output kegg_phast.udb
 
-usearch7.0.10 -ublast vmg.illumina.orfs_aa.filter.virsorter.fasta -db kegg_phast.udb -evalue 0.0001 -blast6out vmg.illumina.orfs_aa.filter.virsorter.kegg_phast_ublast.txt -strand both -top_hits_only -threads 10
-
-
-#makeblastdb -in kegg_phast.fasta -dbtype prot -parse_seqids
-#blastp -db kegg_phast.fasta -query vmg.illumina.orfs_aa.filter.virsorter.fasta -out vmg.illumina.orfs_aa.filter.virsorter.blastp_kegg.txt -evalue 0.00001 -outfmt "6 std qcovs qcovhsp" -max_target_seqs 1 -num_threads 10
+#usearch7.0.10 -ublast vmg.illumina.orfs_aa.filter.virsorter.fasta -db kegg_phast.udb -evalue 0.0001 -blast6out vmg.illumina.orfs_aa.filter.virsorter.kegg_phast_ublast.txt -strand both -top_hits_only -threads 10
 ```
 
-Add python script to filter for AMGs.
+Filtered the KEGG hits for AMGs present in KEGG global metabolism.
 
 ```{r, engine=bash}
-
+# Untitled.ipynb
 
 
 ```
 
-Test if ORFs AMGs were identified on have differential abundance between 55CS and 27CDS. Try DESEQ2 first.
+Test if ORFs AMGs and AMG KNumbers were differentially abundant between 55CS and 27CDS deits. Try DESEQ2 first.
 
 ```{r}
 library(phyloseq)
@@ -86,7 +85,7 @@ res_df <- as.data.frame(res)
 test <- res_df[order(res_df$pvalue),] 
 ```
 
-Now with metagenomeSeq.
+As a followup, looked at differential abundance using metagenomeSeq as well.
 
 ```{r}
 library(metagenomeSeq)
@@ -121,7 +120,7 @@ mod <- model.matrix(~1 + Diet, data = map_sub)
 amg_res <- fitFeatureModel(amg_obj, mod)
 ```
 
-plot AMG heatmap.
+Plot the distribution of AMGs across samples in a heatmap.
 
 ```{r}
 library(metagenomeSeq)
@@ -156,7 +155,6 @@ map_sub$few_cols <- as.character(map_sub$few_cols)
 map$TDN <- as.numeric(as.character(map$TDN))
 map$TDN <- gsub(78.5030, NA, map$TDN)
 map$TDN <- gsub(81.4325, NA, map$TDN)
-
 
 test <- ggplot(map, aes(TDN, reads, color=Diet, group=Diet)) + 
   geom_point(size=2, shape=15) +

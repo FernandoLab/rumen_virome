@@ -12,7 +12,7 @@ Two methods - distribution of protein clusters among samples (assembly-based app
 Calculate Bray-Curtis dissimilarity and plot NMDS.
 
 ```{r, engine='bash', results='hide'}
-python scripts/norm_pc.py 
+#python scripts/norm_pc.py 
 
 mv viral_pc_cluster_raw_abundance.txt viral_beta_div/viral_pc_cluster_raw_abundance.txt
 mv viral_pc_cluster_norm_abundance.txt viral_beta_div/viral_pc_cluster_norm_abundance.txt

@@ -1,4 +1,4 @@
-Analysis to recreate the Anderson et al. manuscript **"Digestible energy content drives the dynamic response of bovine rumen viral communities to dietary change"**.
+Analysis to recreate the Anderson et al. manuscript **"Dietary energy drives the dynamic response of bovine rumen viral communities to dietary perturbation"**.
 
 The analysis is separated into several RMarkdown files.
 
@@ -12,14 +12,13 @@ Generally, the markdown files rely on previously generate outputs, so rendering 
 	4. qc_deep_viral.Rmd
 	5. assembly_and_orfs.Rmd
 	6. map_reads.Rmd
-	7. annotation.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
-	8. abundance_tables.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
-	9. beta_div_viral.Rmd
-	10. beta_div_microbial.Rmd
-	11. circos_plots_viral.Rmd
-	12. circos_plots_microbial.Rmd
-	13. plsr.Rmd
-	14. enzyme_enrichment.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
+	7. protein_clusters.Rmd
+	8. alpha_diversity.Rmd
+	9. beta_div_microbial.Rmd
+	10. beta_div_viral.Rmd
+	11. plsr.Rmd
+	12. viral_groups.Rmd
+	13. virsorter.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
 
 Due to licensing issues, USEARCH can not be included in the setup. To obtain a download link, go to the USEARCH download page and select version USEARCH v8.0.1623 for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
 

@@ -5,6 +5,7 @@ output:
     keep_md: true
 ---
 
+Define vial groups based on contig similarity done via blast pairwise comparisons. Same approach as outlined in http://www.nature.com/ismej/journal/v9/n10/full/ismej201528a.html. First, need to get the abundance of deep viral and viral contigs.
 
 ```{r, engine="bash"}
 cat vmg.contigs.filter.fasta vmg.illumina.contigs.filter.fasta > vmg.ion_illumina.contigs.filter.fasta
@@ -25,6 +26,11 @@ do
   filename="${filename%_*}"
   bowtie2 -U $f --end-to-end --sensitive -p 10 -x vmg_ion_illumina_contigs_bowtie/vmg_ion_illumina_contigs_bowtie_db -S vmg_ion_illumina_contigs_bowtie/$filename.sam --un vmg_ion_illumina_contigs_bowtie/$filename.unaligned.txt --al vmg_ion_illumina_contigs_bowtie/$filename.aligned.txt
 done
+```
+
+Blast the contigs in all vs all blastn search and filter with script used in ISME paper above to define groups.
+
+```{r, engine="bash"}
 
 makeblastdb -in vmg.ion_illumina.contigs.filter.fasta -dbtype nucl -parse_seqids
 
@@ -32,15 +38,13 @@ blastn -db vmg.ion_illumina.contigs.filter.fasta -query vmg.ion_illumina.contigs
 
 python scripts/BLAST2Network.py --input_fn vmg.ion_illumina.contigs.filter.blastn.txt --output_fn blast2network.txt --evalue 1e-10 --num_inputs 470106 --membership_per_community --data_represented --contig_community_cutoff 5
 
-
-#will fail, have to call again to continue analysis
+# will fail, have to call again to continue analysis
 python scripts/BLAST2Network.py --input_fn vmg.ion_illumina.contigs.filter.blastn.txt --output_fn blast2network.txt --evalue 1e-10 --num_inputs 470106 --membership_per_community --data_represented --contig_community_cutoff 5
 
+# blast2network.txt-Partition-Contig-Sizes.tab tells number of contigs per group
+# blast2network.txt-Partition-Membership.tab tells the group ID of each contig
 
-#blast2network.txt-Partition-Contig-Sizes.tab tells number of contigs per group
-#blast2network.txt-Partition-Membership.tab tells the group ID of each contig
-
-#get the abundances of each contig from SAM files
+# get the abundances of each contig from SAM files
 for f in vmg_ion_illumina_contigs_bowtie/*.sam
 do
   filename=$(echo $f | cut -d. -f1)
@@ -52,10 +56,10 @@ do
   samtools idxstats $filename.sorted.bam | cut -f 1,3 | awk ' $2 > 0 ' >> $filename.contig_raw_abundance.txt
 done
 
-
 cat vmg_ion_illumina_contigs_bowtie/*contig_raw_abundance.txt > vmg_ion_illumina_contigs_bowtie/vmg_ion_illumina_contig_raw_abundance.txt
 ```
 
+Calculate some summary stats of the viral groups and filter out those groups with less than 5 contigs and representing less than 10,000 reads.
 
 ```{r}
 library(dplyr)
@@ -97,6 +101,8 @@ sum(mem5_ab10000$ab) / sum(contig_table_sub$ab) #0.7991689
 write.table(mem5_ab10000, file="blast2network.txt-Partition-Contig-Sizes-filter.tab", col.names=TRUE, row.names=FALSE, quote=FALSE, sep="\t")
 ```
 
+Get the abundance of viral groups across samples and subsequently identify which of the groups are "core". See manuscript for discussion regarding core viral groups.
+
 ```{r, engine="bash"}
 python scripts/get_viral_group_abundance.py
 
@@ -116,7 +122,6 @@ biom convert --table-type="OTU table" --to-tsv -i vmg_ion_illumina_contigs_bowti
 biom convert --table-type="OTU table" --to-tsv -i vmg_ion_illumina_contigs_bowtie/vmg_illumina.group_raw_abundance.biom -o vmg_ion_illumina_contigs_bowtie/vmg_illumina.group_raw_abundance.txt
 ```
 
-
 ```{r}
 group_ab <- read.table('vmg_ion_illumina_contigs_bowtie/vmg.group_raw_abundance.txt', header=TRUE, skip=1, comment.char="", row.names=1, sep="\t")
 core_group_ab <- group_ab[apply(group_ab[,-1], 1, function(x) all(x>10)),]
@@ -127,7 +132,7 @@ sum(colSums(core_group_ab)) / sum(contig_table_sub$ab) #0.06841433
 write.table(core_group_ab, file='core_viral_groups.txt', row.names=TRUE, col.names=NA, sep="\t")
 ```
 
-Cluster with RefSeq Genomes:
+Cluster viral groups with RefSeq Genomes to see how novel the rumen viral groups are compared to currently known viruses.
 
 ```{r, engine="bash"}
 wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/viral.1.1.genomic.fna.gz
@@ -146,13 +151,14 @@ blastn -db vmg.ion_illumina.contigs.filter.cat_refseq.fasta -query vmg.ion_illum
 
 python scripts/BLAST2Network.py --input_fn vmg.ion_illumina.contigs.filter.cat_refseq.blastn.txt --output_fn blast2network_refseq.txt --evalue 1e-10 --num_inputs 477551 --membership_per_community --data_represented --contig_community_cutoff 5
 
-#will fail, call again to jump start analysis
+# will fail, call again to jump start analysis
 python scripts/BLAST2Network.py --input_fn vmg.ion_illumina.contigs.filter.cat_refseq.blastn.txt --output_fn blast2network_refseq.txt --evalue 1e-10 --num_inputs 477551 --membership_per_community --data_represented --contig_community_cutoff 5
 
 python find_group_refviral.py 
 #20 groups
 ```
 
+Plot the abundance of viral groups across samples.
 
 ```{r}
 library(metagenomeSeq)
@@ -203,22 +209,4 @@ plotMRheatmap(obj = vgroups, norm=FALSE, log=TRUE, n = 406, trace = "none", col 
 grid::pushViewport(plotViewport())
 grid::grid.draw(g[[8]])
 dev.off()
-
-# mgs_cpm_log2 <- MRcounts(vgroups,norm=FALSE,log=TRUE,sl=1)
-# mgs_cpm_log2_cds <- subset(mgs_cpm_log2, select=c(V4,V10,V13))
-# mgs_cpm_log2_cs <- subset(mgs_cpm_log2, select=c(V5,V9,V11,V12))
-# 
-# mgs_cpm_log2_cds_medians <- rowMedians(mgs_cpm_log2_cds)
-# mgs_cpm_log2_cs_medians <- rowMedians(mgs_cpm_log2_cs)
-# 
-# mgs_cpm_log2_cds_means <- rowMeans(mgs_cpm_log2_cds)
-# mgs_cpm_log2_cs_means <- rowMeans(mgs_cpm_log2_cs)
-# 
-# mgs_cpm_log2_medians <- data.frame(cds=mgs_cpm_log2_cds_medians,cs=mgs_cpm_log2_cs_medians)
-# mgs_cpm_log2_means <- data.frame(cds=mgs_cpm_log2_cds_means,cs=mgs_cpm_log2_cs_means)
-# 
-# ggplot(mgs_cpm_log2_means, aes(x = cds, y = cs)) + 
-#   geom_point(size = 0.2) +
-#   labs(x = "Viral Groups 27CDS Median CPM", y = "Viral Groups 55CS Median CPM") + 
-#   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.text=element_text(size=4.0, color="black"), axis.title=element_text(size=5), axis.line.x = element_line(size = 0.3, linetype = "solid", colour = "black"), panel.border = element_blank(), axis.line.y = element_line(size = 0.3, linetype = "solid", colour = "black"), plot.title = element_text(size = 0.01), axis.ticks=element_line(size=0.3), legend.text=element_text(size=3.5), legend.key = element_blank(), legend.title = element_blank(), legend.key.size = unit(0.15, "cm"), legend.position = "none", legend.background = element_rect(fill=alpha('white', 0.0)))
 ```

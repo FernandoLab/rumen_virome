@@ -24,9 +24,7 @@ mv pc_rarefaction.txt microbial_pc_rarefaction_singletons.txt
 
 ```{r}
 library(ggplot2)
-#add to install setup, in CRAN
 library(sitools)
-#conda install -c kalefranz imagemagick=6.9.1
 
 rarefaction <- read.table('viral_pc_rarefaction.txt', header=FALSE, sep="\t")
 colnames(rarefaction) <- c('iteration', 'samples', 'pcs')
@@ -79,10 +77,6 @@ dev.off()
 ```
 
 ```{r, engine='bash'}
-#convert microbial_rarefaction_singletons.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_rarefaction_singletons_label.tiff 
-
-#convert viral_rarefaction_singletons.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_rarefaction_singletons_label.tiff 
-
 convert microbial_rarefaction.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "A" microbial_rarefaction_label.tiff 
 
 convert viral_rarefaction.tiff -compress lzw -density 600 -font Arial-Bold -pointsize 10 -gravity northwest -annotate +30+0 "B" viral_rarefaction_label.tiff 
@@ -93,13 +87,13 @@ convert rarefaction.tiff rarefaction.eps
 ```
 
 ```{r, engine='bash'}
-#even
+# even
 biom convert --table-type "OTU table" -i viral_ion_illumina_pc_cluster_raw_abundance.txt -o viral_ion_illumina_pc_cluster_raw_abundance.biom --to-json
 multiple_rarefactions_even_depth.py -i viral_ion_illumina_pc_cluster_raw_abundance.biom -n 100 -d 192998 -o viral_mult_even
 alpha_diversity.py -i viral_mult_even/ -o viral_alpha_even -m shannon
 collate_alpha.py -i viral_alpha_even -o viral_alpha_even_collate
 
-#not_even
+# not_even
 multiple_rarefactions.py -i viral_ion_illumina_pc_cluster_raw_abundance.biom -o viral_alpha_rare -m 10000 -s 10000 -n 10  -x 200000
 alpha_diversity.py -i viral_alpha_rare/ -o viral_alpha_rare_shannon -m shannon
 collate_alpha.py -i viral_alpha_rare_shannon/ -o viral_alpha_rare_shannon_collate
@@ -107,20 +101,22 @@ mv viral_alpha_rare_shannon_collate/shannon.txt viral_alpha_rare_shannon_collate
 cut -f 1,2,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18 viral_alpha_rare_shannon_collate/shannon2.txt > viral_alpha_rare_shannon_collate/shannon.txt
 rm viral_alpha_rare_shannon_collate/shannon2.txt
 make_rarefaction_plots.py -i viral_alpha_rare_shannon_collate/ -m viral_mapping.txt -e stderr --generate_per_sample_plots -w -o viral_alpha_rare_collate_plot
-#manually copy html table into file viral_alpha_rare_collate_plot.txt
 
-#even
+# manually copy html table into file viral_alpha_rare_collate_plot.txt
+
+# even
 biom convert --table-type "OTU table" -i microbial_pc_cluster_raw_abundance.txt -o microbial_pc_cluster_raw_abundance.biom --to-json
 multiple_rarefactions_even_depth.py -i microbial_pc_cluster_raw_abundance.biom -n 100 -d 195078 -o microbial_mult_even
 alpha_diversity.py -i microbial_mult_even/ -o microbial_alpha_even -m shannon
 collate_alpha.py -i microbial_alpha_even -o microbial_alpha_even_collate
 
-#not_even
+# not_even
 multiple_rarefactions.py -i microbial_pc_cluster_raw_abundance.biom -o microbial_alpha_rare -m 10000 -s 10000 -n 10 -x 200000
 alpha_diversity.py -i microbial_alpha_rare/ -o microbial_alpha_rare_shannon -m shannon
 collate_alpha.py -i microbial_alpha_rare_shannon/ -o microbial_alpha_rare_shannon_collate
 make_rarefaction_plots.py -i microbial_alpha_rare_shannon_collate/ -m microbial_mapping.txt -e stderr --generate_per_sample_plots -w -o microbial_alpha_rare_collate_plot
-#manually copy html table into file microbial_alpha_rare_collate_plot.txt
+
+# manually copy html table into file microbial_alpha_rare_collate_plot.txt
 ```
 
 Plot rarefaction curves and alpha diversity metrics at an even depth.
@@ -132,7 +128,7 @@ library(plyr)
 library(ggthemes)
 library(sitools)
 
-#viral even
+# viral even
 viral_even <- read.table('viral_alpha_even_collate/shannon.txt', header=TRUE, sep='\t')
 viral_even <- subset(viral_even, select=-c(V4_illumina, V9_illumina, V10_illumina, V11_illumina, V12_illumina, V13_illumina, X, sequences.per.sample, iteration))
 viral_even_matrix <- as.matrix(viral_even)
@@ -179,7 +175,7 @@ ggplot(viral_mapping_even, aes(x = Diet, y = DivMeans)) +
 dev.off()
 
 
-#microbial even
+# microbial even
 microbial_even <- read.table('microbial_alpha_even_collate/shannon.txt', header=TRUE, sep='\t')
 microbial_even <- subset(microbial_even, select=-c(X, sequences.per.sample, iteration))
 microbial_even_matrix <- as.matrix(microbial_even)
@@ -224,8 +220,8 @@ ggplot(microbial_mapping_even, aes(x = Diet, y = DivMeans)) +
   scale_y_continuous(limits=c(9,16))
 dev.off() 
 
-#viral rarefaction
-viral_rare <- read.table('viral_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
+# viral rarefaction
+viral_rare <- read.table('intermediate_results/viral_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
 
 pd <- position_dodge(width = 300)
 shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))
@@ -243,8 +239,8 @@ ggplot(viral_rare, aes(x = Seqs.Sample, y = shannon.Ave., colour = Diet, group =
 dev.off()
 
 
-#microbial rarefaction
-microbial_rare <- read.table('microbial_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
+# microbial rarefaction
+microbial_rare <- read.table('intermediate_results/microbial_alpha_rare_collate_plot.txt', header=TRUE, sep='\t')
 
 pd <- position_dodge(width = 300)
 shannons <- expression(paste("Shannon's Diversity (", italic("H'"), ")"))

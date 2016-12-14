@@ -99,6 +99,9 @@ make openmp=yes
 cd ..
 chmod 775 -R cd-hit-v4.6.1-2012-08-27
 
+#imagemagick
+conda install -c kalefranz imagemagick=6.9.1
+
 # R packages
 printf "\nInstallling R packages, will take some time...\n"
 R CMD BATCH scripts/install_pack.R
