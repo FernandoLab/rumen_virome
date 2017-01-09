@@ -4,7 +4,7 @@ The analysis is separated into several RMarkdown files.
 
 You can setup the same environment used to analyze the data and render the markdown files using the instructions below.
 
-Generally, the markdown files rely on previously generate outputs, so rendering in this order likely matters.
+Generally, the markdown files rely on previously generated outputs, so rendering in this order likely matters.
 
 	1. data_curation.Rmd
 	2. qc_viral.Rmd
@@ -20,7 +20,7 @@ Generally, the markdown files rely on previously generate outputs, so rendering 
 	12. viral_groups.Rmd
 	13. virsorter.Rmd (due to KEGG licensing, not fully reproducible but outputs available in intermediate_results directory)
 
-Due to licensing issues, USEARCH can not be included in the setup. To obtain a download link, go to the USEARCH download page and select version USEARCH v8.0.1623 for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
+Due to licensing issues, USEARCH can not be included in the setup. In the future will switch to VSEARCH and see if identical results are produced. In the mean time, to obtain a download link, go to the USEARCH download page and select version USEARCH v8.0.1623 for linux. A link (expires after 30 days) will be sent to the provided email. Use the link as an argument for shell script below.
 
 Clone the github repository and run the setup.sh script (provide the link to download your licensed USEARCH v8.0.1623 as an argument):
 
