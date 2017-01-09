@@ -1,4 +1,4 @@
-Analysis to recreate the Anderson et al. manuscript **"Dietary energy drives the dynamic response of bovine rumen viral communities to dietary perturbation"**.
+Analysis to recreate the Anderson et al. manuscript **"Dietary energy drives the dynamic response of bovine rumen viral communities"**.
 
 The analysis is separated into several RMarkdown files.
 
